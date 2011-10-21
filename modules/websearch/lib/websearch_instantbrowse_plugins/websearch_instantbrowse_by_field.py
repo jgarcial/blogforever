@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 
 ## This file is part of Invenio.
+<<<<<<< HEAD
 ## Copyright (C) 2011, 2012, 2013 CERN.
+=======
+## Copyright (C) 2011 CERN.
+>>>>>>> WebSearch: configurable latest additions list generator
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -23,24 +27,35 @@ from invenio.search_engine import sort_records
 from invenio.config import CFG_SITE_LANG
 
 def websearch_instantbrowse_by_field(reclist, \
-                                     sf="", so="d"):
+                                     field="", order="d", \
+                                     pattern="", verbose=0, of="hb", \
+                                     ln=CFG_SITE_LANG):
     """
     Plugin used to sort and list
     records by a given field.
     @param reclist: HitSet of recIDs
     @type reclist: HitSet
-    @param sf: field code (E.g.: "author")
+    @param field: field code (E.g.: "author")
     or MARC tag (E.g.: "100__a")
-    More examples:
-    field code: "title" or MARC tag: "245__a"
-    field code: "posted date" or MARC tag: "269__c" (used to display Posts collection)
-    @type sf: string
-    @param so: order for listing records
+    @type field: string
+    @param order: order for listing records
     ("a"=ascending, "d"=descending)
-    @type so: string
-    @return: sorted list of recIDs according to the selected plugin
-    @rtype: list
+    @type order: string
+    @param pattern: pattern to search for
+    (E.g.: "ellis")
+    @type pattern: string
+    @param verbose: verbose level (0=min, 9=max)
+    @type verbose: Useful to print some
+    internal information on the searching process
+    in case something goes wrong.
+    @param of: output format (E.g.: "hb")
+    @type of: string
+    @param ln: language (E.g.: "en")
+    @type ln: string
+    @return: sorted list of recIDs and output format
+    @rtype: tuple(list, string)
     """
 
-    recIDs = sort_records(None, reclist, sort_field=sf, sort_order=so)
-    return recIDs
+    recIDs = sort_records(None, list(reclist), field, order, \
+                          pattern, verbose, of, ln)
+    return (recIDs, 'hb')

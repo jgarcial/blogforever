@@ -28,6 +28,8 @@ import os
 import string
 import time
 import cPickle
+import json
+import os
 
 from invenio.config import \
      CFG_CERN_SITE, \
@@ -83,6 +85,11 @@ CFG_CACHE_LAST_UPDATED_TIMESTAMP_FILE = "%s/collections/last_updated" % CFG_CACH
 # CFG_CACHE_LAST_FAST_UPDATED_TIMESTAMP_FILE -- location of the cache
 # timestamp file usef when running webcoll in the fast-mode.
 CFG_CACHE_LAST_FAST_UPDATED_TIMESTAMP_FILE = "%s/collections/last_fast_updated" % CFG_CACHEDIR
+
+# plugin container used to display
+# latest additions for collections
+instantbrowse_plugins_container = PluginContainer\
+        (os.path.join(CFG_PYLIBDIR, 'invenio', 'websearch_instantbrowse_plugins', 'websearch_*.py'))
 
 
 def get_collection(colname):
@@ -403,56 +410,24 @@ class Collection:
         Create info about latest additions that will be used for
         create_instant_browse() later.
         """
+
         self.latest_additions_info = []
         if self.nbrecs and self.reclist:
-            # firstly, get last 'rg' records:
-            recIDs = list(self.reclist)
-            of = 'hb'
-            # CERN hack begins: tweak latest additions for selected collections:
-            if CFG_CERN_SITE:
-                # alter recIDs list for some CERN collections:
-                this_year = time.strftime("%Y", time.localtime())
-                if self.name in ['CERN Yellow Reports','Videos']:
-                    last_year = str(int(this_year) - 1)
-                    # detect recIDs only from this and past year:
-                    recIDs = list(self.reclist & \
-                                  search_pattern_parenthesised(p='year:%s or year:%s' % \
-                                                 (this_year, last_year)))
-                elif self.name in ['VideosXXX']:
-                    # detect recIDs only from this year:
-                    recIDs = list(self.reclist & \
-                                  search_pattern_parenthesised(p='year:%s' % this_year))
-                elif self.name == 'CMS Physics Analysis Summaries' and \
-                         1281585 in self.reclist:
-                    # REALLY, REALLY temporary hack
-                    recIDs = list(self.reclist)
-                    recIDs.remove(1281585)
-                # apply special filters:
-                if self.name in ['Videos']:
-                    # select only videos with movies:
-                    recIDs = list(intbitset(recIDs) & \
-                                  search_pattern_parenthesised(p='collection:"PUBLVIDEOMOVIE"'))
-                    of = 'hvp'
-                # sort some CERN collections specially:
-                if self.name in ['Videos',
-                                 'Video Clips',
-                                 'Video Movies',
-                                 'Video News',
-                                 'Video Rushes',
-                                 'Webcast',
-                                 'ATLAS Videos',
-                                 'Restricted Video Movies',
-                                 'Restricted Video Rushes',
-                                 'LHC First Beam Videos',
-                                 'CERN openlab Videos']:
-                    recIDs = sort_records(None, recIDs, '269__c')
-                elif self.name in ['LHCb Talks']:
-                    recIDs = sort_records(None, recIDs, 'reportnumber')
-            # CERN hack ends.
+            instantbrowse_plugin = instantbrowse_manager.get_instantbrowse_plugin(self.id)
+            if instantbrowse_plugin:
+                plugin = instantbrowse_plugins_container.get_plugin(instantbrowse_plugin[0])
+                params = instantbrowse_plugin[1]
+                # run the corresponding plugin
+                if params:
+                    recIDs, of = plugin(reclist=self.reclist, **json.loads(params))
+                else:
+                    recIDs, of = plugin(reclist=self.reclist)
+            else: # by default
+                recIDs = list(self.reclist)
+                of = "hb"
 
             total = len(recIDs)
             to_display = min(rg, total)
-
             for idx in range(total-1, total-to_display-1, -1):
                 recid = recIDs[idx]
                 self.latest_additions_info.append({'id': recid,

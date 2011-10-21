@@ -19,7 +19,9 @@ pylibdir=$(libdir)/python/invenio/websearch_instantbrowse_plugins
 
 pylib_DATA = __init__.py \
              websearch_instantbrowse_by_field.py \
+             websearch_instantbrowse_videos.py \
              websearch_instantbrowse_by_number_of_years.py \
+             websearch_instantbrowse_cms_pas.py \
              websearch_instantbrowse_return_empty.py
 
 EXTRA_DIST = $(pylib_DATA)

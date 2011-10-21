@@ -19,12 +19,19 @@
 
 __revision__ = "$Id$"
 
-import string
+from invenio.search_engine import search_pattern_parenthesised
+from intbitset import intbitset
 
-def websearch_instantbrowse_return_empty(reclist):
+def websearch_instantbrowse_videos(reclist):
     """
-    Plugin used to not display latest additions
-    for given collection.
+    Plugin used to list
+    only videos that contain movies.
+    @param reclist: HitSet of recIDs
+    @type reclist: HitSet
+    @return: list of recIDs and output format
+    @rtype: tuple(list, string)
     """
 
-    return ([], None)
+    recIDs = list(intbitset(list(reclist)) & \
+                    search_pattern_parenthesised(p='collection:"PUBLVIDEOMOVIE"'))
+    return (recIDs, 'hvp')
