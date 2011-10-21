@@ -26,6 +26,11 @@ import random
 import time
 import sys
 from invenio.dateutils import strftime
+import string
+import os
+import re
+import json
+
 
 if sys.hexversion < 0x2040000:
     # pylint: disable=W0622
@@ -76,6 +81,10 @@ from invenio.errorlib import register_exception
 from invenio.intbitset import intbitset
 from invenio.bibrank_citation_searcher import get_cited_by_count
 from invenio.bibrecord import record_get_field_instances
+from invenio.pluginutils import PluginContainer, get_callable_documentation, \
+        get_callable_signature_as_string
+from invenio.config import CFG_PYLIBDIR
+
 
 def getnavtrail(previous = ''):
     """Get the navtrail"""
@@ -108,7 +117,7 @@ def perform_modifytranslations(colID, ln, sel_type='', trans=[], confirm=-1, cal
 
     if colID and col_dict.has_key(int(colID)):
         colID = int(colID)
-        subtitle = """<a name="3">3. Modify translations for collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a href="%s/help/admin/websearch-admin-guide#3.3">?</a>]</small>""" % (col_dict[colID], CFG_SITE_URL)
+        subtitle = """<br /><a name="3">3. Modify translations for collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a href="%s/help/admin/websearch-admin-guide#3.3">?</a>]</small>""" % (col_dict[colID], CFG_SITE_URL)
 
         if sel_type == '':
             sel_type = get_col_nametypes()[0][0]
@@ -186,7 +195,7 @@ def perform_modifyrankmethods(colID, ln, func='', rnkID='', confirm=0, callback=
         elif func in ["1", 1] and confirm in ["1", 1]:
             finresult = detach_rnk_col(colID, rnkID)
 
-        subtitle = """<a name="9">9. Modify rank options for collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.9">?</a>]</small>""" % (col_dict[colID], CFG_SITE_URL)
+        subtitle = """<br /><a name="9">9. Modify rank options for collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.9">?</a>]</small>""" % (col_dict[colID], CFG_SITE_URL)
         output  = """
         <dl>
         <dt>The rank methods enabled for the collection '%s' is:</dt>
@@ -268,7 +277,7 @@ def perform_addcollectiontotree(colID, ln, add_dad='', add_son='', rtype='', mty
 
     output = ""
     output2 = ""
-    subtitle = """Attach collection to tree&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#2.2">?</a>]</small>""" % (CFG_SITE_URL)
+    subtitle = """<br />Attach collection to tree&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#2.2">?</a>]</small>""" % (CFG_SITE_URL)
 
     col_dict = dict(get_def_name('', "collection"))
     if confirm not in [-1, "-1"] and not (add_son and add_dad and rtype):
@@ -350,7 +359,7 @@ def perform_addcollection(colID, ln, colNAME='', dbquery='', callback="yes", con
     dbquery - the dbquery of the new collection"""
 
     output = ""
-    subtitle = """Create new collection&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#2.1">?</a>]</small>""" % (CFG_SITE_URL)
+    subtitle = """<br />Create new collection&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#2.1">?</a>]</small>""" % (CFG_SITE_URL)
     text = """
     <span class="adminlabel">Default name</span>
     <input class="admin_w200" type="text" name="colNAME" value="%s" /><br />
@@ -386,7 +395,7 @@ def perform_modifydbquery(colID, ln, dbquery='', callback='yes', confirm=-1):
     col_dict = dict(get_def_name('', "collection"))
     if colID and col_dict.has_key(int(colID)):
         colID = int(colID)
-        subtitle = """<a name="1">1. Modify collection query for collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.1">?</a>]</small>""" % (col_dict[colID], CFG_SITE_URL)
+        subtitle = """<br /><a name="1">1. Modify collection query for collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.1">?</a>]</small>""" % (col_dict[colID], CFG_SITE_URL)
 
         if confirm == -1:
             res = run_sql("SELECT dbquery FROM collection WHERE id=%s" % colID)
@@ -446,7 +455,7 @@ def perform_modifycollectiontree(colID, ln, move_up='', move_down='', move_from=
     tree = get_col_tree(colID, rtype)
     col_dict = dict(get_def_name('', "collection"))
 
-    subtitle = """Modify collection tree: %s&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#2.3">?</a>]&nbsp;&nbsp;&nbsp;<a href="%s/admin/websearch/websearchadmin.py/showtree?colID=%s&amp;ln=%s">Printer friendly version</a></small>""" % (col_dict[colID], CFG_SITE_URL, CFG_SITE_URL, colID, ln)
+    subtitle = """<br />Modify collection tree: %s&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#2.3">?</a>]&nbsp;&nbsp;&nbsp;<a href="%s/admin/websearch/websearchadmin.py/showtree?colID=%s&amp;ln=%s">Printer friendly version</a></small>""" % (col_dict[colID], CFG_SITE_URL, CFG_SITE_URL, colID, ln)
     fin_output = ""
     output = ""
 
@@ -593,11 +602,193 @@ def perform_modifycollectiontree(colID, ln, move_up='', move_down='', move_from=
     else:
         return addadminbox(subtitle, body)
 
+def _build_parameters_examples_for_plugins(plugin_names, instantbrowse_plugins_container):
+    """
+    Function to format the optional parameters of each
+    plugin and to build an example about how the admin
+    should provide them.
+    @param plugin_names: list of available plugin names
+    used to list the latest additions for each collection
+    @type plugin_names: list of strings
+    @param instantbrowse_plugins_container: container of
+    available plugins used to list the latest additions
+    for each collection
+    @type instantbrowse_plugins_container: container
+    @return: dictionary of pairs (plugin_name, parameters_example)
+    @rtype: dictionary
+    """
+
+    parameters_examples_for_plugins = {}
+    for pl in plugin_names:
+        plugin_callable = instantbrowse_plugins_container.get_plugin(pl)
+        plugin_header = get_callable_signature_as_string(plugin_callable)
+        # extract parameters between brackets
+        parameters = string.split(re.search('\((.*?)\)', plugin_header).group(1), ",")
+        # split each parameter in name and its default value
+        parameters_names_and_values = [string.split(param, "=") for param in parameters if string.find(param, "=") > 0]
+        if parameters_names_and_values:
+            parameters_example = "E.g.: {"
+            for param in parameters_names_and_values:
+                # json is defined to recognize only IDs with quotation marks (")
+                key = '"%s"' % param[0][1:] # starts with a white space, so let's skip it
+                if param[1] == "''":
+                    value = '""'
+                else:
+                    value = '"%s"' % param[1].replace('\'','')
+                pair = key + ": " + value
+                if parameters_names_and_values.index(param) < (len(parameters_names_and_values) - 1):
+                    pair += ", "
+                parameters_example += pair
+            parameters_example += "}"
+            parameters_examples_for_plugins.update({pl:parameters_example})
+        else:
+            parameters_examples_for_plugins.update({pl:"No parameters needed for this plugin."})
+
+    return parameters_examples_for_plugins
+
+def _build_documentation_for_plugins(plugin_names, instantbrowse_plugins_container):
+    """
+    Function to obtain the documentation for each
+    available plugin.
+    @param plugin_names: list of available plugin names
+    used to list the latest additions for each collection
+    @type plugin_names: list of strings
+    @param instantbrowse_plugins_container: container of
+    available plugins used to list the latest additions
+    for each collection
+    @type instantbrowse_plugins_container: container
+    @return: dictionary of pairs (plugin_name, documentation)
+    @rtype: dictionary
+    """
+
+    plugins_documentation = {}
+    for pl in plugin_names:
+        plugin_callable = instantbrowse_plugins_container.get_plugin(pl)
+        plugin_documentation = get_callable_documentation(plugin_callable)
+        plugins_documentation.update({pl:plugin_documentation})
+    return plugins_documentation
+
+def perform_instantbrowseoptions(colID, ln=CFG_SITE_LANG, select_plugin="", params="", callback='yes', confirm=0):
+    """
+    Permit administrators to decide which plugin will be
+    used for which collection to list its latest additions.
+    Admin can also provide valid optional parameters to run
+    the selected plugin.
+    @param colID: collection ID
+    @type colID: int
+    @param ln: language
+    @type ln: string
+    @param select_plugin: plugin that will be run to list
+    the latest additions for the corresponding collection
+    @type select_plugin: string
+    @param params: optional parameters provided by the admin
+    @type params: string
+    """
+
+    output = ""
+    output_messages = ""
+    colID = int(colID)
+    coll_dict = dict(get_def_name('', "collection"))
+    if colID and coll_dict.has_key(colID):
+        if confirm in ["1", 1]:
+            output_messages += """<b><span style="padding-left:12px;" class="info">Operation successfully completed. <br /></span></b>"""
+            output_messages += """<b><span style="padding-left:12px;" class="info">Plugin '%s' will be \
+                                        used to list latest additions for collection '%s'.</span></b>""" % \
+                                                (select_plugin, coll_dict[colID])
+            from invenio.websearch_instantbrowse import instantbrowse_manager
+            instantbrowse_manager.set_instantbrowse_plugin(colID, select_plugin, params)
+
+        if confirm in ["-1", -1]:
+            if not select_plugin:
+                output_messages += """<b><span style="padding-left:12px;" class="warning">Please select a plugin. <br/></span></b>"""
+            if params == None:
+                output_messages += """<b><span style="padding-left:12px;" class="warning">Please type parameters in the \
+                                            format indicated above.</span></b>"""
+
+        subtitle = """<br/><a name="13">13. Set instant browse plugin for collection '%s'</a>\
+                        &nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.13">?</a>]</small>""" % \
+                            (coll_dict[colID], CFG_SITE_URL)
+        text = """
+                <table>
+                  <tr>
+                    <td style="padding-right:500px;"></td>
+                    <td style="padding-top:10px;"><span class="adminlabel">Plugin documentation:</span></td>
+                  </tr>
+                  <tr>
+                    <td style="padding-top:29px;">
+                      <table>
+                        <tr>
+                          <td style="padding-left:7px;padding-right:9px;"><span class="adminlabel">Instant browse plugin:</span></td>
+                          <td> <select class="admin_w200" name="select_plugin" id="select_plugin" \
+                                  onchange="javascript:updateExampleandDocumentation();">
+                                <option value="" selected="selected" or "">- select plugin -</option>
+                """
+
+        instantbrowse_plugins_container = PluginContainer\
+                    (os.path.join(CFG_PYLIBDIR, 'invenio', 'websearch_instantbrowse_plugins', 'websearch_*.py'))
+        plugin_names = instantbrowse_plugins_container.keys()
+        for pl in plugin_names:
+            pl = string.replace(pl, "websearch_", "")
+            text += """<option value="%s">%s</option>""" % (pl, pl)
+
+        text += """</select></td></tr></table></td>"""
+
+        text += """ <td rowspan="5"><div align="center" style="width:600px; height:250px; \
+                      border: solid thin black; overflow-y: auto; overflow-x: auto;"><pre id="documentation"></pre></div></td></tr>
+                    <tr>
+                      <td style="padding-left:10px;padding-top:5px;"><span class="adminlabel">\
+                          Introduce optional parameters to run the selected plugin:</span></td></tr>
+                    <tr>
+                      <td style="padding-left:10px;"><textarea style="width: 405px; height: 60px; margin-left:0px;" \
+                          class="admin_w200" name="params"></textarea></td></tr>
+                    <tr>
+                      <td style="padding-bottom:20px;color:#A4A4A4;padding-left:10px;">
+                          <span name="example" id="example" \
+                            class="adminlabel"></span></td></tr><tr>"""
+
+        # build examples about how provide optional parameters for all available plugins
+        examples_for_plugins_parameters = json.dumps(_build_parameters_examples_for_plugins(plugin_names, \
+                                                                                            instantbrowse_plugins_container))
+        # extract the documentation for all available plugins
+        plugins_documentation = json.dumps(_build_documentation_for_plugins(plugin_names, \
+                                                                            instantbrowse_plugins_container))
+        text += """
+                  <script type='text/javascript'>
+                      function updateExampleandDocumentation(){
+                         var plugin = document.getElementById("select_plugin").value;
+                         var examples_for_plugins_parameters = %s;
+                         var plugins_documentation = %s;
+                         if (examples_for_plugins_parameters["websearch_" + plugin] == undefined){
+                             document.getElementById("example").innerHTML = "";
+                             document.getElementById("documentation").innerHTML = "";}
+                         else{
+                             document.getElementById("example").innerHTML = examples_for_plugins_parameters["websearch_" + plugin];
+                             document.getElementById("documentation").innerHTML = plugins_documentation["websearch_" + plugin]}
+                  }
+                      updateExampleandDocumentation();
+                  </script>
+                """ % (examples_for_plugins_parameters, plugins_documentation)
+
+        output += createhiddenform(action="instantbrowseoptions#13",
+                                   text=text,
+                                   button="Set plugin",
+                                   button_style="vertical-align: top",
+                                   colID=colID,
+                                   ln=ln,
+                                   confirm=1)
+        output += """</tr></table><br />"""
+        output += output_messages
+        body = [output]
+        if callback:
+            return perform_editcollection(colID, ln, mtype="perform_instantbrowseoptions", content=addadminbox(subtitle, body))
+        else:
+            return addadminbox(subtitle, body)
+
 def perform_showtree(colID, ln):
     """create collection tree/hiarchy"""
 
     col_dict = dict(get_def_name('', "collection"))
-    subtitle = "Collection tree: %s" % col_dict[int(colID)]
+    subtitle = "<br />Collection tree: %s" % col_dict[int(colID)]
     output = """<table border ="0" width="100%">
     <tr><td width="50%">
     <b>Narrow by collection:</b>
@@ -627,7 +818,7 @@ def perform_addportalbox(colID, ln, title='', body='', callback='yes', confirm=-
 
     col_dict = dict(get_def_name('', "collection"))
     colID = int(colID)
-    subtitle = """<a name="5.1"></a>Create new portalbox"""
+    subtitle = """<br /><a name="5.1"></a>Create new portalbox"""
     text = """
     <span class="adminlabel">Title</span>
     <textarea cols="50" rows="1" class="admin_wvar" type="text" name="title">%s</textarea><br />
@@ -662,7 +853,7 @@ def perform_addexistingportalbox(colID, ln, pbxID=-1, score=0, position='', sel_
     position - the position of the portalbox on the page
     sel_ln - the language of the portalbox"""
 
-    subtitle = """<a name="5.2"></a>Add existing portalbox to collection"""
+    subtitle = """<br /><a name="5.2"></a>Add existing portalbox to collection"""
     output  = ""
 
     colID = int(colID)
@@ -732,7 +923,7 @@ def perform_deleteportalbox(colID, ln, pbxID=-1, callback='yes', confirm=-1):
     colID - the current collection.
     pbxID - the id of the portalbox"""
 
-    subtitle = """<a name="5.3"></a>Delete an unused portalbox"""
+    subtitle = """<br /><a name="5.3"></a>Delete an unused portalbox"""
     output  = ""
 
     colID = int(colID)
@@ -804,7 +995,7 @@ def perform_modifyportalbox(colID, ln, pbxID=-1, score='', position='', sel_ln='
 
     if pbxID not in [-1, "-1"]:
         pbxID = int(pbxID)
-        subtitle = """<a name="5.4"></a>Modify portalbox '%s' for this collection""" % pbx_dict[pbxID]
+        subtitle = """<br /><a name="5.4"></a>Modify portalbox '%s' for this collection""" % pbx_dict[pbxID]
         col_pbx = get_col_pbx(colID)
         if not (score and position) and not (body and title):
             for (id_pbx, id_collection, tln, score, position, title, body) in col_pbx:
@@ -894,7 +1085,7 @@ def perform_showportalboxes(colID, ln, callback='yes', content='', confirm=-1):
     colID = int(colID)
     col_dict = dict(get_def_name('', "collection"))
 
-    subtitle = """<a name="5">5. Modify portalboxes for collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.5">?</a>]</small>""" % (col_dict[colID], CFG_SITE_URL)
+    subtitle = """<br /><a name="5">5. Modify portalboxes for collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.5">?</a>]</small>""" % (col_dict[colID], CFG_SITE_URL)
     output  = ""
     pos = get_pbx_pos()
 
@@ -955,7 +1146,7 @@ def perform_removeportalbox(colID, ln, pbxID='', sel_ln='', callback='yes', conf
     sel_ln - remove the portalbox with this language
     pbxID - remove the portalbox with this id"""
 
-    subtitle = """<a name="5.5"></a>Remove portalbox"""
+    subtitle = """<br /><a name="5.5"></a>Remove portalbox"""
     output  = ""
 
     col_dict = dict(get_def_name('', "collection"))
@@ -1030,7 +1221,7 @@ def perform_addnewfieldvalue(colID, fldID, ln, name='', value='', callback="yes"
     """
 
     output = ""
-    subtitle = """<a name="7.4"></a>Add new value"""
+    subtitle = """<br /><a name="7.4"></a>Add new value"""
     text = """
     <span class="adminlabel">Display name</span>
     <input class="admin_w200" type="text" name="name" value="%s" /><br />
@@ -1070,7 +1261,7 @@ def perform_modifyfieldvalue(colID, fldID, fldvID, ln, name='', value='', callba
         res = get_fld_value(fldvID)
         (id, name, value) = res[0]
     output = ""
-    subtitle = """<a name="7.4"></a>Modify existing value"""
+    subtitle = """<br /><a name="7.4"></a>Modify existing value"""
 
     output = """<dl>
      <dt><b><span class="info">Warning: Modifications done below will also inflict on all places the modified data is used.</span></b></dt>
@@ -1131,7 +1322,7 @@ def perform_removefield(colID, ln, fldID='', fldvID='', fmeth='', callback='yes'
     else:
         field = "field"
 
-    subtitle = """<a name="6.4"><a name="7.4"><a name="8.4"></a>Remove %s""" % field
+    subtitle = """<br /><a name="6.4"><a name="7.4"><a name="8.4"></a>Remove %s""" % field
     output  = ""
     col_dict = dict(get_def_name('', "collection"))
     fld_dict = dict(get_def_name('', "field"))
@@ -1175,7 +1366,7 @@ def perform_removefieldvalue(colID, ln, fldID='', fldvID='', fmeth='', callback=
     sel_ln - remove the field with this language
     fldID - remove the field with this id"""
 
-    subtitle = """<a name="7.4"></a>Remove value"""
+    subtitle = """<br /><a name="7.4"></a>Remove value"""
     output  = ""
 
     col_dict = dict(get_def_name('', "collection"))
@@ -1271,7 +1462,7 @@ def perform_addexistingfieldvalue(colID, fldID, fldvID=-1, ln=CFG_SITE_LANG, cal
     fldID - the field to add the fieldvalue to
     fldvID - the fieldvalue to add"""
 
-    subtitle = """</a><a name="7.4"></a>Add existing value to search option"""
+    subtitle = """<br /></a><a name="7.4"></a>Add existing value to search option"""
     output  = ""
 
     if fldvID not in [-1, "-1"] and confirm in [1, "1"]:
@@ -1324,7 +1515,7 @@ def perform_addexistingfield(colID, ln, fldID=-1, fldvID=-1, fmeth='', callback=
     fldID - the field to add
     sel_ln - the language of the field"""
 
-    subtitle = """<a name="6.2"></a><a name="7.2"></a><a name="8.2"></a>Add existing field to collection"""
+    subtitle = """<br /><a name="6.2"></a><a name="7.2"></a><a name="8.2"></a>Add existing field to collection"""
     output  = ""
 
     if fldID not in [-1, "-1"] and confirm in [1, "1"]:
@@ -1386,7 +1577,7 @@ def perform_showsortoptions(colID, ln, callback='yes', content='', confirm=-1):
     fld_dict = dict(get_def_name('', "field"))
     fld_type = get_sort_nametypes()
 
-    subtitle = """<a name="8">8. Modify sort options for collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.8">?</a>]</small>""" % (col_dict[colID], CFG_SITE_URL)
+    subtitle = """<br /><a name="8">8. Modify sort options for collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.8">?</a>]</small>""" % (col_dict[colID], CFG_SITE_URL)
     output = """<dl>
      <dt>Field actions (not related to this collection)</dt>
      <dd>Go to the BibIndex interface to modify the available sort options</dd>
@@ -1447,7 +1638,7 @@ def perform_showsearchfields(colID, ln, callback='yes', content='', confirm=-1):
     fld_dict = dict(get_def_name('', "field"))
     fld_type = get_sort_nametypes()
 
-    subtitle = """<a name="6">6. Modify search fields for collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.6">?</a>]</small>""" % (col_dict[colID], CFG_SITE_URL)
+    subtitle = """<br /><a name="6">6. Modify search fields for collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.6">?</a>]</small>""" % (col_dict[colID], CFG_SITE_URL)
     output = """<dl>
      <dt>Field actions (not related to this collection)</dt>
      <dd>Go to the BibIndex interface to modify the available search fields</dd>
@@ -1508,7 +1699,7 @@ def perform_showsearchoptions(colID, ln, callback='yes', content='', confirm=-1)
     fld_dict = dict(get_def_name('', "field"))
     fld_type = get_sort_nametypes()
 
-    subtitle = """<a name="7">7. Modify search options for collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.7">?</a>]</small>""" % (col_dict[colID], CFG_SITE_URL)
+    subtitle = """<br /><a name="7">7. Modify search options for collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.7">?</a>]</small>""" % (col_dict[colID], CFG_SITE_URL)
     output = """<dl>
      <dt>Field actions (not related to this collection)</dt>
      <dd>Go to the BibIndex interface to modify the available search options</dd>
@@ -1571,7 +1762,7 @@ def perform_modifyfield(colID, fldID, fldvID='', ln=CFG_SITE_LANG, content='', c
     fld_type = get_sort_nametypes()
     fldID = int(fldID)
 
-    subtitle = """<a name="7.3">Modify values for field '%s'</a>""" % (fld_dict[fldID])
+    subtitle = """<br /><a name="7.3">Modify values for field '%s'</a>""" % (fld_dict[fldID])
     output = """<dl>
      <dt>Value specific actions
      <dd><a href="addexistingfieldvalue?colID=%s&amp;ln=%s&amp;fldID=%s#7.4">Add existing value to search option</a></dd>
@@ -1631,7 +1822,7 @@ def perform_showoutputformats(colID, ln, callback='yes', content='', confirm=-1)
     colID = int(colID)
     col_dict = dict(get_def_name('', "collection"))
 
-    subtitle = """<a name="10">10. Modify output formats for collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.10">?</a>]</small>""" % (col_dict[colID], CFG_SITE_URL)
+    subtitle = """<br /><a name="10">10. Modify output formats for collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.10">?</a>]</small>""" % (col_dict[colID], CFG_SITE_URL)
     output = """
     <dl>
      <dt>Output format actions (not specific to the chosen collection)
@@ -1704,7 +1895,7 @@ def perform_manage_external_collections(colID, ln, callback='yes', content='', c
 
     colID = int(colID)
 
-    subtitle = """<a name="11">11. Configuration of related external collections</a>
+    subtitle = """<br /><a name="11">11. Configuration of related external collections</a>
     &nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.11">?</a>]</small>""" % CFG_SITE_URL
     output = '<form action="update_external_collections" method="POST"><input type="hidden" name="colID" value="%(colID)d">' % {'colID': colID}
 
@@ -1755,7 +1946,7 @@ def perform_showdetailedrecordoptions(colID, ln, callback='yes', content='', con
 
     colID = int(colID)
 
-    subtitle = """<a name="12">12. Configuration of detailed record page</a>
+    subtitle = """<br /><a name="12">12. Configuration of detailed record page</a>
     &nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.12">?</a>]</small>""" % CFG_SITE_URL
     output = '''<form action="update_detailed_record_options" method="post">
     <table><tr><td>
@@ -1828,7 +2019,7 @@ def perform_addexistingoutputformat(colID, ln, fmtID=-1, callback='yes', confirm
     colID - the collection the format should be added to
     fmtID - the format to add."""
 
-    subtitle = """<a name="10.2"></a>Add existing output format to collection"""
+    subtitle = """<br /><a name="10.2"></a>Add existing output format to collection"""
     output  = ""
 
     if fmtID not in [-1, "-1"] and confirm in [1, "1"]:
@@ -1876,7 +2067,7 @@ def perform_deleteoutputformat(colID, ln, fmtID=-1, callback='yes', confirm=-1):
     colID - the collection id of the current collection.
     fmtID - the format id to delete."""
 
-    subtitle = """<a name="10.3"></a>Delete an unused output format"""
+    subtitle = """<br /><a name="10.3"></a>Delete an unused output format"""
     output  = """
     <dl>
      <dd>Deleting an output format will also delete the translations associated.</dd>
@@ -1943,7 +2134,7 @@ def perform_removeoutputformat(colID, ln, fmtID='', callback='yes', confirm=0):
     fmtID - the format id.
     """
 
-    subtitle = """<a name="10.5"></a>Remove output format"""
+    subtitle = """<br /><a name="10.5"></a>Remove output format"""
     output  = ""
 
     col_dict = dict(get_def_name('', "collection"))
@@ -1993,14 +2184,14 @@ def perform_index(colID=1, ln=CFG_SITE_LANG, mtype='', content='', confirm=0):
         else:
             return "Error renaming root collection."
     fin_output += """
-    <table>
+    <table cellpadding="8" style="padding-bottom:5px;">
     <tr>
     <td>0.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_showall">Show all</a></small></td>
     <td>1.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_addcollection">Create new collection</a></small></td>
     <td>2.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_addcollectiontotree">Attach collection to tree</a></small></td>
     <td>3.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_modifycollectiontree">Modify collection tree</a></small></td>
-    <td>4.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_checkwebcollstatus">Webcoll Status</a></small></td>
     </tr><tr>
+    <td>4.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_checkwebcollstatus">Webcoll Status</a></small></td>
     <td>5.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_checkcollectionstatus">Collection Status</a></small></td>
     <td>6.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_checkexternalcollections">Check external collections</a></small></td>
     <td>7.&nbsp;<small><a href="%s/help/admin/websearch-admin-guide?ln=%s">Guide</a></small></td>
@@ -2015,24 +2206,22 @@ def perform_index(colID=1, ln=CFG_SITE_LANG, mtype='', content='', confirm=0):
         fin_output += content
     elif mtype == "perform_addcollection" or mtype == "perform_showall":
         fin_output += perform_addcollection(colID=colID, ln=ln, callback='')
-        fin_output += "<br />"
 
     if mtype == "perform_addcollectiontotree" and content:
         fin_output += content
     elif mtype == "perform_addcollectiontotree" or mtype == "perform_showall":
         fin_output += perform_addcollectiontotree(colID=colID, ln=ln, callback='')
-        fin_output += "<br />"
 
     if mtype == "perform_modifycollectiontree" and content:
         fin_output += content
     elif mtype == "perform_modifycollectiontree" or mtype == "perform_showall":
         fin_output += perform_modifycollectiontree(colID=colID, ln=ln, callback='')
-        fin_output += "<br />"
 
     if mtype == "perform_checkwebcollstatus" and content:
         fin_output += content
     elif mtype == "perform_checkwebcollstatus" or mtype == "perform_showall":
         fin_output += perform_checkwebcollstatus(colID, ln, callback='')
+    fin_output += "<br />"
 
     if mtype == "perform_checkcollectionstatus" and content:
         fin_output += content
@@ -2045,9 +2234,8 @@ def perform_index(colID=1, ln=CFG_SITE_LANG, mtype='', content='', confirm=0):
         fin_output += perform_checkexternalcollections(colID, ln, callback='')
 
     body = [fin_output]
-    body = [fin_output]
 
-    return addadminbox('<b>Menu</b>', body)
+    return addadminbox('<br /><font size="4"><b>Menu</b></font> ', body)
 
 def show_coll_not_in_tree(colID, ln, col_dict):
     """Returns collections not in tree"""
@@ -2222,7 +2410,7 @@ def perform_deletecollection(colID, ln, confirm=-1, callback='yes'):
     col_dict = dict(get_def_name('', "collection"))
     if colID != 1 and colID and col_dict.has_key(int(colID)):
         colID = int(colID)
-        subtitle = """<a name="4">4. Delete collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.4">?</a>]</small>""" % (col_dict[colID], CFG_SITE_URL)
+        subtitle = """<br/><a name="4">4. Delete collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.4">?</a>]</small>""" % (col_dict[colID], CFG_SITE_URL)
         res = run_sql("SELECT id_dad,id_son,type,score from collection_collection WHERE id_dad=%s", (colID, ))
         res2 = run_sql("SELECT id_dad,id_son,type,score from collection_collection WHERE id_son=%s", (colID, ))
 
@@ -2272,7 +2460,7 @@ def perform_editcollection(colID=1, ln=CFG_SITE_LANG, mtype='', content=''):
         """
 
     fin_output = """
-    <table>
+    <table cellpadding="5" style="padding-bottom:5px;">
     <tr>
     <td><b>Menu</b></td>
     </tr>
@@ -2292,9 +2480,10 @@ def perform_editcollection(colID=1, ln=CFG_SITE_LANG, mtype='', content=''):
     <td>10.&nbsp;<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_showoutputformats#10">Modify output formats</a></small></td>
     <td>11.&nbsp;<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_manage_external_collections#11">Configuration of related external collections</a></small></td>
     <td>12.&nbsp;<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_showdetailedrecordoptions#12">Detailed record page options</a></small></td>
+    <td>13.&nbsp;<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_instantbrowseoptions#13">Instant browse options</a></small></td>
     </tr>
     </table>
-    """ % (colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln)
+    """ % (colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln)
 
     if mtype == "perform_modifydbquery" and content:
         fin_output += content
@@ -2310,6 +2499,7 @@ def perform_editcollection(colID=1, ln=CFG_SITE_LANG, mtype='', content=''):
         fin_output += content
     elif mtype == "perform_modifytranslations" or not mtype:
         fin_output += perform_modifytranslations(colID, ln, callback='')
+    fin_output += "<br />"
 
     if mtype == "perform_deletecollection" and content:
         fin_output += content
@@ -2356,12 +2546,17 @@ def perform_editcollection(colID=1, ln=CFG_SITE_LANG, mtype='', content=''):
     elif mtype == "perform_showdetailedrecordoptions" or not mtype:
         fin_output += perform_showdetailedrecordoptions(colID, ln, callback='')
 
-    return addadminbox("Overview of edit options for collection '%s'" % col_dict[colID],  [fin_output])
+    if mtype == "perform_instantbrowseoptions" and content:
+        fin_output += content
+    elif mtype == "perform_instantbrowseoptions" or not mtype:
+        fin_output += perform_instantbrowseoptions(colID, ln, callback='')
+
+    return addadminbox("<br />Overview of edit options for collection '%s'" % col_dict[colID],  [fin_output])
 
 def perform_checkwebcollstatus(colID, ln, confirm=0, callback='yes'):
     """Check status of the collection tables with respect to the webcoll cache."""
 
-    subtitle = """<a name="11"></a>Webcoll Status&nbsp;&nbsp;&nbsp;[<a href="%s/help/admin/websearch-admin-guide#5">?</a>]""" % CFG_SITE_URL
+    subtitle = """<br /><a name="11"></a>Webcoll Status&nbsp;&nbsp;&nbsp;[<a href="%s/help/admin/websearch-admin-guide#5">?</a>]""" % CFG_SITE_URL
     output  = ""
 
     colID = int(colID)
@@ -2462,7 +2657,7 @@ def perform_modifyrestricted(colID, ln, rest='', callback='yes', confirm=-1):
     action_id = acc_get_action_id(VIEWRESTRCOLL)
     if colID and col_dict.has_key(int(colID)):
         colID = int(colID)
-        subtitle = """<a name="2">2. Modify access restrictions for collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.2">?</a>]</small>""" % (col_dict[colID], CFG_SITE_URL)
+        subtitle = """<br /><a name="2">2. Modify access restrictions for collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.2">?</a>]</small>""" % (col_dict[colID], CFG_SITE_URL)
 
         output = """<p>Please note that Invenio versions greater than <em>0.92.1</em> manage collection restriction via the standard
         <strong><a href="/admin/webaccess/webaccessadmin.py/showactiondetails?id_action=%i">WebAccess Admin Interface</a></strong> (action '%s').</p>
@@ -2479,7 +2674,7 @@ def perform_checkcollectionstatus(colID, ln, confirm=0, callback='yes'):
 
     from invenio.search_engine import collection_restricted_p, restricted_collection_cache
 
-    subtitle = """<a name="11"></a>Collection Status&nbsp;&nbsp;&nbsp;[<a href="%s/help/admin/websearch-admin-guide#6">?</a>]""" % CFG_SITE_URL
+    subtitle = """<br /><a name="11"></a>Collection Status&nbsp;&nbsp;&nbsp;[<a href="%s/help/admin/websearch-admin-guide#6">?</a>]""" % CFG_SITE_URL
     output  = ""
 
     colID = int(colID)
@@ -2553,7 +2748,7 @@ def perform_checkcollectionstatus(colID, ln, confirm=0, callback='yes'):
 def perform_checkexternalcollections(colID, ln, icl=None, update="", confirm=0, callback='yes'):
     """Check the external collections for inconsistencies."""
 
-    subtitle = """<a name="7"></a>Check external collections&nbsp;&nbsp;&nbsp;[<a href="%s/help/admin/websearch-admin-guide#7">?</a>]""" % CFG_SITE_URL
+    subtitle = """<br /><a name="7"></a>Check external collections&nbsp;&nbsp;&nbsp;[<a href="%s/help/admin/websearch-admin-guide#7">?</a>]""" % CFG_SITE_URL
     output  = ""
 
     colID = int(colID)

@@ -15,7 +15,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-SUBDIRS = facets
+SUBDIRS = facets websearch_instantbrowse_plugins
 
 pylibdir = $(libdir)/python/invenio
 
@@ -55,8 +55,8 @@ pylib_DATA = \
 	websearch_external_collections_unit_tests.py \
 	websearch_external_collections_utils.py \
 	websearch_admin_blueprint.py \
-	websearch_admin_forms.py
-
+	websearch_admin_forms.py \
+	websearch_instantbrowse.py
 
 jsdir=$(localstatedir)/www/js
 

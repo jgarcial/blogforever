@@ -881,6 +881,7 @@ AC_CONFIG_FILES([config.nice  \
      modules/websearch/etc/templates/Makefile \
      modules/websearch/lib/Makefile \
      modules/websearch/lib/facets/Makefile \
+     modules/websearch/lib/websearch_instantbrowse_plugins/Makefile \
      modules/websearch/web/Makefile \
      modules/websearch/web/admin/Makefile \
      modules/websession/Makefile \

@@ -497,6 +497,44 @@ def update_detailed_record_options(req, colID, ln=CFG_SITE_LANG, tabs=[], recurs
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
+def instantbrowseoptions(req, colID, ln=CFG_SITE_LANG, select_plugin="", params="", callback='yes', confirm=0):
+
+    navtrail_previous_links = wsc.getnavtrail() + \
+                                """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ \
+                                % (CFG_SITE_URL)
+
+    try:
+        uid = getUid(req)
+    except Error, e:
+        return error_page(req)
+
+    auth = check_user(req, 'cfgwebsearch')
+    if not auth[0]:
+        if params:
+            import json
+            try:
+                # let's try to build a dictionary
+                json.loads(params)
+            except:
+                params = None
+                confirm = -1
+        if not select_plugin:
+            confirm = -1
+        return page(title="Edit Collection",
+                    body=wsc.perform_instantbrowseoptions(colID=colID,
+                                                          ln=ln,
+                                                          select_plugin=select_plugin,
+                                                          params=params,
+                                                          callback=callback,
+                                                          confirm=confirm),
+                uid=uid,
+                language=ln,
+                req=req,
+                navtrail = navtrail_previous_links,
+                lastupdated=__lastupdated__)
+    else:
+        return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
+
 def removefieldvalue(req, colID, ln=CFG_SITE_LANG, fldID='', fldvID='', fmeth='', callback='yes', confirm=0):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (CFG_SITE_URL)
 

@@ -879,7 +879,7 @@ def addcheckboxes(datalist=[], name='authids', startindex=1, checked=[]):
     return datalist
 
 
-def createhiddenform(action="", text="", button="confirm", cnfrm='', **hidden):
+def createhiddenform(action="", text="", button="confirm", button_style="", cnfrm='', **hidden):
     """create select with hidden values and submit button
 
       action - name of the action to perform on submit
@@ -903,7 +903,10 @@ def createhiddenform(action="", text="", button="confirm", cnfrm='', **hidden):
                 output += ' <input type="hidden" name="%s" value="%s"/>\n' % (key, value)
         else:
             output += ' <input type="hidden" name="%s" value="%s"/>\n' % (key, hidden[key])
-    output += '</td><td style="vertical-align: bottom">'
+    if button_style:
+        output += '</td><td style="%s;">' % button_style
+    else:
+        output += '</td><td style="vertical-align: bottom;">'
     output += ' <input class="adminbutton" type="submit" value="%s"/>\n' % (button, )
     output += '</td></tr></table>'
     output += '</form>\n'
