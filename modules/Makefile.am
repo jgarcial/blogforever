@@ -28,6 +28,7 @@ SUBDIRS = bibauthorid \
           bibfield \
           bibformat \
           bibindex \
+          bibingest \
           bibknowledge \
           bibmatch \
           bibmerge \
