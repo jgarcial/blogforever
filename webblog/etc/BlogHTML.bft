@@ -1,0 +1,28 @@
+<name>Blog HTML</name>
+<description>First draft to display blog posts</description>
+<link href="<BFE_SERVER_INFO var="weburl"/>/img/bull_StylesPlain.css" rel="stylesheet" media="all" type="text/css" />
+<link href="<BFE_SERVER_INFO var="weburl"/>/img/bull_print.css" rel="stylesheet" media="print" type="text/css" />
+
+
+<BFE_BULLETIN_HEADER />
+<div id="container">
+<table id="middle">
+<tr>
+<td valign="top">
+<div class="menuleft">
+<br />
+<BFE_BLOG_NAVIGATION />
+</div>
+</td>
+<td>
+<div class="text" >
+<BFE_TITLE prefix='<h2 class="articleTitle">' suffix='</h2>' />
+<BFE_ABSTRACT escape="0" />
+<BFE_WEBJOURNAL_ARTICLE_AUTHOR prefix="<br/>by " separator=", " display_email="no"/>
+</div>
+</td>
+</tr>
+</table>
+
+<div id="bottom">  </div>
+</div>
