@@ -27,10 +27,10 @@ def format_element(bfo):
     """
 
 #    attached_files = bfo.fields('8564__u')
-#    
+#
 #    # get only the files .jpg, .png
 #    attached_files_names = [file[file.rfind('/') + 1:] for file in attached_files]
-#    
+#
 #    # exclude "snapshot", include .jpg, .png
 #    final_images = []
 #    for name in attached_files_names:
@@ -40,15 +40,14 @@ def format_element(bfo):
 #            ext = str(name_split[1])
 #        if name.find("snapshot") == -1 and (ext == "png" or ext == "jpg"):
 #            final_images = name
-            
+
     img = '<img src="http://cdsweb.cern.ch/record/1368911/files/BlogForever_image.png" width="110" height="110" hspace="10" align="left">'
-       
+
     # http://pcuds99.cern.ch/record/1778/files/subID21
     # http://pcuds99.cern.ch/record/1778/files/TL_snapshot.png
     #http://pcuds99.cern.ch/record/1778/files/snapshot.pdf
-    
-    # VER bfe_photos
 
+    # VER bfe_photos
 
     return '<div>' + img + '</div>'
 

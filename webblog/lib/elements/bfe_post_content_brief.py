@@ -90,7 +90,7 @@ def format_element(bfo, prefix, suffix, limit, max_chars, extension="[...] ", co
             out += abstract
 
         out += suffix
-        
+
         out += "<div></div>"
 #
 #    if highlight == 'yes':

@@ -59,6 +59,7 @@ def get_blog_descendants(recid):
 
     return descendants
 
+
 ##### POSTS #####
 
 def get_posts(blog_recid, newest_first=True):
@@ -66,7 +67,7 @@ def get_posts(blog_recid, newest_first=True):
     written on the given blog
     @param blog_recid: blog recid
     @type blog_recid: int
-    @param newest_first: order in which the posts will be displayed. If
+    @param newest_first: order in wich the posts will be displayed. If
     it is True the newest published posts will be displayed first
     @type newest_first: boolean
     @return: list of posts recids

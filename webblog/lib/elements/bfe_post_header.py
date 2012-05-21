@@ -34,7 +34,7 @@ def format_element(bfo):
     Formats a header used in Bulletin Articles containing: issue nr., date,
     english/french link, report number
     """
-    
+
     # get variables
     this_recid = bfo.control_field('001')
     current_language = bfo.lang

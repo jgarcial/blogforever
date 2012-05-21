@@ -43,10 +43,10 @@ def format_element(bfo):
             out += "<br />"
 
     return out
-    
+
 def escape_values(bfo):
     """
     Called by BibFormat in order to check if output of this element
     should be escaped.
     """
-    return 0
+return 0
