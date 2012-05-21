@@ -12,9 +12,9 @@ test:
 	$(foreach SUBDIR, $(SUBDIRS), cd $(SUBDIR) && make test && cd .. ;)
 	@echo "Done.  Please run make install now."
 
-install-yes-i-know:
+install:
 	$(foreach SUBDIR, $(SUBDIRS), cd $(SUBDIR) && make install && cd .. ;)
 	@echo "Done.  You may want to restart Apache now."
 
-install:
+install-yes-i-know:
 	@echo "If you are really sure you want to install *all* then launch \"make install-yes-i-know\""

@@ -842,11 +842,11 @@ a.google:hover {
    padding: 1px;
    margin: 5px 0px 5px 0px;
    border-collapse: collapse;
-   border-top: 1px solid #fc0;
+   border-top: 1px solid #567025;
 }
 .youraccountheader {
    color: #333;
-   background: #ffc;
+   background: #e0f0c0;
    font-weight: normal;
    font-size: small;
    vertical-align: top;
@@ -909,16 +909,16 @@ th.youraccountheader a:hover {
 }
 .searchresultsbox {
    color: #000;
-   background: #ffe;
+   background: #efe;
    padding: 0px;
    margin-top: 15px;
    border-collapse: collapse;
-   border-top: 1px solid #fc0;
+   border-top: 1px solid #567025;
    width: 100%;
 }
 .searchresultsboxheader {
    color: #000;
-   background: #ffc;
+   background: #e0f0c0;
    padding: 2px;
    border-spacing: 0px;
    text-align: left;
@@ -926,9 +926,9 @@ th.youraccountheader a:hover {
 }
 .searchresultsboxbody {
    color: #000;
-   background: #ffe;
-   border-top: 1px dotted #fc0;
-   border-bottom: 1px dotted #fc0;
+   background: #efe;
+   border-top: 1px dotted #567025;
+   border-bottom: 1px dotted #567025;
    padding: 2px;
 }
 .searchresultsboxrecords {

@@ -11,14 +11,17 @@
 <td valign="top">
 <div class="menuleft">
 <br />
-<BFE_BLOG_NAVIGATION />
+<BFE_POST_THUMBNAIL />
 </div>
 </td>
 <td>
 <div class="text" >
 <BFE_TITLE prefix='<h2 class="articleTitle">' suffix='</h2>' />
-<BFE_ABSTRACT escape="0" />
-<BFE_WEBJOURNAL_ARTICLE_AUTHOR prefix="<br/>by " separator=", " display_email="no"/>
+<BFE_BLOG_URL_LINK />
+<br /><br />
+<div>
+<BFE_LATEST_POSTS>
+</div>
 </div>
 </td>
 </tr>

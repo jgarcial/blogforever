@@ -17,45 +17,38 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 """
-BibFormat Element - thumbnail of the post
+BibFormat Element - creates the blog navigation menu
 """
+from invenio.search_engine import search_pattern, record_exists
 from invenio.bibformat_engine import BibFormatObject
 from invenio.config import CFG_SITE_URL
-from invenio.webjournal_utils import get_release_datetime, issue_to_datetime, get_journal_preferred_language
-from invenio.dateutils import get_i18n_day_name, get_i18n_month_name
+from invenio.webblog_utils import get_parent_blog, get_posts
 
 
-def format_element(bfo):
+import cgi
+
+cfg_messages = {}
+cfg_messages["in_issue"] = {"en": "wrote",
+                            "fr": "a écrit"}
+
+def format_element(bfo, separator=" ", highlight='no'):
     """
-    Returns the url of the previous post record in the current language.
+    Prints the titles of a record.
+
+    @param separator: separator between the different titles
+    @param highlight: highlights the words corresponding to search query if set to 'yes'
     """
 
-    # get variables
-    this_recid = bfo.control_field('001')
-    files = bfo.fields('8564_')
-
-    thumbnail_url = ''
-    snapshot_url = ''
-
-    for f in files:
-        if f['u'].find('TL_') > -1:
-            thumbnail_url = f['u']
-        elif f['u'].find('snapshot') > -1:
-            snapshot_url = f['u']
-
-    # assemble the HTML output
-    img = '<img src="%s" width="175" height="350">' % (thumbnail_url)
-    out = '<a href="%s" target="_blank">%s</a>' % (snapshot_url, img)
+    author = bfo.field('100__a')
+    current_language = bfo.lang
+    out = """<a href = "%s/search?ln=%s&p=%s&f=author">%s</a> %s:""" % (CFG_SITE_URL, current_language, author, author, \
+                                                                        cfg_messages["in_issue"][current_language])
 
     return out
-
+    
 def escape_values(bfo):
     """
     Called by BibFormat in order to check if output of this element
     should be escaped.
     """
     return 0
-
-if __name__ == "__main__":
-    myrec = BibFormatObject(619)
-    format(myrec)

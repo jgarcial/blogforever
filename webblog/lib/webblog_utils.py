@@ -49,40 +49,57 @@ from invenio.search_engine_utils import get_fieldvalues
 from invenio.messages import gettext_set_language
 from invenio.errorlib import register_exception
 
-
-############################# POSTS RELATED ##########################
+#####  BLOGS #####
 
 def get_parent_blog(recid):
-    if get_fieldvalues(recid,'980__a')[0] == 'BLOG':
+    """ This function returns the parent blog of any 
+    post or comment given its recid
+    @param recid: comment or post recid
+    @type recid: int
+    @return: parent blog recid
+    @rtype: int"""
+
+    if get_fieldvalues(recid, '980__a')[0] == 'BLOG':
         return recid
     parent_blog_recid = get_fieldvalues(recid, '760__w')
-    if len(parent_blog_recid)>0:
+    if len(parent_blog_recid) > 0:
         parent_blog_recid = parent_blog_recid[0]
     else:
         parent_blog_recid = None
     return parent_blog_recid
 
+##### POSTS #####
+
 def get_posts(blog_recid, newest_first=True):
+    """ This function returns the list of posts 
+    belongs to the given blog
+    @param blog_recid: blog recid
+    @type blog_recid: int
+    @param newest_first: order in wich the posts will be displayed
+    @type newest_first: boolean"""
     return perform_request_search(p='760__w:"%s"' % blog_recid, sf='date', so='d')
 
-def get_comments(post_recid, newest_first=True):
-    pass
-
 def get_parent_post(comment_recid):
-    pass
+    """ This function returns the parent post of any 
+    comment given its recid
+    @param recid: comment recid
+    @type recid: int
+    @return: post recid
+    @rtype: int"""
+
+    parent_comment_recid = get_fieldvalues(comment_recid, '773__w')
+    if len(parent_comment_recid) > 0:
+        get_parent_post = parent_comment_recid[0]
+    else:
+        get_parent_post = None
+
+    return get_parent_post
 
 def get_sibling_posts(post_recid, newest_first=True, exclude_this_post=True):
     main_blog_recid = get_parent_blog(recid)
     siblings_list = get_posts(main_blog_recid, newest_first)
     if exclude_this_post:
         siblings_list.remove(post_recid)
-    return siblings_list
-
-def get_sibling_comments(comment_recid, newest_first=True, exclude_this_comment=True):
-    post_recid = get_parent_post(comment_recid)
-    siblings_list = get_comments(post_recid, newest_first)
-    if exclude_this_comment:
-        siblings_list.remove(comment_recid)
     return siblings_list
 
 def get_next_post(post_recid):
@@ -107,6 +124,18 @@ def get_previous_post(post_recid):
         if len(recid_list) > 1:
             previous_post_recid = recid_list[1]
     return previous_post_recid
+
+##### COMMENTS #####
+
+def get_comments(post_recid, newest_first=True):
+    return perform_request_search(p='773__w:"%s"' % post_recid, sf='date', so='d')
+
+def get_sibling_comments(comment_recid, newest_first=True, exclude_this_comment=True):
+    post_recid = get_parent_post(comment_recid)
+    siblings_list = get_comments(post_recid, newest_first)
+    if exclude_this_comment:
+        siblings_list.remove(comment_recid)
+    return siblings_list
 
 def get_next_comment(comment_recid):
     pass

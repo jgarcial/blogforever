@@ -1,27 +1,22 @@
-<name>Post HTML</name>
-<description>First draft to display blog posts</description>
+<name>Comment HTML</name>
+<description>First draft to display blog comments</description>
 <link href="<BFE_SERVER_INFO var="weburl"/>/img/bull_StylesPlain.css" rel="stylesheet" media="all" type="text/css" />
 <link href="<BFE_SERVER_INFO var="weburl"/>/img/bull_print.css" rel="stylesheet" media="print" type="text/css" />
 
 
-<BFE_POST_HEADER />
+<BFE_COMMENT_HEADER />
 <div id="container">
 <table id="middle">
 <tr>
-<td valign="top">
+<td valign="top" style="padding-left:10px">
 <div class="menuleft">
-<br />
-<BFE_BLOG_NAVIGATION />
+<BFE_COMMENT_NAVIGATION />
 </div>
 </td>
-<td valign="top">
+<td valign="top" style="padding-left:30px">
 <div class="text" >
-<div class="to-be-translated" style="padding-left:10px;padding-right:10px">
-<div class="translate-link"></div>
-<BFE_TITLE prefix='<h2 class="articleTitle">' suffix='</h2>' />
-<BFE_POST_CONTENT escape="0" />
-<BFE_AUTHORS prefix="<br/>by " separator=", " print_links="yes"/>
-</div>
+<BFE_COMMENT_AUTHOR prefix='<h2 class="articleTitle">' suffix='</h2>' />
+<BFE_ABSTRACT escape="0" />
 </div>
 </td>
 <td valign="top">
