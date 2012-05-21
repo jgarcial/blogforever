@@ -16,38 +16,13 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
 """
 Various utilities for WebBlog, e.g. config parser, etc.
 """
 
-import time
-import datetime
-import calendar
-import re
-import os
-import cPickle
-import math
-import urllib
-from MySQLdb import OperationalError
-from xml.dom import minidom
-from urlparse import urlparse
-
-from invenio.config import \
-     CFG_ETCDIR, \
-     CFG_SITE_URL, \
-     CFG_CACHEDIR, \
-     CFG_SITE_LANG, \
-     CFG_ACCESS_CONTROL_LEVEL_SITE, \
-     CFG_SITE_SUPPORT_EMAIL, \
-     CFG_DEVEL_SITE
-from invenio.dbquery import run_sql
-from invenio.bibformat_engine import BibFormatObject
-from invenio.search_engine import search_pattern, \
-                                  record_exists, \
-                                  perform_request_search
+from invenio.search_engine import perform_request_search
 from invenio.search_engine_utils import get_fieldvalues
-from invenio.messages import gettext_set_language
-from invenio.errorlib import register_exception
 
 #####  BLOGS #####
 
@@ -57,84 +32,156 @@ def get_parent_blog(recid):
     @param recid: comment or post recid
     @type recid: int
     @return: parent blog recid
-    @rtype: int"""
+    @rtype: int
+    """
 
     if get_fieldvalues(recid, '980__a')[0] == 'BLOG':
         return recid
-    parent_blog_recid = get_fieldvalues(recid, '760__w')
-    if len(parent_blog_recid) > 0:
-        parent_blog_recid = parent_blog_recid[0]
+
+    parent_recid = get_fieldvalues(recid, '760__w')
+    if parent_recid:
+        parent_blog_recid = int(parent_recid[0])
     else:
         parent_blog_recid = None
+
     return parent_blog_recid
 
 ##### POSTS #####
 
 def get_posts(blog_recid, newest_first=True):
     """ This function returns the list of posts 
-    belongs to the given blog
+    written on the given blog
     @param blog_recid: blog recid
     @type blog_recid: int
-    @param newest_first: order in wich the posts will be displayed
-    @type newest_first: boolean"""
+    @param newest_first: order in wich the posts will be displayed. If
+    it is True the newest published posts will be displayed first
+    @type newest_first: boolean
+    @return: list of posts recids
+    @rtype: list
+    """
+
     return perform_request_search(p='760__w:"%s"' % blog_recid, sf='date', so='d')
 
 def get_parent_post(comment_recid):
     """ This function returns the parent post of any 
     comment given its recid
-    @param recid: comment recid
-    @type recid: int
-    @return: post recid
-    @rtype: int"""
+    @param comment_recid: comment recid
+    @type comment_recid: int
+    @return: parent post recid
+    @rtype: int
+    """
 
     parent_comment_recid = get_fieldvalues(comment_recid, '773__w')
-    if len(parent_comment_recid) > 0:
-        get_parent_post = parent_comment_recid[0]
+    if parent_comment_recid:
+        get_parent_post = int(parent_comment_recid[0])
     else:
         get_parent_post = None
 
     return get_parent_post
 
 def get_sibling_posts(post_recid, newest_first=True, exclude_this_post=True):
-    main_blog_recid = get_parent_blog(recid)
+    """ This function returns the list of the sibling posts of any 
+    post given its recid
+    @param post_recid: post recid
+    @type post_recid: int
+    @param newest_first: order in wich the sibling posts will be displayed. If
+    it is True the newest sibling posts will be displayed first
+    @type newest_first: boolean
+    @param exclude_this_post: if it is True the given post will not be returned
+    as a sibling post
+    @type exclude_this_post: boolean
+    @return: list of sibling posts recids
+    @rtype: list
+    """
+
+    main_blog_recid = get_parent_blog(post_recid)
     siblings_list = get_posts(main_blog_recid, newest_first)
     if exclude_this_post:
         siblings_list.remove(post_recid)
+
     return siblings_list
 
 def get_next_post(post_recid):
+    """ This function returns the next post of the
+    given one that was published
+    @param post_recid: post recid
+    @type post_recid: int
+    @return: the next post recid of the
+    given one that was published
+    @rtype: recid
+    """
+
     next_post_recid = None
     main_blog_recid = get_parent_blog(post_recid)
     post_date = get_fieldvalues(post_recid, '269__c')
-    if len(post_date) > 0:
+    if post_date:
         post_date = post_date[0]
-        recid_list = perform_request_search(p='760__w:"%s" 269__c:%s-->9999-99-99' % (main_blog_recid, post_date), sf='date', so='d')
-        if len(recid_list) > 0:
+        recid_list = perform_request_search(p='760__w:"%s" 269__c:%s-->9999-99-99' % \
+                                            (main_blog_recid, post_date), sf='date', so='d')
+        if len(recid_list) > 1:
             next_post_recid = recid_list[0]
+
     return next_post_recid
 
 
 def get_previous_post(post_recid):
+    """ This function returns the previous post of the
+    given one that was published
+    @param post_recid: post recid
+    @type post_recid: int
+    @return: the previous post recid of the
+    given one that was published
+    @rtype: recid
+    """
+
     previous_post_recid = None
     main_blog_recid = get_parent_blog(post_recid)
     post_date = get_fieldvalues(post_recid, '269__c')
-    if len(post_date) > 0:
+    if post_date:
         post_date = post_date[0]
-        recid_list = perform_request_search(p='760__w:"%s" 269__c:0000-00-00-->%s' % (main_blog_recid, post_date), sf='date', so='a')
+        recid_list = perform_request_search(p='760__w:"%s" 269__c:0000-00-00-->%s' % \
+                                            (main_blog_recid, post_date), sf='date', so='a')
         if len(recid_list) > 1:
             previous_post_recid = recid_list[1]
+
     return previous_post_recid
 
 ##### COMMENTS #####
 
 def get_comments(post_recid, newest_first=True):
+    """ This function returns the list of comments 
+    written on the given post
+    @param post_recid: post recid
+    @type post_recid: int
+    @param newest_first: order in wich the comments will be displayed. If
+    it is True the newest comments will be displayed first
+    @type newest_first: boolean
+    @return: list of sibling comments recids
+    @rtype: list
+    """
+
     return perform_request_search(p='773__w:"%s"' % post_recid, sf='date', so='d')
 
 def get_sibling_comments(comment_recid, newest_first=True, exclude_this_comment=True):
+    """ This function returns the list of the sibling comments of any 
+    comment given its recid
+    @param comment_recid: comment recid
+    @type comment_recid: int
+    @param newest_first: order in wich the sibling comments will be displayed. If
+    it is True the newest sibling comments will be displayed first
+    @type newest_first: boolean
+    @param exclude_this_comment: if it is True the given post will not be returned
+    as a sibling post
+    @type exclude_this_comment: boolean
+    @return: list of sibling comments recids
+    @rtype: list
+    """
+
     post_recid = get_parent_post(comment_recid)
     siblings_list = get_comments(post_recid, newest_first)
     if exclude_this_comment:
         siblings_list.remove(comment_recid)
+
     return siblings_list
 
 def get_next_comment(comment_recid):

@@ -17,30 +17,87 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 """
-BibFormat Element - format the link to the next post
+BibFormat Element -
 """
-from invenio.bibformat_engine import BibFormatObject
-from invenio.config import CFG_SITE_URL
-from invenio.webjournal_utils import get_release_datetime, issue_to_datetime, get_journal_preferred_language
-from invenio.dateutils import get_i18n_day_name, get_i18n_month_name
-from invenio.search_engine_utils import get_fieldvalues
-from invenio.webblog_utils import *
 
 
-def format_element(bfo):
+__revision__ = "$Id$"
+
+from invenio import bibformat_utils
+
+def format_element(bfo, prefix, suffix, limit, max_chars, extension="[...] ", contextual="no",
+                   highlight='no', escape="3", separator="<br/>", latex_to_html='no'):
+    """ Prints the abstract of a post in HTML.
+
+
+    @param prefix: a prefix for abstract
+    @param limit: the maximum number of sentences of the abstract to display
+    @param max_chars: the maximum number of chars of the abstract to display 
+    @param extension: a text printed after abstracts longer than parameter 'limit'
+    @param suffix: a suffix for abstract
+    @parmm contextual if 'yes' prints sentences the most relative to user search keyword (if limit < abstract)
+    @param highlight: if 'yes' highlights words from user search keyword
+    @param escape: escaping method (overrides default escape parameter to not escape separators)
+    @param separator: a separator between each abstract
+    @param latex_to_html: if 'yes', interpret as LaTeX abstract
     """
-    Returns the url of the next post record in the current language.
-    """
 
-    # get variables
-    this_recid = bfo.control_field('001')
-    parent_blog_recid = bfo.fields('773__w')
-    available_languages = bfo.fields('041__a')
-    current_language = bfo.lang
-    
-    
-    # assemble the HTML output
-    out = bfo.fields('520')[0]['a']
+    out = ""
+
+    try:
+        escape_mode_int = int(escape)
+    except ValueError, e:
+        escape_mode_int = 0
+
+    abstract = bfo.fields('520__a', escape=escape_mode_int)
+#    abstract.extend(bfo.fields('520__b', escape=escape_mode_int))
+    abstract = separator.join(abstract)
+
+    if contextual == 'yes' and limit != "" and \
+           limit.isdigit() and int(limit) > 0:
+        context = bibformat_utils.get_contextual_content(abstract,
+                                                         bfo.search_pattern,
+                                                         max_lines=int(limit))
+        abstract = "<br/>".join(context)
+
+
+    if abstract:
+        out += prefix
+        print_extension = False
+
+        if max_chars != "" and max_chars.isdigit() and \
+               int(max_chars) < len(abstract):
+            print_extension = True
+            abstract = abstract[:int(max_chars)]
+
+        if limit != "" and limit.isdigit():
+            s_abstract = abstract.split(". ") 
+
+            if int(limit) < len(s_abstract):
+                print_extension = True
+                s_abstract = s_abstract[:int(limit)]
+
+            out = '. '.join(s_abstract)
+
+            # Add final dot if needed
+            if abstract.endswith('.'):
+                out += '.'
+
+            if print_extension:
+                out += " " + extension
+
+        else:
+            out += abstract
+
+        out += suffix
+        
+        out += "<div></div>"
+#
+#    if highlight == 'yes':
+#        out = bibformat_utils.highlight(out, bfo.search_pattern)
+#
+#    if latex_to_html == 'yes':
+#        out = bibformat_utils.latex_to_html(out)
 
     return out
 
@@ -50,7 +107,3 @@ def escape_values(bfo):
     should be escaped.
     """
     return 0
-
-if __name__ == "__main__":
-    myrec = BibFormatObject(619)
-    format(myrec)

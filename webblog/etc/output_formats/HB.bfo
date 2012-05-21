@@ -5,7 +5,6 @@ tag 773.t:
 Atlantis Times --- Journal_HTML_brief.bft
 tag 980.a:
 VIDEO --- Video_HTML_brief.bft
-BLOG --- Blog_HTML_brief.bft
-BLOGPOST --- Post_HTML_brief.bft
 COMMENT --- Comment_HTML_brief.bft
+BLOGPOST --- Post_HTML_brief.bft
 default: Default_HTML_brief.bft

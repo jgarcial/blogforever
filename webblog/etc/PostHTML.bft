@@ -16,11 +16,13 @@
 </td>
 <td valign="top">
 <div class="text" >
-<div class="to-be-translated" style="padding-left:10px;padding-right:10px">
-<div class="translate-link"></div>
-<BFE_TITLE prefix='<h2 class="articleTitle">' suffix='</h2>' />
-<BFE_POST_CONTENT escape="0" />
-<BFE_AUTHORS prefix="<br/>by " separator=", " print_links="yes"/>
+<BFE_TITLE prefix='<h2 class="articleTitle">' suffix='</h2>'/>
+<BFE_ABSTRACT escape="0" />
+<BFE_WEBJOURNAL_ARTICLE_AUTHOR prefix="<br/>by " separator=", " display_email="no"/>
+<br />
+<br />
+<div id="post_comments">
+<BFE_POST_COMMENTS />
 </div>
 </div>
 </td>

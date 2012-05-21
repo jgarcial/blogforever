@@ -34,8 +34,8 @@ def format_element(bfo):
     Formats a header used in Bulletin Articles containing: issue nr., date,
     english/french link, report number
     """
+    
     # get variables
-
     this_recid = bfo.control_field('001')
     current_language = bfo.lang
     this_title = ""
@@ -50,9 +50,6 @@ def format_element(bfo):
     except:
         blog_title = 'Untitled'
 
-    this_recid = bfo.control_field('001')
-    current_language = bfo.lang
-
     try:
         date = bfo.fields('269__c')[0]
     except:
@@ -65,7 +62,7 @@ def format_element(bfo):
     out += '<tr>'
     out += '<td class="left"><a href="%s/record/%s%s">%s</a></div>' % (CFG_SITE_URL,
                                                     blog_recid, (bfo.lang=="fr")
-                                                    and "?ln=fr" or "", blog_title)
+                                                    and "?ln=fr" or "?ln=en", blog_title)
 
     out += '<td class="right">%s</td>' % date
     out += '</tr>'

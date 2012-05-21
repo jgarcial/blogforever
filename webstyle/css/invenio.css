@@ -84,19 +84,19 @@ h6 {
    background: transparent;
 }
 a:link {
-   color: #00c;
+   color: #567025;
    background: transparent;
 }
 a:visited {
-   color: #006;
+   color: #38610B;
    background: transparent;
 }
 a:active {
-   color: #00c;
+   color: #5E610B;
    background: transparent;
 }
 a:hover {
-   color: #00c;
+   color: #5E610B;
    background: transparent;
 }
 a.moreinfo:link {
@@ -607,7 +607,7 @@ a.footer:hover {
     font-size: medium;
 }
 .searchboxheader {
-   color: #000;
+   color: #243B0B;
    /*background: #f1f1f1;
    padding: 3px;*/
    border-spacing: 0px;
@@ -628,7 +628,7 @@ a.footer:hover {
    /*border-top: 1px solid #567025;*/
 }
 .narrowsearchboxheader {
-   color: #000;
+   color: #243B0B;
    /*background: #f1f1f1;*/
    padding: 3px;
    border-spacing: 0px;
@@ -842,11 +842,11 @@ a.google:hover {
    padding: 1px;
    margin: 5px 0px 5px 0px;
    border-collapse: collapse;
-   border-top: 1px solid #567025;
+   border-top: 1px solid #fc0;
 }
 .youraccountheader {
    color: #333;
-   background: #e0f0c0;
+   background: #ffc;
    font-weight: normal;
    font-size: small;
    vertical-align: top;
@@ -909,16 +909,16 @@ th.youraccountheader a:hover {
 }
 .searchresultsbox {
    color: #000;
-   background: #efe;
+   background: #ffe;
    padding: 0px;
    margin-top: 15px;
    border-collapse: collapse;
-   border-top: 1px solid #567025;
+   border-top: 1px solid #fc0;
    width: 100%;
 }
 .searchresultsboxheader {
    color: #000;
-   background: #e0f0c0;
+   background: #ffc;
    padding: 2px;
    border-spacing: 0px;
    text-align: left;
@@ -926,9 +926,9 @@ th.youraccountheader a:hover {
 }
 .searchresultsboxbody {
    color: #000;
-   background: #efe;
-   border-top: 1px dotted #567025;
-   border-bottom: 1px dotted #567025;
+   background: #ffe;
+   border-top: 1px dotted #fc0;
+   border-bottom: 1px dotted #fc0;
    padding: 2px;
 }
 .searchresultsboxrecords {
@@ -1125,9 +1125,9 @@ hr {
     border-width: 0;
 }
 form input[type="text"], form input[type="password"], form select {
-    color: #000;
+    color: #243B0B;
     background: #fff;
-    border: 1px solid #555;
+    border: 1px solid #567025;
 }
 form input[disabled], form input[disabled="true"]{
    /* <http://reference.sitepoint.com/css/attributeselector#compatibilitysection> */
