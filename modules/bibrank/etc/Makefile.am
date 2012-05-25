@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -41,7 +41,11 @@ etc_DATA = bibrankgkb.cfg \
            citerank_pagerank_t.cfg \
            selfcites.cfg \
            demo_itc_collection.cfg \
-           template_index_term_count.cfg
+           template_index_term_count.cfg \
+           record_view.cfg \
+           average_score.cfg \
+           template_record_view.cfg \
+           template_average_score.cfg
 
 EXTRA_DIST = bibrankgkb.cfg.in \
              bibrankgkb_jif_conv.kb \
@@ -66,6 +70,10 @@ EXTRA_DIST = bibrankgkb.cfg.in \
              citerank_pagerank_c.cfg \
              citerank_pagerank_t.cfg \
              demo_itc_collection.cfg \
-             template_index_term_count.cfg
+             template_index_term_count.cfg \
+             record_view.cfg \
+             average_score.cfg \
+             template_record_view.cfg \
+             template_average_score.cfg
 
 CLEANFILES = *~ *.tmp

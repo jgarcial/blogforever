@@ -1663,6 +1663,14 @@ INSERT INTO rnkMETHOD (id,name,last_updated) VALUES (7,'selfcites','0000-00-00 0
 INSERT INTO collection_rnkMETHOD (id_collection,id_rnkMETHOD,score) VALUES (1,7,10);
 INSERT INTO collection_rnkMETHOD (id_collection,id_rnkMETHOD,score) VALUES (15,7,80);
 
+INSERT INTO rnkMETHOD (id,name,last_updated) VALUES (8,'average_score','0000-00-00 00:00:00');
+INSERT INTO collection_rnkMETHOD (id_collection,id_rnkMETHOD,score) VALUES (1,8,0);
+INSERT INTO collection_rnkMETHOD (id_collection,id_rnkMETHOD,score) VALUES (15,8,0);
+
+INSERT INTO rnkMETHOD (id,name,last_updated) VALUES (9,'record_view','0000-00-00 00:00:00');
+INSERT INTO collection_rnkMETHOD (id_collection,id_rnkMETHOD,score) VALUES (1,9,0);
+INSERT INTO collection_rnkMETHOD (id_collection,id_rnkMETHOD,score) VALUES (15,9,0);
+
 INSERT INTO externalcollection (id, name) VALUES (1, 'Amazon');
 INSERT INTO externalcollection (id, name) VALUES (2, 'CERN EDMS');
 INSERT INTO externalcollection (id, name) VALUES (3, 'CERN Indico');

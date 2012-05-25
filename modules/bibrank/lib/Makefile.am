@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -48,7 +48,9 @@ pylib_DATA = bibrankadminlib.py \
              bibrank_selfcites_indexer.py \
              bibrank_selfcites_task.py \
              bibrank_selfcites_unit_tests.py \
-             bibrank_selfcites_regression_tests.py
+             bibrank_selfcites_regression_tests.py \
+             bibrank_record_view_indexer.py \
+             bibrank_average_score_indexer.py
 
 EXTRA_DIST = $(pylib_DATA)
 

@@ -1,7 +1,7 @@
 ## -*- mode: python; coding: utf-8; -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2010, 2011 CERN.
+## Copyright (C) 2007, 2008, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -90,7 +90,9 @@ from invenio.bibrank_tag_based_indexer import \
      download_weight_filtering_user, \
      download_weight_total, \
      file_similarity_by_times_downloaded, \
-     index_term_count
+     index_term_count, \
+     record_view, \
+     average_score
 from invenio.bibrank_word_indexer import word_similarity #@UnusedImport
 from invenio.bibrank_citerank_indexer import citerank #@UnusedImport
 from invenio.solrutils_bibrank_indexer import word_similarity_solr #@UnusedImport

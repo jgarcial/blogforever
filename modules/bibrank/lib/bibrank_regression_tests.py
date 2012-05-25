@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -22,12 +22,17 @@
 __revision__ = "$Id$"
 
 import unittest
+import re
+from datetime import datetime
+from subprocess import Popen
+from mechanize import Browser
 
-from invenio.config import CFG_SITE_URL, CFG_SITE_RECORD
+from invenio.config import CFG_SITE_URL, CFG_SITE_RECORD, CFG_BINDIR
 from invenio.dbquery import run_sql
 from invenio.testutils import make_test_suite, run_test_suite, \
                               test_web_page_content, merge_error_messages
 from invenio.bibrank_bridge_utils import get_external_word_similarity_ranker
+from invenio.bibsched import get_last_taskid
 
 class BibRankWebPagesAvailabilityTest(unittest.TestCase):
     """Check BibRank web pages whether they are up or not."""
@@ -167,10 +172,130 @@ class BibRankExtCitesTest(unittest.TestCase):
                          test_case_repno_cited_by)
 
 
+class BibRankAverageScoreRankingTest(unittest.TestCase):
+    """Check bibrank average score ranking tools."""
+
+    def setUp(self):
+        # Test records from Article collection.
+        test_scores = {86: [5, 5, 4, 3, 1, 1, 2, 5, 4, 4, 2],
+                       87: [1, 2, 2, 5, 5, 5, 4, 3, 3, 3, 4, 5, 5, 1, 2],
+                       91: [5, 5, 1, 1, 2, 3],
+                       89: [5, 4, 1, 1, 4, 5, 2, 2],
+                       90: [4, 4, 4, 3, 2, 1],
+                       92: [4, 4, 4, 3, 3, 1, 5, 1],
+                       94: [5, 5, 5, 5, 3],
+                       95: [1, 2, 3, 4, 5, 3, 4, 4, 2],
+                       96: [4, 3, 5, 5, 5, 2, 4],
+                       97: [2, 3, 5, 5, 4, 4, 4, 3, 2, 4, 5, 1, 3]}
+
+        # Clean tables before test starts.
+        run_sql("delete from cmtRECORDCOMMENT")
+        # Clean rank method data.
+        run_sql("DELETE from rnkMETHODDATA WHERE id_rnkMETHOD in (SELECT id from rnkMETHOD WHERE name = 'average_score')")
+
+        # Construct test table with test scores.
+        query = "INSERT into cmtRECORDCOMMENT(id_bibrec, id_user, star_score) VALUES(%s, 1, %s)"
+        for recid in test_scores:
+            star_scores = test_scores[recid]
+            for score in star_scores:
+                run_sql(query, (recid, score,))
+
+        command = "%s/bibrank" % CFG_BINDIR
+        proc = Popen([command, "-u", "admin"])
+        proc.wait()
+
+        # Manually run the bibrank task! Just imitate bibsched's operations.
+        task_id = get_last_taskid()
+        proc = Popen([command, str(task_id)])
+        proc.wait()
+
+    def tearDown(self):
+        query = "DELETE from cmtRECORDCOMMENT"
+        run_sql(query)
+
+    def test_search_results_ranked_by_average_score(self):
+        """bibrank - search results ranked by average score"""
+
+        expected_result = ['94', '96', '97', '87', '86', '92', '95', '90',
+                           '89', '91']
+        browser = Browser()
+        browser.open(CFG_SITE_URL + "/search?ln=en&cc=Articles&rm=average_score&rg=10&of=hx")
+        search_response = browser.response().read()
+
+        regex = re.compile("@article{[\w]*:([\d]+),")
+        search_results = regex.findall(search_response)
+
+        if expected_result != search_results:
+            self.fail("Expected to see in order %s, got %s." % \
+                      (expected_result, search_results))
+
+
+class BibRankRecordViewRankingTest(unittest.TestCase):
+    """Check bibrank record view ranking tools."""
+
+    def setUp(self):
+        # Test records from Article collection.
+        dummy_client = 3140802413
+        test_records = {94: 10,
+                        96: 12,
+                        97: 19,
+                        87: 5,
+                        86: 23,
+                        92: 14,
+                        95: 19,
+                        90: 28,
+                        89: 18,
+                        91: 9}
+
+        # Clean tables before test starts.
+        run_sql("DELETE from rnkPAGEVIEWS")
+        # Clean rank method data.
+        run_sql("DELETE from rnkMETHODDATA WHERE id_rnkMETHOD in (SELECT id from rnkMETHOD WHERE name = 'record_view')")
+
+        # Construct test table with test scores.
+        query = "insert into rnkPAGEVIEWS(id_bibrec, id_user, client_host, view_time) values(%s, 1, %s, %s)"
+        for recid in test_records:
+            for elem in range(0, test_records[recid]):
+                cur_time = str(datetime.now())
+                run_sql(query, (recid, dummy_client, cur_time))
+                dummy_client = dummy_client + 1
+
+        command = "%s/bibrank" % CFG_BINDIR
+        proc = Popen([command, "-u", "admin"])
+        proc.wait()
+
+        # Manually run the bibrank task! Just imitate bibsched's operations.
+        task_id = get_last_taskid()
+        proc = Popen([command, str(task_id)])
+        proc.wait()
+
+    def tearDown(self):
+        query = "DELETE from rnkPAGEVIEWS"
+        run_sql(query)
+
+    def test_search_results_ranked_by_view_count(self):
+        """bibrank - search results ranked by view count"""
+
+        expected_result = ['90', '86', '97', '95', '89', '92', '96', '94',
+                           '91', '87']
+        browser = Browser()
+        browser.open(CFG_SITE_URL + "/search?ln=en&cc=Articles+%26+Preprints&rm=record_view&rg=10&of=hx")
+        search_response = browser.response().read()
+
+        regex = re.compile("@article{[\w]*:([\d]+),")
+        search_results = regex.findall(search_response)
+
+        if expected_result != search_results:
+            self.fail("Expected to see in order %s, got %s." % \
+                      (expected_result, search_results))
+
+
 TESTS = [BibRankWebPagesAvailabilityTest,
          BibRankIntlMethodNames,
          BibRankCitationRankingTest,
-         BibRankExtCitesTest]
+         BibRankExtCitesTest,
+         BibRankAverageScoreRankingTest,
+         BibRankRecordViewRankingTest]
 
 
 if not get_external_word_similarity_ranker():
@@ -178,7 +303,6 @@ if not get_external_word_similarity_ranker():
 
 
 TEST_SUITE = make_test_suite(*TESTS)
-
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)

@@ -2,7 +2,7 @@
 ## Ranking of records using different parameters and methods on the fly.
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -121,6 +121,11 @@ def create_rnkmethod_cache():
             methods[rank_method_code]["prefix"] = config.get(cfg_function, "relevance_number_output_prologue")
             methods[rank_method_code]["postfix"] = config.get(cfg_function, "relevance_number_output_epilogue")
             methods[rank_method_code]["chars_alphanumericseparators"] = r"[1234567890\!\"\#\$\%\&\'\(\)\*\+\,\-\.\/\:\;\<\=\>\?\@\[\\\]\^\_\`\{\|\}\~]"
+            try:
+                methods[rank_method_code]["show_relevance"] = int(config.get(cfg_function, "show_relevance"))
+            except:
+                methods[rank_method_code]["show_relevance"] = 1
+
         else:
             raise Exception("Error in configuration file: %s" % (CFG_ETCDIR + "/bibrank/" + rank_method_code + ".cfg"))
 
@@ -277,6 +282,7 @@ def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern=
                 result = func_object(rank_method_code, pattern, hitset, rank_limit_relevance, verbose)
         else:
             result = rank_by_method(rank_method_code, pattern, hitset, rank_limit_relevance, verbose)
+
     except Exception, e:
         register_exception()
         result = (None, "", adderrorbox("An error occured when trying to rank the search result "+rank_method_code, ["Unexpected error: %s<br />" % (e,)]), voutput)
@@ -297,6 +303,10 @@ def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern=
         tmp += "<br/>Elapsed time after finding: "+str(afterfind)+"\nElapsed after mapping: "+str(aftermap)
     result = (result[0],result[1],result[2],result[3],tmp)
 
+    if not methods[rank_method_code]["show_relevance"]:
+        result = (result[0],None,result[2],result[3],tmp)
+    else:
+        result = (result[0],result[1],result[2],result[3],tmp)
     #dbg = string.join(map(str,methods[rank_method_code].items()))
     #result = (None, "", adderrorbox("Debug ",rank_method_code+" "+dbg),"",voutput);
     return result

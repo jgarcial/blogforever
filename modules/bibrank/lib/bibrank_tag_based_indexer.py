@@ -2,7 +2,7 @@
 ## Ranking of records using different parameters and methods.
 
 ## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2012 CERN.
+## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -39,6 +39,8 @@ from invenio.errorlib import register_exception
 from invenio.bibtask import task_get_option, write_message, task_sleep_now_if_required
 from invenio.bibindex_engine import create_range_list
 from invenio.intbitset import intbitset
+from invenio.bibrank_record_view_indexer import record_view_to_index
+from invenio.bibrank_average_score_indexer import average_score_to_index
 
 options = {}
 
@@ -531,3 +533,32 @@ def calculate_index_term_count(config):
 
 def index_term_count(run):
     return bibrank_engine(run)
+
+def record_view(run):
+    return bibrank_engine(run)
+
+def record_view_exec(rank_method_code, cfg_name, config):
+    """
+    Ranking by total number of record visits without check the user ip.
+    """
+    begin_date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    time1 = time.time()
+    unit_time = int(config.get("record_view", "time_interval")) * 60
+    dic = record_view_to_index(unit_time)
+    intoDB(dic, begin_date, rank_method_code)
+    time2 = time.time()
+    return {"time": time2 - time1}
+
+def average_score(run):
+    return bibrank_engine(run)
+
+def average_score_exec(rank_method_code, cfg_name, config):
+    """
+    Ranking by average review score.
+    """
+    begin_date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    time1 = time.time()
+    dic = average_score_to_index()
+    intoDB(dic, begin_date, rank_method_code)
+    time2 = time.time()
+    return {"time": time2 - time1}
