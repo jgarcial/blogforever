@@ -24,6 +24,9 @@
 <div id="post_comments">
 <BFE_POST_COMMENTS />
 </div>
+<div>
+<BFE_TAGS >
+</div>
 </div>
 </td>
 <td valign="top">
