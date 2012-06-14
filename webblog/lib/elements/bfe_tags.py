@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 ## This file is part of CDS Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## Copyright (C) 2012 CERN.
 ##
 ## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -16,8 +16,9 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
 """
-BibFormat Element - displays the tags of a blog and/or blog post
+BibFormat Element - displays tags on blogs and blog posts
 """
 
 from invenio.config import CFG_SITE_URL
@@ -29,7 +30,7 @@ cfg_messages["in_issue"] = {"en": "Tags",
 
 def format_element(bfo):
     """
-    Returns all the tags of the correspoding blog or blogpost
+    Returns all the tags of the corresponding blog or blogpost
     """
 
     current_language = bfo.lang
@@ -43,7 +44,7 @@ def format_element(bfo):
             cfg_messages["in_issue"][current_language]
 
         for tag in tags:
-            out += """<a href = "%s/search?ln=%s&p=%s">%s</a>  """ % (CFG_SITE_URL, current_language, tag, tag)
+            out += """<a href = "%s/search?ln=%s&p=653__1:%s">%s</a>  """ % (CFG_SITE_URL, current_language, tag, tag)
 
         out += """</span>"""
     return out
