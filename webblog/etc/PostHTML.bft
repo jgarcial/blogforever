@@ -34,6 +34,11 @@
 <br />
 <BFE_POST_THUMBNAIL />
 </div>
+<br />
+<br />
+<div class="menuleft">
+<BFE_LINKS_MENU>
+</div>
 </td>
 </tr>
 </table>
