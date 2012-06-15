@@ -849,15 +849,19 @@ URI: http://%(host)s%(page)s
 
         ### BF: let's display a disclaimer with every part of a blog
         from invenio.search_engine_utils import get_fieldvalues
-        elem_url = get_fieldvalues(recid, "520__u")[0]
         try:
-            elem_title = get_fieldvalues(recid, "245__a")[0]
+            coll = get_fieldvalues(recid, "980__a")[0]
         except:
-            elem_title = "Untitled"
+            coll = "record"
 
-        elem_html_url = """<a href = "%(url)s">%(title)s</a>""" % {'url': elem_url, 'title': elem_title}
-        coll = get_fieldvalues(recid, "980__a")[0]
-        disclaimer_content = "The content of this %s is an archived copy and not the original, to go to the original click here  " % coll.lower()
+        try:
+            elem_url = get_fieldvalues(recid, "520__u")[0]
+        except:
+            elem_url = ""
+
+        elem_html_url = """<a href = '%(url)s'>here</a>""" % {'url': elem_url}
+
+        disclaimer_content = "The content of this %s is an archived copy and not the original, to go to the original click " % coll.lower()
 
         if show_similar_rec_p and not CFG_INSPIRE_SITE:
             similar = create_html_link(
