@@ -21,7 +21,6 @@
 Various utilities for WebBlog, e.g. config parser, etc.
 """
 
-from invenio.search_engine import perform_request_search
 from invenio.search_engine_utils import get_fieldvalues
 
 #####  BLOGS #####
@@ -35,16 +34,30 @@ def get_parent_blog(recid):
     @rtype: int
     """
 
-    if get_fieldvalues(recid, '980__a')[0] == 'BLOG':
+    coll = get_fieldvalues(recid, '980__a')[0]
+    if coll == 'BLOG':
         return recid
+    elif coll == 'COMMENT':
+        parent_post = get_parent_post(recid)
+        recid = parent_post
 
-    parent_recid = get_fieldvalues(recid, '760__w')
-    if parent_recid:
-        parent_blog_recid = int(parent_recid[0])
+    parent_blog = get_fieldvalues(recid, '760__w')
+
+    if parent_blog:
+        return int(parent_blog[0])
     else:
-        parent_blog_recid = None
+        return None
 
-    return parent_blog_recid
+def get_blog_descendants(recid):
+    """ This function returns all the descendants of the given blog """
+
+    posts = get_posts(recid)
+    descendants = posts
+    for post_recid in posts:
+        comments = get_comments(post_recid)
+        descendants += comments
+
+    return descendants
 
 ##### POSTS #####
 
@@ -53,13 +66,14 @@ def get_posts(blog_recid, newest_first=True):
     written on the given blog
     @param blog_recid: blog recid
     @type blog_recid: int
-    @param newest_first: order in wich the posts will be displayed. If
+    @param newest_first: order in which the posts will be displayed. If
     it is True the newest published posts will be displayed first
     @type newest_first: boolean
     @return: list of posts recids
     @rtype: list
     """
 
+    from invenio.search_engine import perform_request_search
     return perform_request_search(p='760__w:"%s"' % blog_recid, sf='date', so='d')
 
 def get_parent_post(comment_recid):
@@ -71,13 +85,11 @@ def get_parent_post(comment_recid):
     @rtype: int
     """
 
-    parent_comment_recid = get_fieldvalues(comment_recid, '773__w')
-    if parent_comment_recid:
-        get_parent_post = int(parent_comment_recid[0])
+    parent_post = get_fieldvalues(comment_recid, '773__w')
+    if parent_post:
+        return int(parent_post[0])
     else:
-        get_parent_post = None
-
-    return get_parent_post
+        return None
 
 def get_sibling_posts(post_recid, newest_first=True, exclude_this_post=True):
     """ This function returns the list of the sibling posts of any 
@@ -116,6 +128,7 @@ def get_next_post(post_recid):
     post_date = get_fieldvalues(post_recid, '269__c')
     if post_date:
         post_date = post_date[0]
+        from invenio.search_engine import perform_request_search
         recid_list = perform_request_search(p='760__w:"%s" 269__c:%s-->9999-99-99' % \
                                             (main_blog_recid, post_date), sf='date', so='d')
         if len(recid_list) > 1:
@@ -139,6 +152,7 @@ def get_previous_post(post_recid):
     post_date = get_fieldvalues(post_recid, '269__c')
     if post_date:
         post_date = post_date[0]
+        from invenio.search_engine import perform_request_search
         recid_list = perform_request_search(p='760__w:"%s" 269__c:0000-00-00-->%s' % \
                                             (main_blog_recid, post_date), sf='date', so='a')
         if len(recid_list) > 1:
@@ -159,7 +173,7 @@ def get_comments(post_recid, newest_first=True):
     @return: list of sibling comments recids
     @rtype: list
     """
-
+    from invenio.search_engine import perform_request_search
     return perform_request_search(p='773__w:"%s"' % post_recid, sf='date', so='d')
 
 def get_sibling_comments(comment_recid, newest_first=True, exclude_this_comment=True):
