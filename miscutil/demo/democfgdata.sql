@@ -1,4 +1,5 @@
 
+-- create collections
 
 INSERT INTO collection VALUES (2,'Blogs','collection:BLOG',NULL,NULL);
 INSERT INTO collection VALUES (3,'Posts','collection:BLOGPOST',NULL,NULL);
@@ -18,7 +19,14 @@ INSERT INTO collection_collection VALUES (1,4,'r',30);
 INSERT INTO collection_collection VALUES (1,5,'r',20);
 -- INSERT INTO collection_collection VALUES (1,6,'r',10);
 
--- submission form
+
+-- set the 'websearch_instantbrowse_by_field' plugin up to
+-- the blog posts collection to display them by publication date
+
+INSERT INTO collection_instantbrowse VALUES (3, 'websearch_instantbrowse_by_field', '{"field": "269__c", "order": "d"}');
+
+
+-- blogs submission form
 
 DELETE FROM sbmFUNDESC WHERE function LIKE 'BSI%';
 DELETE FROM sbmFIELD WHERE subname LIKE '%BSI';
@@ -31,7 +39,7 @@ DELETE FROM sbmIMPLEMENT WHERE docname='BSI';
 DELETE FROM sbmPARAMETERS WHERE doctype='BSI';
 INSERT INTO sbmDOCTYPE VALUES ('Blog Submission Interface','BSI','2012-05-23','2012-05-23','Blog Submission Interface');
 INSERT INTO sbmFIELD VALUES ('SBIBSI',1,1,'BSI_TITLE','<table style=\"font-family: Verdana, Arial, Helvetica, sans-serif;font-size: 16px;width: 400px;height:380px;background:#E8F9EC;border-spacing: 4px 4px;padding-left:10px;\" align=\"center\" cellspacing=\"2\" cellpadding=\"2\">\r\n<tr>\r\n<td style=\"text-align: left\"><br />\r\n<span style=\"font-weight: bold;\">Submit blog metadata:</span><br /><br />\r\n<span>Blog title:</span><br />','M','Blog title','','2012-05-23','2012-05-29',NULL,NULL);
-INSERT INTO sbmFIELD VALUES ('SBIBSI',1,2,'BSI_URL','<br /><br />\r\n<span style=\"color: red;\">* </span>Blog URL:<br />','M','Blog URL','','2012-05-23','2012-05-24',NULL,NULL);
+INSERT INTO sbmFIELD VALUES ('SBIBSI',1,2,'BSI_URL','<br /><br />\r\n<span style=\"color: red;\">* </span>Blog URL:<br />','M','Blog URL','','2012-05-23','2012-06-21',NULL,NULL);
 INSERT INTO sbmFIELD VALUES ('SBIBSI',1,3,'BSI_TOPIC','<br /><br /><span style=\"color: red;\">* </span>Topic:<br />','M','Topic','','2012-05-23','2012-05-23',NULL,NULL);
 INSERT INTO sbmFIELD VALUES ('SBIBSI',1,4,'BSI_LICENSE','<br /><br /><span style=\"color: red;\">* </span>License:<br />','M','License','','2012-05-23','2012-05-23',NULL,NULL);
 INSERT INTO sbmFIELD VALUES ('SBIBSI',1,5,'BSI_END','<br /><br /></td></tr></table><br />','O','','','2012-05-23','2012-05-23',NULL,NULL);
@@ -49,6 +57,7 @@ INSERT INTO sbmFUNCTIONS VALUES ('SBI','BSI','Move_to_Done',80,1);
 INSERT INTO sbmFUNCTIONS VALUES ('SBI','BSI','Print_Success',60,1);
 INSERT INTO sbmFUNCTIONS VALUES ('SBI','BSI','Report_Number_Generation',30,1);
 INSERT INTO sbmIMPLEMENT VALUES ('BSI','SBI','Y','SBIBSI',1,'2012-05-23','2012-06-21',NULL,'','',0,0,'');
+INSERT INTO sbmPARAMETERS VALUES ('BSI','authorfile','');
 INSERT INTO sbmPARAMETERS VALUES ('BSI','autorngen','Y');
 INSERT INTO sbmPARAMETERS VALUES ('BSI','counterpath','lastid_BLOG_<PA>yy</PA>	');
 INSERT INTO sbmPARAMETERS VALUES ('BSI','createTemplate','BSIcreate.tpl');
