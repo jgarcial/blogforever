@@ -1162,15 +1162,15 @@ form input[disabled], form input[disabled="true"]{
 }
 .submitBody {
    color: #000;
-   background: #9cf;
+   background: #CEF6CE;
 }
 .submitHeader {
    color: #fff;
-   background: #006;
+   background: #567025;
 }
 .submitCurrentPage {
    color: #000;
-   background: #9cf;
+   background: #CEF6CE;
    border-top: 1px solid #039;
    border-left: 1px solid #039;
    border-right: 1px solid #039;
