@@ -9,4 +9,4 @@ TMPDIR = $(PREFIX)/tmp
 LIBDIR = $(PREFIX)/lib
 IMGDIR = $(PREFIX)/var/www/img
 
-INSTALL = install -g apache -m 775
+INSTALL = install -g www-data -m 775
