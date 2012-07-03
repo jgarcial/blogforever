@@ -4615,7 +4615,10 @@ def print_records_prologue(req, format, cc=None):
     format.
     """
     prologue = "" # no prologue needed for HTML or Text formats
-    if format.startswith('xm'):
+    
+    if format.startswith('xmets'):
+        prologue = websearch_templates.tmpl_xml_mets_prologue()
+    elif format.startswith('xm'):
         prologue = websearch_templates.tmpl_xml_marc_prologue()
     elif format.startswith('xn'):
         prologue = websearch_templates.tmpl_xml_nlm_prologue()
@@ -4641,7 +4644,9 @@ def print_records_epilogue(req, format):
     format.
     """
     epilogue = "" # no epilogue needed for HTML or Text formats
-    if format.startswith('xm'):
+    if format.startswith('xmets'):
+        epilogue = websearch_templates.tmpl_xml_mets_epilogue()
+    elif format.startswith('xm'):
         epilogue = websearch_templates.tmpl_xml_marc_epilogue()
     elif format.startswith('xn'):
         epilogue = websearch_templates.tmpl_xml_nlm_epilogue()

@@ -32,7 +32,8 @@ etc_DATA = Default_HTML_captions.bft Picture_HTML_brief.bft \
            Video_HTML_brief.bft Video_HTML_detailed.bft \
            Basket_Search_Result.bft Default_HTML_meta.bft \
            WebAuthorProfile_affiliations_helper.bft DataCite.xsl \
-           Default_Mobile_brief.bft Default_Mobile_detailed.bft
+           Default_Mobile_brief.bft Default_Mobile_detailed.bft \
+           METS.bft
 
 tmpdir = $(prefix)/var/tmp
 
