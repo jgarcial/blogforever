@@ -23,7 +23,7 @@ def process_dir(dir_name, delete=False):
 				print "ERROR deleting file " + file_name
 	ftp.cwd('..')
 
-	task_low_level_submission('bibupload', 'batchupload', '--replace', local_dir+dir_name+'.xml', '--pre-plugin=bp_pre_ingestion', '')
+	task_low_level_submission('bibupload', 'batchupload', '--replace', local_dir+dir_name+'.xml', '--pre-plugin=bp_pre_ingestion', '--post-plugin=bp_post_ingestion')
 
 	if delete:
 		try:
