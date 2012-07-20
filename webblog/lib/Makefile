@@ -4,7 +4,7 @@ include ../../config.mk
 
 SUBDIRS = elements
 
-LIBFILES = webblog_utils.py
+LIBFILES = webblog_utils.py bloguploader.py
 
 all:
 	$(foreach SUBDIR, $(SUBDIRS), cd $(SUBDIR) && make all && cd .. ;)

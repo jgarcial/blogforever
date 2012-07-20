@@ -2,7 +2,7 @@
 
 include ../config.mk
 
-SUBDIRS = etc lib
+SUBDIRS = etc lib bin
 
 LIBFILES = 
 
