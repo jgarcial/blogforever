@@ -30,6 +30,7 @@ import string
 import os
 import re
 import json
+from invenio.dateutils import strftime
 
 
 if sys.hexversion < 0x2040000:
