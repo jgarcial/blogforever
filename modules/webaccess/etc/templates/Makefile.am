@@ -20,7 +20,13 @@ templates_DATA = webaccess_admin_index.html \
 		 webaccess_admin_rolearea.html \
 		 webaccess_admin_showroledetails.html \
 		 webaccess_admin_userarea.html \
-		 webaccess_admin_actionarea.html
+		 webaccess_admin_actionarea.html \
+		 webaccess_admin_premiumarea.html \
+		 webpayment_index.html \
+		 webpayment_review.html \
+		 webpayment_upgrade.html \
+		 webpayment_display.html \
+		 webpayment_packages.html
 
 EXTRA_DIST = $(templates_DATA)
 

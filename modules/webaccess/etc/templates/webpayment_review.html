@@ -1,0 +1,28 @@
+{% extends "page.html" %} {% block body %}
+<div class="page-header">
+	<h1>{{_('Confirm payment')}}</h1>
+</div>
+<table class="table table-striped">
+	<tr>
+		<th>{{_('Name')}}</th>
+		<th>{{_('Details')}}</th>
+		<th>{{_('Duration')}}</th>
+		<th>{{_('Price')}}</th>
+	</tr>
+	<tr>
+		<td>{{result['premium_package'].name}}</td>
+		<td>{{result['premium_package'].details}}</td>
+		<td>{{duration_formatter(result['premium_package'])}}</td>
+		<td>{{result['premium_package'].price}}
+			{{result['premium_package'].currency}}</td>
+	</tr>
+	<tr>
+		<td colspan=4 style="text-align: center">Total:
+			{{result['premium_package'].price}}
+			{{result['premium_package'].currency}}</td>
+	</tr>
+	<tr>
+		<td colspan=4 style="text-align: center">{{result['data']|safe}}</td>
+	</tr>
+</table>
+{% endblock %}

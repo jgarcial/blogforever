@@ -1,0 +1,139 @@
+{% extends "page.html" %} {% block css %}
+<style type="text/css">
+.cc-input .add-on {
+	width: 20%;
+}
+
+.cc-input .input-block-level {
+	width: 80%;
+}
+
+.cc-input select {
+	display: inline;
+}
+
+.cc-input-double .input-block-level {
+	width: 40%;
+}
+
+.cc-input-double span+* {
+	border-radius: 0px;
+}
+</style>
+{% endblock %} {% block javascript %}
+<script type="text/javascript">
+	function createErrorPopover(jQueryObj, content, placement) {
+		jQueryObj.popover({
+			content : content,
+			placement : placement,
+			trigger : 'manual'
+		});
+	}
+
+	$(document).ready(function() {
+		{%- if form.errors -%}	
+			var leftSide = true;
+			{%- for field in form-%}
+				{%- if field.type != "CSRFTokenField" and field.type != "HiddenField" -%}
+					createErrorPopover($("#{{field.id}}").parent(),
+						"{%-for msg in field.errors -%}{{msg}} {%- endfor -%}",
+						leftSide ? 'left' : 'right');
+					leftSide = !leftSide;
+					$("#{{field.id}}").parent().popover('show');
+				{%- endif -%}
+			{%- endfor -%}
+			
+			{%- for field in form.additional()-%}
+				{%- if field.type != "CSRFTokenField" and field.type != "HiddenField" -%}
+					createErrorPopover($("#{{field.id}}").parent(),
+						"{%-for msg in field.errors -%}{{msg}} {%- endfor -%}",
+						leftSide ? 'left' : 'right');
+					leftSide = !leftSide;
+					$("#{{field.id}}").parent().popover('show');
+				{%- endif -%}
+			{%- endfor -%}
+		{%- endif -%}
+	});
+</script>
+{% endblock %}{% block body %}
+
+<div class="page-header">
+	<h1>{{_('Purchase a premium package with credit card')}}</h1>
+</div>
+<form id='pay_with_credit_card' method="POST" action=""
+	autocomplete="OFF">
+	<fieldset>
+		<legend>Premium Package Details</legend>
+		<table class="table table-striped table-condensed">
+			<tbody>
+				<tr>
+					<th>Name</th>
+					<td>{{premium_package.name}}</td>
+				</tr>
+				<tr>
+					<th>Details</th>
+					<td>{{premium_package.details}}</td>
+				</tr>
+				<tr>
+					<th>Duration</th>
+					<td>{{duration_formatter(premium_package)}}</td>
+				</tr>
+				<tr>
+					<th>Price</th>
+					<td>{{premium_package.price}} {{premium_package.currency}}</td>
+				</tr>
+				<tr>
+					<th>Access to Collections</th>
+					<td>{%- for collection in restricted_collections -%}
+						<div>{{collection.name}}</div> {%- endfor -%}
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</fieldset>
+	<fieldset>
+		<legend>{{_("Credit Card Information")}}</legend>
+		{%- if error_messages -%} {%- for message in error_messages -%}
+		<div class="alert alert-error">
+			<button type="button" class="close" data-dismiss="alert">&times;</button>
+			{{ message }}
+		</div>
+		{%- endfor -%} {%- endif -%}
+		{{form.id_package(value=premium_package.id)}}
+		<div class="input-prepend cc-input">
+			<span class="add-on">{{form.name_on_card.label}}</span>
+			{{form.name_on_card(class="input-block-level", required="required",
+			value="")}}
+		</div>
+		<div class="input-prepend cc-input">
+			<span class="add-on">{{form.card_number.label}}</span>
+			{{form.card_number(class="input-block-level", required="required",
+			value="")}}
+		</div>
+		<div class="input-prepend cc-input cc-input-double">
+			<span class="add-on">{{form.expiration_month.label}}</span>
+			{{form.expiration_month(class="input-block-level",
+			required="required")}}{{form.expiration_year(class="input-block-level",
+			required="required")}}
+		</div>
+		<div class="input-prepend cc-input">
+			<span class="add-on">{{form.cvv.label}}</span>
+			{{form.cvv(class="input-block-level", required="required",
+			value="")}}
+		</div>
+		{%- for field in form.additional() -%} {%- if field.type !=
+		"CSRFTokenField" and field.type != "HiddenField" -%}
+		<div class="input-prepend cc-input">
+			<span class="add-on">{{field.label}}</span>
+			{{field(class="input-block-level", required="required")}}
+		</div>
+		{%- else -%} {{field()}} {%- endif -%} {%- endfor -%} {{
+		form.csrf_token() }}
+	</fieldset>
+	<center>
+		<button class="btn btn-primary" id="upgrade-button" type="submit" />
+		{{_('Upgrade')}}
+		</button>
+	</center>
+</form>
+{% endblock %}

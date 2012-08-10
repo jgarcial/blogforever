@@ -1,0 +1,11 @@
+{% extends "page.html" %} {% from "webpayment_packages.html" import
+webpayment_packages_body %} {% from "webpayment_packages.html" import
+webpayment_packages_css %} {% from "webpayment_packages.html" import
+webpayment_packages_javascript %} {% block css %} {{
+webpayment_packages_css() }} {% endblock %} {% block javascript %} {{
+webpayment_packages_javascript() }} {% endblock %} {% block body %}
+<div class="page-header">
+	<h1>{{_('Purchase a premium package')}}</h1>
+</div>
+{{ webpayment_packages_body(premium_packages, payment_methods,
+package_collection_map, duration_formatter, _) }} {% endblock %}

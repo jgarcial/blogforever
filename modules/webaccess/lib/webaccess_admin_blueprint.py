@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+#-*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
 ## Copyright (C) 2012 CERN.
@@ -19,10 +19,19 @@
 
 """WebAccess Admin Flask Blueprint"""
 
-from flask import redirect, url_for
+from flask import redirect, url_for, request
 from invenio.webaccess_model import AccACTION, AccROLE
-from invenio.websession_model import User
+from invenio.webpayment_model import Premium, HstPAYMENT
+from invenio.websession_model import User, UserUsergroup, Usergroup
 from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
+
+from invenio.webuser_flask import current_user
+from sqlalchemy.sql import operators, expression, functions
+from sqlalchemy.orm import exc
+from invenio.websearch_model import Collection, CollectionCollection
+from invenio.webpayment_forms import PremiumPackageForm, GiftPremiumPackageForm
+from invenio import webpayment_query as webpayment_db
+from invenio import webpayment
 
 from invenio.access_control_config import \
     WEBACCESSACTION
@@ -64,7 +73,10 @@ def index():
         dict(url=url_for('.managerobotlogin'),
              title=_('Manage Robot Login'),
              description=_('Manage robot login keys and test URLs.')),
-    ]
+        dict(url=url_for('.premiumarea'),
+             title=_('Premium Area'),
+             description=_('Manage premium packages'))
+        ]
     return dict(actions=actions)
 
 
@@ -134,3 +146,95 @@ def delegate_startarea():
 def managerobotlogin():
     #FIXME reimplement this function
     return redirect('/admin/webaccess/webaccessadmin.py/managerobotlogin')
+
+
+@blueprint.route('/premiumarea', methods=['GET', 'POST'])
+@blueprint.invenio_authenticated
+@blueprint.invenio_authorized(WEBACCESSACTION)
+@blueprint.invenio_templated('webaccess_admin_premiumarea.html')
+def premiumarea():
+    form = PremiumPackageForm(request.values)
+    gift_form = GiftPremiumPackageForm(request.values)
+
+    if request.method == 'POST':
+        if request.args.get('page', None) == 'packages' and form.validate():
+            if not form.package_id.data:  # Add new one
+                webpayment.add_new_premium_package(form)
+            else:  # Update existing one
+                webpayment.edit_premium_package(form)
+        if request.args.get('page', None) == 'users' and gift_form.validate():
+            webpayment.gift_premium_package(gift_form)
+
+    premium_packages = webpayment_db.get_all_premium_packages()
+    package_collection_map = webpayment.get_package_collection_map()
+    history = webpayment_db.get_payment_history()
+    transaction_number = webpayment_db.get_total_transaction_number()
+    total_revenue = webpayment_db.get_total_revenue()
+    premium_user_number = webpayment_db.get_premium_user_number()
+    users = webpayment_db.get_premium_users()
+
+    return dict(premium_packages=premium_packages,
+                package_collection_map=package_collection_map,
+                history=history,
+                users=users,
+                premium_user_number=premium_user_number,
+                transaction_number=transaction_number,
+                total_revenue=total_revenue,
+                form=form,
+                gift_form=gift_form,
+                page=request.args.get('page', None))
+
+
+@blueprint.route('/premiumarea/delete', methods=['POST'])
+@blueprint.invenio_authenticated
+@blueprint.invenio_authorized(WEBACCESSACTION)
+@blueprint.invenio_wash_urlargd({'id_package': (int, 0)})
+def delete_premium_package(id_package):
+    if id_package <= 0:
+        return "Could not found premium package with id %s" % id_package, 404
+
+    try:
+        webpayment.delete_premium_package(id_package)
+        return ""
+    except:
+        return "Could not delete the premium package with id %s" % id_package, 404
+
+
+@blueprint.route('/premiumarea/movedown', methods=['PUT'])
+@blueprint.invenio_authenticated
+@blueprint.invenio_authorized(WEBACCESSACTION)
+@blueprint.invenio_wash_urlargd({'id_package': (int, 0)})
+def move_premium_package_down(id_package):
+    if id_package <= 0:
+        return "Could not found premium package with id %s" % id_package, 404
+
+    try:
+        webpayment_db.move_package_down(id_package)
+        return ""
+    except exc.NoResultFound:
+        return "The package is already last", 404
+
+
+@blueprint.route('/premiumarea/moveup', methods=['PUT'])
+@blueprint.invenio_authenticated
+@blueprint.invenio_authorized(WEBACCESSACTION)
+@blueprint.invenio_wash_urlargd({'id_package': (int, 0)})
+def move_premium_package_up(id_package):
+    if id_package <= 0:
+        return "Could not found premium package with id %s" % id_package, 404
+
+    try:
+        webpayment_db.move_package_up(id_package)
+        return ""
+    except exc.NoResultFound:
+        return "The package is already first", 404
+
+
+@blueprint.route('/premiumarea/gift', methods=['POST'])
+@blueprint.invenio_authenticated
+@blueprint.invenio_authorized(WEBACCESSACTION)
+@blueprint.invenio_wash_urlargd({'username': (unicode, ''),
+                                 'premium_package': (int, 0)})
+def gift_premium_package(username, premium_package):
+    webpayment.gift_premium_package(username, premium_package)
+    return redirect(url_for('.premiumarea'))

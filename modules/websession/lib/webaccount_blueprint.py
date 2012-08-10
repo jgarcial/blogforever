@@ -213,6 +213,8 @@ def _invenio_settings_plugin_builder(plugin_name, plugin_code):
     from invenio.settings import Settings
     if 'settings' in dir(plugin_code):
         candidate = getattr(plugin_code, 'settings')
+        if not candidate:
+            return None
         if issubclass(candidate, Settings):
             return candidate
     raise ValueError('%s is not a valid settings plugin' % plugin_name)

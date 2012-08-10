@@ -349,6 +349,35 @@ def acc_update_role(id_role=0, name_role='', dummy=0, description='', \
         WHERE id = %s""", (description, firerole_def_ser,
                            firerole_def_src, id_role))
 
+def acc_add_premium_role(name_role, description,
+        firerole_def_ser = CFG_ACC_EMPTY_ROLE_DEFINITION_SER,
+        firerole_def_src = CFG_ACC_EMPTY_ROLE_DEFINITION_SRC):
+    """add a new role to accROLE in the database.
+
+    name_role - name of the role, must be unique
+
+    description - text to describe the role
+
+    firerole_def_ser - compiled firewall like role definition
+
+    firerole_def_src - firewall like role definition sources
+    """
+
+    query = """
+        INSERT INTO     accROLE (
+                            name,
+                            description,
+                            firerole_def_ser,
+                            firerole_def_src)
+        VALUES          (%s, %s, %s, %s)
+        ON DUPLICATE KEY
+            UPDATE          name=name
+    """
+    params = (name_role, description, firerole_def_ser, firerole_def_src)
+
+    res = run_sql(query, params)
+
+    return res, name_role, description, firerole_def_src
 
 # CONNECTIONS BETWEEN USER AND ROLE
 

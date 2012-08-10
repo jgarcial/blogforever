@@ -19,6 +19,7 @@
 
 """WebSearch Flask Blueprint"""
 
+import os
 import json
 import string
 import functools
@@ -42,17 +43,12 @@ from invenio.websearch_facet_builders import \
     get_current_user_records_that_can_be_displayed, faceted_results_filter, \
     FacetLoader
 from invenio.search_engine import get_creation_date, perform_request_search,\
-<<<<<<< HEAD
     print_record, create_nearest_terms_box, browse_pattern_phrases
 from invenio.paginationutils import Pagination
-=======
-    search_pattern, print_record, create_nearest_terms_box
 from invenio.websearch_instantbrowse import instantbrowse_manager
 from invenio.pluginutils import PluginContainer
 from invenio.config import CFG_PYLIBDIR, CFG_WEBSEARCH_INSTANT_BROWSE_AND_SEARCH_SAME_SORTING
-import os
-
->>>>>>> 3eb4751... BibSort: fix sorting by posted date
+from invenio.webpayment_query import is_collection_premium_restricted
 
 blueprint = InvenioBlueprint('search', __name__, url_prefix="",
                              config='invenio.search_engine_config',
@@ -97,9 +93,16 @@ def check_collection(method=None, name_getter=collection_name_from_request,
             if auth_code and current_user.is_guest:
                 return redirect(url_for('webaccount.login',
                                         referer=request.url))
+            elif (auth_code and
+                is_collection_premium_restricted(collection.id)):
+                if CFG_PREMIUM_SERVICE:
+                    return redirect(url_for('webpayment.display',
+                                            collection_id=collection.id))
+                else:
+                    flash(_("Purchasing premium memberships are currently disabled."))
+                    return redirect(url_for('search.index'))
             elif auth_code:
                 return abort(401)
-
         return method(collection, *args, **kwargs)
     return decorated
 

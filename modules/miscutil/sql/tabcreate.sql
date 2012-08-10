@@ -4352,4 +4352,42 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_02_01_oaiREPOSITORY
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_03_07_crcILLREQUEST_overdue_letter',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_01_12_bibrec_master_format',NOW());
 
+-- tables for web payment
+CREATE TABLE IF NOT EXISTS premium (
+  id int(11) NOT NULL AUTO_INCREMENT,
+  name varchar(256) NOT NULL DEFAULT 'New Premium Package',
+  details text NOT NULL,
+  duration int(11) NOT NULL DEFAULT '1',
+  unit_time enum('HOUR','DAY','WEEK','MONTH','YEAR','UNLIMITED') NOT NULL DEFAULT 'UNLIMITED',
+  price double(6,2) NOT NULL DEFAULT '19.95',
+  currency enum('AUD','CAD','CZK','DKK','EUR','HKD','HUF','JPY','NOK','NZD','PLN','GBP','SGD','SEK','CHF','USD') NOT NULL DEFAULT 'EUR',
+  ord int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (id)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS hstPAYMENT (
+  id int(11) NOT NULL AUTO_INCREMENT,
+  id_user int(11) NOT NULL,
+  id_package int(11) NOT NULL,
+  price float NOT NULL,
+  currency enum('AUD','CAD','CZK','DKK','EUR','HKD','HUF','JPY','NOK','NZD','PLN','GBP','SGD','SEK','CHF','USD') NOT NULL DEFAULT 'EUR',
+  transaction_time datetime NOT NULL,
+  payment_method varchar(256) NOT NULL,
+  token varchar(256) NOT NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY (token)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS premium_collection (
+  id_package int(11) NOT NULL,
+  id_collection int (11) NOT NULL,
+  PRIMARY KEY (id_package, id_collection)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS collection_accROLE (
+	id_collection int(15),
+	id_accROLE int(15),
+	PRIMARY KEY (id_collection, id_accROLE)
+) ENGINE=MyISAM;
+
 -- end of file

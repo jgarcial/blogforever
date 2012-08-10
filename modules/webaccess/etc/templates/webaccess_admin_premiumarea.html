@@ -1,0 +1,560 @@
+{% extends "page.html" %} {% set title = _("Premium Area") %} {% block
+title %}
+<div class="page-header">
+	<h1>
+		{{ title }} <small>{{ _('selection for WebAccess Admin') }}</small>
+	</h1>
+</div>
+{% endblock title %} {% block css %}
+<style type="text/css">
+span.revenue {
+	margin: 10px;
+}
+
+.pp-input {
+	margin-right: 10px;
+}
+
+.pp-input .add-on {
+	width: 20%;
+}
+
+.pp-input input,.pp-input select,.pp-input textarea,.pp-input button {
+	width: 80%;
+}
+
+.pp-input-double input,.pp-input-double select,.pp-input-double textarea,.pp-input-double button
+	{
+	width: 40%;
+}
+
+.pp-input-button input,.pp-input-button select,.pp-input-button textarea,.pp-input-button button
+	{
+	width: 60%;
+	border-radius: 0px;
+	border-right-style: none;
+	border-left-style: dotted;
+}
+
+.pp-input-button .btn {
+	width: 20%;
+	border-top-right-radius: 5px;
+	border-bottom-right-radius: 5px;
+}
+
+.pp-input-double span+* {
+	border-radius: 0px;
+	border-right-style: none;
+}
+
+.pp-input span                             ~* {
+	display: inline;
+}
+
+.pp-input span+* {
+	border-left-style: dotted;
+	border-top-left-radius: 0px;
+	border-bottom-left-radius: 0px;
+}
+
+span.btn {
+	margin: 2px;
+}
+
+form {
+	margin: 0px;
+}
+
+.modal-body {
+	overflow-y: initial;
+}
+
+i {
+	cursor: pointer;
+}
+
+.icon-remove-collection-name {
+	margin-right: 5px;
+}
+</style>
+{% endblock css %} {% block javascript %}
+<script type="text/javascript">
+	if (!String.prototype.trim) {
+		/*
+		 * Defines trim function for the browsers that do not support.
+		 */
+		String.prototype.trim = function() {
+			return this.replace(/^\s+|\s+$/g, '');
+		};
+	}
+
+	function addCollection(collectionID, collectionName) {
+		var collectionList = eval($("#{{form.collections.id}}").val());
+		
+		if (collectionList.indexOf(parseInt(collectionID)) != -1)
+			return;
+		
+		collectionList = collectionList.concat(parseInt(collectionID));
+		$("#{{form.collections.id}}").val(JSON.stringify(collectionList));
+
+		var collectionNames = $("#selected_collection_names");
+		collectionNames.html(collectionNames.html() + '<span class="btn btn-info remove-collection-name" collectionID="'+collectionID+'">'
+			+ '<i class="icon-remove icon-white icon-remove-collection-name"></i>'
+			+ collectionName
+			+ '</span>');
+
+		$(".remove-collection-name").die();
+		$(".remove-collection-name").live('click', function() {
+			var collections = eval($("#{{form.collections.id}}").val());
+			var index = collections.indexOf(parseInt(this.attributes.collectionID.value));
+			collections.splice(index, 1);
+			$("#{{form.collections.id}}").val(JSON.stringify(collections));
+			this.parentNode.removeChild(this);
+		});
+	}
+	
+	function addCollectionByID(collectionID) {
+		var collectionList = $("#{{form.collection_list.id}}");
+		var collectionName = "";
+		collectionList.children().each(function() {
+			if (this.value == collectionID) {
+				collectionName = this.innerText;
+			}
+		});
+		addCollection(collectionID, collectionName);
+	}
+
+	function collectPackageInfo(edit_icon) {
+		var info = {}
+		var row = $(edit_icon).parents("tr")[0];
+		row = $(row);
+		info.id = row.find("[attr=id]").text().trim();
+		info.name = row.find("[attr=name]").text().trim();
+		info.details = row.find("[attr=details]").text().trim();
+		var duration = row.find("[attr=duration]").text().split(/\s+/);
+		info.duration = duration.length > 1 && duration[0] || "";
+		info.unit_time = duration.length > 1 && duration[1] || duration[0];
+		var price = row.find("[attr=price]").text().split(/\s+/);
+		info.price = price[0];
+		info.currency = price[1];
+		info.collections = {};
+		row.find("[attr=collection]").each(function() {
+			info.collections[this.attributes.collection_id.value] = this.innerText.trim();
+		});
+
+		return info;
+	}
+
+	function clearModal() {
+		$("#{{form.package_id.id}}").val("");
+		$("#{{form.name.id}}").val("");
+		$("#{{form.name.id}}").parent().popover("hide");
+		$("#{{form.details.id}}").val("");
+		$("#{{form.details.id}}").parent().popover("hide");
+		$("#{{form.duration.id}}").val("");
+		$("#{{form.duration.id}}").parent().popover("hide");
+		$("#{{form.unit_time.id}}").val("Hour");
+		$("#{{form.price.id}}").val("");
+		$("#{{form.price.id}}").parent().popover("hide");
+		$("#{{form.currency.id}}").val("EUR");
+		$("#{{form.collections.id}}").val("[]");
+		$("#selected_collection_names").html("");
+		$("#{{form.collection_list.id}}").parent().popover("hide");
+		$("#addModalTitle").html("{{_('Add New Premium Package')}}");
+		$("#addButton").val("{{_('Add')}}");
+		
+		$('#premium_modal').off('shown');
+	}
+	
+	function clearGiftModal() {
+		$("#{{gift_form.username.id}}").val("");
+	}
+
+	function createErrorPopover(jQueryObj, content, placement) {
+		jQueryObj.popover({
+			content: content,
+			placement: placement,
+			trigger: 'manual'
+		});
+	}
+
+	$(document).ready(
+			function() {
+				$("#addCollectionButton").click(function() {
+					var collectionID = $("#{{form.collection_list.id}}").val();
+					addCollectionByID(collectionID);
+				});
+
+				$(".icon-arrow-down").click(function(e) {
+					var id_package = this.attributes.id_package.value;
+					var self = this;
+					$.ajax({
+						url : "premiumarea/movedown",
+						type : "PUT",
+						data : {
+							id_package : id_package
+						},
+						success : function(r) {
+							var tbody = $(self).parents("tbody")[0];
+							var row = $(self).parents("tr")[0];
+							var nextRow = row.nextSibling;
+							tbody.insertBefore(nextRow, row);
+						}
+					});
+				});
+
+				$(".icon-arrow-up").click(function(e) {
+					var id_package = this.attributes.id_package.value;
+					var self = this;
+					$.ajax({
+						url : "premiumarea/moveup",
+						type : "PUT",
+						data : {
+							id_package : id_package
+						},
+						success : function(r) {
+							var tbody = $(self).parents("tbody")[0];
+							var row = $(self).parents("tr")[0];
+							var previousRow = row.previousSibling;
+							tbody.insertBefore(row, previousRow);
+						}
+					});
+				});
+
+				$(".remove-premium-package").click(function(e) {
+					var id_package = this.attributes.id_package.value;
+					var self = this;
+					$.ajax({
+						url : "premiumarea/delete",
+						type : "POST",
+						data : {
+							id_package : id_package
+						},
+						success : function(r) {
+							$(self).parents("tr")[0].remove();
+						}
+					});
+				});
+
+				$(".icon-edit").click(function() {
+					var packageInfo = collectPackageInfo(this);
+					$("#addModalTitle").html("{{_('Edit Premium Package')}}");
+					$("#addButton").val("{{_('Edit')}}");
+					$("#{{form.package_id.id}}").val(packageInfo.id);
+					$("#{{form.name.id}}").val(packageInfo.name);
+					$("#{{form.details.id}}").val(packageInfo.details);
+					$("#{{form.duration.id}}").val(packageInfo.duration);
+					$("#{{form.unit_time.id}}").val(packageInfo.unit_time);
+					$("#{{form.price.id}}").val(packageInfo.price);
+					$("#{{form.currency.id}}").val(packageInfo.currency);
+					for (collectionID in packageInfo.collections) {
+						addCollection(collectionID, packageInfo.collections[collectionID]);
+					}
+					$("#premium_modal").modal({show : true});
+				});
+
+				$('#premium_modal').on('hidden', function () {
+					clearModal();
+				});
+				
+				$('#gift_premium').on('hidden', function () {
+					clearGiftModal();
+				});
+				
+				{%- if gift_form.errors -%}
+					$("#gift_premium").modal({show : true});
+					
+					{%- if gift_form.username.errors -%}
+						createErrorPopover($("#{{gift_form.username.id}}").parent(),
+								"{%-for msg in gift_form.username.errors -%}{{msg}} {%- endfor -%}",
+								'left');
+					{%- endif -%}
+					
+					{%- if gift_form.premium_package.errors -%}
+					createErrorPopover($("#{{gift_form.premium_package.id}}").parent(),
+								"{%-for msg in gift_form.premium_package.errors -%}{{msg}} {%- endfor -%}",
+								'right');
+					{%- endif -%}
+					
+					$('#gift_premium').on('shown', function () {
+						$("#{{gift_form.username.id}}").parent().popover('show');
+						$("#{{gift_form.premium_package.id}}").parent().popover('show');
+					});
+				{%- endif -%}
+				
+				{%- if form.errors -%}
+					$("#premium_modal").modal({show : true});
+					
+					{%- if form.name.errors -%}
+						createErrorPopover($("#{{form.name.id}}").parent(),
+								"{%-for msg in form.name.errors -%}{{msg}} {%- endfor -%}",
+								'left');
+					{%- endif -%}
+					
+					{%- if form.details.errors -%}
+					createErrorPopover($("#{{form.details.id}}").parent(),
+							"{%-for msg in form.details.errors -%}{{msg}} {%- endfor -%}",
+							'right');
+					{%- endif -%}
+					{%- if form.duration.errors or form.unit_time.errors -%}
+						createErrorPopover($("#{{form.duration.id}}").parent(),
+								"{%-for msg in form.duration.errors -%}{{msg}} {%- endfor -%}{%-for msg in form.unit_time.errors -%}{{msg}} {%- endfor -%}",
+								'left');
+					{%- endif -%}
+					{%- if form.price.errors or form.currency.errors-%}
+						createErrorPopover($("#{{form.price.id}}").parent(),
+								"{%-for msg in form.price.errors -%}{{msg}} {%- endfor -%}{%-for msg in form.currency.errors -%}{{msg}} {%- endfor -%}",
+								'right');
+					{%- endif -%}
+					{%- if form.collections.errors or form.collection_list.error -%}
+						createErrorPopover($("#{{form.collection_list.id}}").parent(),
+								"{%-for msg in form.collections.errors -%}{{msg}} {%- endfor -%}",
+								'left');
+					{%- endif -%}
+					
+					
+					var collections = eval($("#{{form.collections.id}}").val());
+					
+					$("#{{form.collections.id}}").val("[]");
+					
+					for (var elem in collections)
+						addCollectionByID(collections[elem]);
+					
+					$('#premium_modal').on('shown', function () {
+						$("#{{form.name.id}}").parent().popover('show');
+						$("#{{form.details.id}}").parent().popover('show');
+						$("#{{form.duration.id}}").parent().popover('show');
+						$("#{{form.price.id}}").parent().popover('show');
+						$("#{{form.collection_list.id}}").parent().popover('show');
+					});
+				{%- else -%}
+					clearModal();
+				{%- endif -%}
+			});
+</script>
+{% endblock javascript %} {% block body %}
+<ul class="nav nav-tabs">
+	<li {%- if page== 'packages' or not page -%}{{' '}}class="active"{%-endif-%}><a
+		href="#edit-premium-packages" data-toggle="tab">{{_('Edit Premium
+			Packages')}}</a></li>
+	<li><a href="#payment-history" data-toggle="tab">{{_('Payment
+			History')}}</a></li>
+	<li {%- if page== 'users' -%}{{' '}} class="active"{%-endif-%}><a
+		href="#premium-users" data-toggle="tab">{{_('Premium Users')}}</a></li>
+</ul>
+<div class="tab-content">
+	<div
+		class="tab-pane {%- if page=='packages' or not page -%}{{' '}}active{%-endif-%}"
+		id="edit-premium-packages">
+		<table class="table table-striped table-bordered table-condensed">
+			{%- if premium_packages -%}
+			<thead>
+				<tr>
+					<th>{{ _('ID') }}</th>
+					<th>{{ _('Name') }}</th>
+					<th>{{ _('Details') }}</th>
+					<th>{{ _('Duration') }}</th>
+					<th>{{ _('Price') }}</th>
+					<th>{{ _('Access') }}</th>
+					<th></th>
+					<th></th>
+					<th></th>
+					<th></th>
+				</tr>
+			</thead>
+			{%- endif -%}
+			<tbody>
+				{%- for premium in premium_packages: -%}
+				<tr>
+					<td attr="id">{{premium.id}}</td>
+					<td attr="name">{{premium.name}}</td>
+					<td attr="details">{{premium.details}}</td>
+					<td attr="duration">{%- if premium.unit_time.capitalize() !=
+						'Unlimited' -%} {{premium.duration}} {{' '}} {%- endif -%}
+						{{premium.unit_time.capitalize()}}</td>
+					<td attr="price">{{premium.price}} {{premium.currency}}
+					<td>{%- for collection in package_collection_map[premium.id]
+						-%} <span attr="collection" collection_id="{{collection['id']}}">
+							{{ collection['name'] }}</span>{%- endfor -%}
+					</td>
+					<!-- TODO add the events -->
+					<td><i class="icon-edit" id_package="{{premium.id}}"></i></td>
+					<td><i class="icon-remove remove-premium-package"
+						id_package="{{premium.id}}"></i></td>
+					<td><i class="icon-arrow-up" id_package="{{premium.id}}"></i></td>
+					<td><i class="icon-arrow-down" id_package="{{premium.id}}"></i></td>
+				</tr>
+				{%- endfor -%}
+		</table>
+		<center>
+			<!-- Button to trigger modal -->
+			<a href="#premium_modal" role="button" class="btn"
+				data-toggle="modal">{{_('Add new premium package')}}</a>
+		</center>
+	</div>
+	<div class="tab-pane" id="payment-history">
+		{%- if history -%}
+		<div class="alert alert-info">
+			<button type="button" class="close" data-dismiss="alert">&times;</button>
+			<i class="icon-info-sign"></i> {{ _('Number of transactions') }} : {{
+			transaction_number }}
+		</div>
+		<div class="alert alert-info">
+			<button type="button" class="close" data-dismiss="alert">&times;</button>
+			<i class="icon-info-sign"></i> {{ _('Total revenue') }} : {%- for
+			revenue in total_revenue -%}<span class="revenue">{{'%0.2f' % revenue[0]}}
+				{{revenue[1]}}</span>{%- endfor -%}
+		</div>
+		<table class="table table-striped table-bordered table-condensed">
+			<thead>
+				<th>{{ _('Transaction Time') }}</th>
+				<th>{{ _('User ID') }}</th>
+				<th>{{ _('User e-mail') }}</th>
+				<th>{{ _('Package ID') }}</th>
+				<th>{{ _('Price') }}</th>
+				<th>{{ _('Payment Method') }}</th>
+			</thead>
+			<tbody>
+				{%- for transaction in history: -%}
+				<tr>
+					<td>{{transaction.transaction_time}}</td>
+					<td>{{transaction.id_user}}</td>
+					<td>{{transaction.email}}</td>
+					<td>{{transaction.id_package}}</td>
+					<td>{{transaction.price}} {{transaction.currency}}</td>
+					<td>{{transaction.payment_method}}</td>
+				</tr>
+				{%- endfor -%}
+			</tbody>
+		</table>
+		{%- else -%}
+		<div class="alert alert-warning">
+			<button type="button" class="close" data-dismiss="alert">&times;</button>
+			<i class="icon-info-sign"></i> {{ _('No transaction has been made
+			yet.') }}
+		</div>
+		{%- endif -%}
+	</div>
+	<div class="tab-pane {%- if page=='users' -%}{{' '}}active{%-endif-%}"
+		id="premium-users">
+		{%- if users -%}
+		<div class="alert alert-info">
+			<button type="button" class="close" data-dismiss="alert">&times;</button>
+			<i class="icon-info-sign"></i> {{ _('Total number of premium users')
+			}}: {{ premium_user_number[0] }}
+		</div>
+		<table class="table table-striped table-bordered table-condensed">
+			<thead>
+				<th>{{ _('User ID') }}</th>
+				<th>{{ _('User E-mail') }}</th>
+				<th>{{ _('User Nickname') }}</th>
+				<th>{{ _('Collection') }}</th>
+				<th>{{ _('Expiration Time') }}</th>
+			</thead>
+			<tbody>
+				{%- for user in users: -%}
+				<tr>
+					<td>{{user.id}}</td>
+					<td>{{user.email}}</td>
+					<td>{{user.nickname}}</td>
+					<td>{{user.name}}</td>
+					<td>{{user.expiration}}</td>
+				</tr>
+				{%- endfor -%}
+			</tbody>
+		</table>
+		{%- else -%}
+		<div class="alert alert-warning">
+			<button type="button" class="close" data-dismiss="alert">&times;</button>
+			<i class="icon-info-sign"></i> {{ _('There is no premium user.') }}
+		</div>
+		{%- endif -%}
+		<center>
+			<!-- Button to trigger modal -->
+			<a href="#gift_premium" role="button" class="btn" data-toggle="modal">Give
+				a gift!</a>
+		</center>
+	</div>
+</div>
+
+<div id="premium_modal" class="modal hide fade" tabindex="-1"
+	role="dialog" aria-labelledby="addModalTitle" aria-hidden="true">
+	<form id="premiumPackageModal" name="premiumPackageModal"
+		action="?page=packages" method="post">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal"
+				aria-hidden="true">×</button>
+			<h3 id="addModalTitle">{{_('Add New Premium Package')}}</h3>
+		</div>
+		<div class="modal-body">
+			<div
+				class="input-prepend pp-input{%- if form.name.errors -%}{{' '}}control-group error{%- endif -%}">
+				<span class="add-on">{{form.name.label}}</span> {{
+				form.name(class_="input-block-level", required="required") }}
+			</div>
+			<div
+				class="input-prepend pp-input{%- if form.details.errors -%}{{' '}}control-group error{%- endif -%}">
+				<span class="add-on">{{form.details.label}}</span> {{
+				form.details(class_="input-block-level", required="required") }}
+			</div>
+			<div
+				class="input-prepend pp-input pp-input-double{%- if form.duration.errors -%}{{' '}}control-group error{%- endif -%}">
+				<span class="add-on">{{form.duration.label}}</span> {{
+				form.duration(class_ = "input-block-level") }} {{
+				form.unit_time(class_="input-block-level")}}
+			</div>
+			<div
+				class="input-prepend pp-input pp-input-double{%- if form.price.errors -%}{{' '}}control-group error{%- endif -%}">
+				<span class="add-on">{{form.price.label}}</span> {{
+				form.price(class="input-block-level", required="required") }} {{
+				form.currency(class="input-block-level") }}
+			</div>
+			<div
+				class="input-prepend pp-input pp-input-button{%- if form.collections.errors -%}{{' '}}control-group error{%- endif -%}">
+				<span class="add-on">{{_("Collections")}}</span> {{
+				form.collection_list(class_="input-block-level") }} <input
+					type="button" class="btn" value="Add" id="addCollectionButton">
+			</div>
+			{{ form.collections() }}
+			<div id="selected_collection_names"></div>
+			{{ form.package_id() }} {{ form.csrf_token() }}
+		</div>
+		<div class="modal-footer">
+			<button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+			<input id="addButton" type="submit" class="btn btn-primary"
+				value="Add" />
+		</div>
+	</form>
+</div>
+
+<div id="gift_premium" class="modal hide fade" tabindex="-1"
+	role="dialog" aria-labelledby="giftModalTitle" aria-hidden="true">
+	<form id="giftPremiumModal" name="giftPremiumModal"
+		action="?page=users" method="post">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal"
+				aria-hidden="true">×</button>
+			<h3 id="giftModalTitle">Gift to a User an Premium Package</h3>
+		</div>
+		<div class="modal-body">
+			<div
+				class="input-prepend pp-input {%- if gift_form.username.errors -%}{{' '}}control-group error{%- endif -%}">
+				<span class="add-on">{{gift_form.username.label}}</span> {{
+				gift_form.username(class_="input-block-level", required="required")
+				}}
+			</div>
+			<div
+				class="input-prepend pp-input{%- if gift_form.premium_package.errors -%}{{' '}}control-group error{%- endif -%}">
+				<span class="add-on">{{gift_form.premium_package.label}}</span> {{
+				gift_form.premium_package(class_="input-block-level",
+				required="required") }}
+			</div>
+		</div>
+		<div class="modal-footer">
+			<button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+			<input type="submit" class="btn btn-primary" value="Confirm" />
+		</div>
+		{{ form.csrf_token() }}
+	</form>
+</div>
+{% endblock body %}

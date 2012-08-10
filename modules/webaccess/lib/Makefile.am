@@ -36,7 +36,17 @@ pylib_DATA = access_control_engine.py \
              webaccess_regression_tests.py \
              external_authentication_oauth1.py \
              external_authentication_oauth2.py \
-             external_authentication_openid.py
+             external_authentication_openid.py \
+             webpayment.py \
+             webpayment_ogone.py \
+             webpayment_paypal.py \
+             webpayment_base.py \
+             webpayment_forms.py \
+             webpayment_blueprint.py \
+             webpayment_model.py \
+             webpayment_query.py \
+             webpayment_user_settings.py \
+             webpayment_config.py
 
 noinst_DATA = collection_restrictions_migration_kit.py
 

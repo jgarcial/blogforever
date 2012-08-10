@@ -1,0 +1,67 @@
+{% macro webpayment_packages_css() %}
+<style type="text/css">
+div.payment_method {
+	text-align: center;
+	cursor: pointer;
+	margin: 5px;
+}
+</style>
+{% endmacro %} {% macro webpayment_packages_javascript() %}
+<script type="text/javascript">
+	$(document).ready(function() {
+		$("div.payment_method").click(function() {
+			var form = document.forms.package_select;
+			form['payment_method'].setAttribute('value', this.id);
+			for ( var i = 0; i < form.length; i++) {
+				if (form[i].checked) {
+					form.submit();
+					break;
+				}
+			}
+		});
+	});
+</script>
+{% endmacro %} {% macro webpayment_packages_body(premium_packages,
+payment_methods, package_collection_map, duration_formatter, _) %}
+<form id="package_select" action="{{url_for('webpayment.upgrade')}}"
+	method="POST">
+	<div id=premium_packages>
+		<table class="table table-hover table-striped">
+			<thead>
+				<tr>
+					<th></th>
+					<th>{{_('Name')}}</th>
+					<th>{{_('Details')}}</th>
+					<th>{{_('Duration')}}</th>
+					<th>{{_('Price')}}</th>
+					<th>{{_('Access to collections')}}</th>
+				</tr>
+			</thead>
+			<tbody>
+				{%- for package in premium_packages -%}
+				<tr>
+					<td><input type="radio" name="id_package"
+						value="{{package['id']}}" /></td>
+					<td>{{package.name}}</td>
+					<td>{{package.details}}</td>
+					<td>{{duration_formatter(package)}}</td>
+					<td>{{package.price}} {{package.currency}}</td>
+					<td>{%- for collection in package_collection_map[package.id]
+						-%}
+						<div>
+							{{collection['name']}} <br>
+						</div> {%- endfor -%}
+					</td>
+				</tr>
+				{%- endfor -%}
+			</tbody>
+		</table>
+		{%- if not payment_methods|length -%}
+		<div>No payment method is configured!</div>
+		s {%- else -%} {%- for payment_method in payment_methods -%}
+		<div class="payment_method" id="{{payment_method[0]}}">{{payment_method[1]|safe}}</div>
+		{%- endfor -%} {%- endif -%}
+	</div>
+	<input type="hidden" name='payment_method' />
+</form>
+{% endmacro %}

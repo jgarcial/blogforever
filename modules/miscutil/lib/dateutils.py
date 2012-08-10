@@ -60,6 +60,14 @@ datetext_default = '0000-00-00 00:00:00'
 datestruct_default = (0, 0, 0, 0, 0, 0, 0, 0, 0)
 datetext_format = "%Y-%m-%d %H:%M:%S"
 
+SECOND_CONVERSION = {
+    'HOUR': 60 * 60,
+    'DAY': 60 * 60 * 24,
+    'WEEK': 60 * 60 * 24 * 7,
+    'MONTH': 60 * 60 * 24 * 30,
+    'YEAR': 60 * 60 * 24 * 365
+}
+
 class date(real_date):
     def strftime(self, fmt):
         return strftime(fmt, self)

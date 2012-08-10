@@ -308,7 +308,15 @@ img_DATA = add-small.png \
            yahoo_icon_24.png \
            yahoo_icon_48.png \
            yammer_icon_24.png \
-           yammer_icon_48.png
+           yammer_icon_48.png \
+           paypal_checkout.gif \
+           credit_card.png \
+           con_info.png \
+           americanexpress.png \
+           discover.png \
+           maestro.png \
+           mastercard.png \
+           visa.png
 
 tmpdir=$(localstatedir)/tmp
 
