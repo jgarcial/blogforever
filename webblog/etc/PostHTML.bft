@@ -26,7 +26,7 @@
 </div>
 <br />
 <br />
-<div id="post_comments">
+<div>
 <BFE_POST_COMMENTS />
 </div>
 <div>

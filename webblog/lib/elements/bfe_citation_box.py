@@ -19,11 +19,11 @@
 
 
 """
-BibFormat Element - displays the description of how to cite the archive's content
+BibFormat Element - displays the description of how to cite a record
 """
 
 from invenio.config import CFG_SITE_URL
-from invenio.webblog_utils import get_parent_blog
+from invenio.webblog_utils import get_parent_blog, get_parent_post
 from invenio.search_engine import get_creation_date
 from invenio.bibformat_engine import BibFormatObject
 
@@ -31,9 +31,13 @@ def format_element(bfo):
     """
     Displays the description of how users should cite
     any content of the archive. The citation includes:
-    For blogs: "title". (record_creation_date). record_url
+    For blogs: "title".
+    (record_creation_date). record_url
     Retrieved from the original "original_url"
     For blog posts: author. "title". Blog: "blog_title".
+    (record_creation_date). record_url
+    Retrieved from the original "original_url"
+    For comments: author. Blog post: "post_title".
     (record_creation_date). record_url
     Retrieved from the original "original_url"
     """
@@ -44,7 +48,10 @@ def format_element(bfo):
     # let's get the fields we want to show
     if coll in ["BLOGPOST", "COMMENT"]:
         author = bfo.fields('100__a')[0]
-        original_creation_date = bfo.fields('269__c')[0]
+        try:
+            original_creation_date = bfo.fields('269__c')[0]
+        except:
+            original_creation_date = ""
 
     try:
         title = bfo.fields('245__a')[0]
@@ -61,9 +68,9 @@ def format_element(bfo):
     # url in the archive
     record_url = CFG_SITE_URL + "/record/" + recid
 
-    if coll in ["BLOGPOST", "COMMENT"]:
+    if coll == "BLOGPOST":
         # we will also show the blog's title of 
-        # the corresponding comment or blog post
+        # the corresponding blog post
         blog_recid = get_parent_blog(recid)
         blog_bfo = BibFormatObject(blog_recid)
         try:
@@ -72,15 +79,33 @@ def format_element(bfo):
             blog_title = 'Untitled'
 
         description = """<table style="border:1px solid black;"><tr><td>\
-        <span><b>%s</b>. '%s'. </br>Blog: '%s'. (%s). <i>'%s'</i> </br> \
+        <span><b>%s</b>. '%s'. Blog: '%s'. </br> \
+        (%s). <i>'%s'</i> </br> \
         Retrieved from the original <i>'%s'</i><span></td></tr></table>""" \
         % (author, title, blog_title, record_creation_date, record_url, original_url)
-    else:
+
+    elif coll == "COMMENT":
+        # we will also show the post's title of
+        # the corresponding comment
+        post_recid = get_parent_post(recid)
+        post_bfo = BibFormatObject(post_recid)
+        try:
+            post_title = post_bfo.fields('245__a')[0]
+        except:
+            post_title = 'Untitled'
+
         description = """<table style="border:1px solid black;"><tr><td>\
-        <span>'%s'. (%s). <i>'%s'</i> </br> \
+        <span><b>%s. </b>Blog post: '%s'.</br> \
+        (%s). <i>'%s'</i> </br> \
+        Retrieved from the original <i>'%s'</i><span></td></tr></table>""" \
+        % (author, post_title, record_creation_date, record_url, original_url)
+
+    else: # coll == "BLOG"
+        description = """<table style="border:1px solid black;"><tr><td>\
+        <span>'%s' </br> \
+        (%s). <i>'%s'</i> </br> \
         Retrieved from the original <i>'%s'</i><span></td></tr></table>""" \
         % (title, record_creation_date, record_url, original_url)
-
 
     out = """
         <script type="text/javascript">
@@ -92,7 +117,7 @@ def format_element(bfo):
                 citation_link.innerHTML = "Hide citation description"
             } else {
                 description.style.display = 'none';
-                citation_link.innerHTML = "Show citation description"
+                citation_link.innerHTML = "How to cite this"
             }
         }
         </script>
@@ -104,16 +129,6 @@ def format_element(bfo):
     out += '<script type="text/javascript">displayCitationDescription()</script>'
 
     return out
-
-#    out = """
-#    <a class="moreinfo" id="citation_info" href="#">How to cite this</a>
-#    <script type="text/javascript">
-#        $(document).ready(function(){
-#        $("#citation_info").click(function(){
-#        alert("%s");
-#        });
-#        });
-#    </script>""" % description
 
 def escape_values(bfo):
     """

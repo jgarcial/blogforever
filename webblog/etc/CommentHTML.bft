@@ -17,6 +17,11 @@
 <div class="text" >
 <BFE_COMMENT_AUTHOR prefix='<h2 class="articleTitle">' suffix='</h2>' />
 <BFE_ABSTRACT escape="0" />
+<br />
+<br />
+<div>
+<BFE_CITATION_BOX>
+</div>
 </div>
 </td>
 <td valign="top">
@@ -29,4 +34,5 @@
 </table>
 
 <div id="bottom">  </div>
+
 </div>
