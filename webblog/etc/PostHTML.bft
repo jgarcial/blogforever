@@ -21,6 +21,11 @@
 <BFE_WEBJOURNAL_ARTICLE_AUTHOR prefix="<br/>by " separator=", " display_email="no"/>
 <br />
 <br />
+<div>
+<BFE_CITATION_BOX>
+</div>
+<br />
+<br />
 <div id="post_comments">
 <BFE_POST_COMMENTS />
 </div>
