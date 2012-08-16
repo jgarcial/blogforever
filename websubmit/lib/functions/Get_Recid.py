@@ -39,9 +39,9 @@ document.forms[0].action="/submit";
 document.forms[0].curpage.value=1;
 document.forms[0].step.value=0;
 user_must_confirm_before_leaving_page = false;
-alert('The blog with url [%s] cannot be found in our """ \
+alert('The document with report-number [%s] cannot be found in our """ \
 """database.\\nPerhaps it has not yet been integrated?\\nYou can choose """ \
-"""other url or retry this action in a few minutes.');\n
+"""another report number or retry this action in a few minutes.');\n
 document.forms[0].submit();
 </script>"""
 
@@ -52,8 +52,8 @@ document.forms[0].action="/submit";
 document.forms[0].curpage.value=1;
 document.forms[0].step.value=0;
 user_must_confirm_before_leaving_page = false;
-alert('Multiple documents with the url [%s] have been found.\\n""" \
-"""You can choose other url or retry this action in a few """ \
+alert('Multiple documents with the report number [%s] have been found.\\n""" \
+"""You can choose another report number or retry this action in a few """ \
 """minutes.');\n
 document.forms[0].submit();
 </script>"""
@@ -68,8 +68,8 @@ document.forms[0].curpage.value=1;
 document.forms[0].step.value=0;
 user_must_confirm_before_leaving_page = false;
 document.forms[0].submit();
-alert('This blog can not be handled using this submission interface.\\n""" \
-"""You can choose other url or retry this action in a few """ \
+alert('This document can not be handled using this submission interface.\\n""" \
+"""You can choose another report number or retry this action in a few """ \
 """minutes.');\n</script>"""
 
 def Get_Recid(parameters, curdir, form, user_info=None):
@@ -118,6 +118,7 @@ def Get_Recid(parameters, curdir, form, user_info=None):
     global rn, sysno
     ## initialize sysno
     sysno = ""
+
     if access("%s/SN" % curdir, F_OK|R_OK):
         ## SN exists and should contain the recid; get it from there.
         try:
@@ -199,19 +200,19 @@ def get_existing_records_for_reportnumber(reportnum):
     ## Get list of records with the report-number: (first in phrase indexes)
     reclist = list(search_pattern(req=None,
                                   p=reportnum,
-                                  f="520__u",
+                                  f="reportnumber",
                                   m="e"))
-#    if not reclist:
-#        # Maybe the record has not been indexed yet? (look in bibxxx tables)
-#        tags = get_field_tags("reportnumber")
-#        for tag in tags:
-#            recids = list(search_pattern(req=None,
-#                                         p=reportnum,
-#                                         f=tag,
-#                                         m="e"))
-#            reclist.extend(recids)
-#
-#        reclist = dict.fromkeys(reclist).keys() # Remove duplicates
+    if not reclist:
+        # Maybe the record has not been indexed yet? (look in bibxxx tables)
+        tags = get_field_tags("reportnumber")
+        for tag in tags:
+            recids = list(search_pattern(req=None,
+                                         p=reportnum,
+                                         f=tag,
+                                         m="e"))
+            reclist.extend(recids)
+
+        reclist = dict.fromkeys(reclist).keys() # Remove duplicates
 
     ## Loop through all recids retrieved and testing to see whether the record
     ## actually exists or not. If none of the records exist, there is no record

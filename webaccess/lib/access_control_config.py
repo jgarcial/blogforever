@@ -156,7 +156,10 @@ DEF_DEMO_ROLES = (('swordcurator', 'BibSword client curator', 'deny any'),
                   ('curator', 'Curator', 'deny any'),
                   ('basketusers', 'Users who can use baskets', 'deny email "hyde@cds.cern.ch"\nallow any'),
                   ('claimpaperusers', 'Users who can perform changes to their own paper attributions without the need for an operator\'s approval', 'deny email "hyde@cds.cern.ch"\nallow any'),
-                  ('commentmoderator', 'Users who can moderate comments', 'deny all'))
+                  ('commentmoderator', 'Users who can moderate comments', 'deny all'),
+                  ('internalviewer', 'Internal collections viewer', 'deny all'),
+                  ('submit_BSI_*', 'Users who can use the BSI document', 'deny all'),
+                  ('submit_BSIREF_APP*', 'Users with rights as referee ', 'deny all'))
 
 DEF_DEMO_USER_ROLES = (('jekyll@cds.cern.ch', 'swordcurator'),
                        ('jekyll@cds.cern.ch', 'claimpaperusers'),
@@ -257,7 +260,21 @@ DEF_DEMO_AUTHS = (
              ('curator', 'runbibedit', {}),
              ('curator', 'runbibeditmulti', {}),
              ('curator', 'runbibmerge', {}),
-             ('swordcurator', 'runbibswordclient', {})
+             ('swordcurator', 'runbibswordclient', {}),
+             ('internalviewer', VIEWRESTRCOLL, {'collection': 'Provisional Blogs'}),
+             ('internalviewer', VIEWRESTRCOLL, {'collection': 'Rejected Blogs'}),
+             ('submit_BSI_*', 'submit', {'doctype': 'BSI', 'act': 'SBI', 'categ': '*'}),
+             ('submit_BSI_*', 'submit', {'doctype': 'BSI', 'act': 'MBI', 'categ': '*'}),
+             ('submit_BSI_*', 'submit', {'doctype': 'BSI', 'act': 'DPI', 'categ': '*'}),
+             ('submit_BSI_*', 'submit', {'doctype': 'BSI', 'act': 'DBI', 'categ': '*'}),
+             ('submit_BSIREF_APP*', 'submit', {'doctype': 'BSIREF', 'act': 'APS', 'categ': '*'}),
+             ('submit_BSIREF_APP*', 'submit', {'doctype': 'BSIREF', 'act': 'APM', 'categ': '*'}),
+             ('submit_BSIREF_APP*', 'submit', {'doctype': 'BSIREF', 'act': 'APO', 'categ': '*'}),
+             ('submit_BSIREF_APP*', 'submit', {'doctype': 'BSIREF', 'act': 'APP', 'categ': '*'}),
+             ('anyuser', 'submit', {'doctype': 'BSIREF', 'act': 'SBI', 'categ': '*'}),
+             ('anyuser', 'submit', {'doctype': 'BSIREF', 'act': 'MBI', 'categ': '*'}),
+             ('anyuser', 'submit', {'doctype': 'BSIREF', 'act': 'DPI', 'categ': '*'}),
+             ('anyuser', 'submit', {'doctype': 'BSIREF', 'act': 'DBI', 'categ': '*'}),
             )
 
 _ = gettext_set_language(CFG_SITE_LANG)
