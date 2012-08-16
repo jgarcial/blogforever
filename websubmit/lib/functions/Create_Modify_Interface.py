@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -37,6 +37,7 @@ def Create_Modify_Interface_getfieldval_fromfile(cur_dir, fld=""):
        can be populated with the value last entered by the user (before reload), instead of always being
        populated with the value still found in the DB.
     """
+
     fld_val = ""
     if len(fld) > 0 and os.access("%s/%s" % (cur_dir, fld), os.R_OK|os.W_OK):
         fp = open( "%s/%s" % (cur_dir, fld), "r" )
@@ -49,6 +50,7 @@ def Create_Modify_Interface_getfieldval_fromfile(cur_dir, fld=""):
             pass
         fld_val = fld_val.strip()
     return fld_val
+
 def Create_Modify_Interface_getfieldval_fromDBrec(fieldcode, recid):
     """Read a field's value from the record stored in the DB.
        This function is called when the Create_Modify_Interface function is called for the first time
@@ -60,6 +62,7 @@ def Create_Modify_Interface_getfieldval_fromDBrec(fieldcode, recid):
             fld_val += "%s\n" % Get_Field(next_field_code, recid)
         fld_val = fld_val.rstrip('\n')
     return fld_val
+
 def Create_Modify_Interface_transform_date(fld_val):
     """Accept a field's value as a string. If the value is a date in one of the following formats:
           DD Mon YYYY (e.g. 23 Apr 2005)
@@ -79,7 +82,6 @@ def Create_Modify_Interface_transform_date(fld_val):
             # bad date format:
             pass
     return fld_val
-
 
 def Create_Modify_Interface(parameters, curdir, form, user_info=None):
     """
@@ -127,12 +129,11 @@ def Create_Modify_Interface(parameters, curdir, form, user_info=None):
     retrieve value either from the record, or from the submission
     directory.
     """
-    global sysno,rn
+    global sysno, rn
     t = ""
     # variables declaration
     fieldname = parameters['fieldnameMBI']
     # Path of file containing fields to modify
-
     the_globals = {
         'doctype' : doctype,
         'action' : action,
@@ -161,7 +162,7 @@ def Create_Modify_Interface(parameters, curdir, form, user_info=None):
         fieldstext = re.sub("\+","\n", fieldstext)
         fields = fieldstext.split("\n")
     else:
-        res = run_sql("SELECT fidesc FROM sbmFIELDDESC WHERE  name=%s", (fieldname,))
+        res = run_sql("SELECT fidesc FROM sbmFIELDDESC WHERE name=%s", (fieldname,))
         if len(res) == 1:
             fields = res[0][0].replace(" ", "")
             fields = re.findall("<optionvalue=.*>", fields)
@@ -172,17 +173,17 @@ def Create_Modify_Interface(parameters, curdir, form, user_info=None):
         else:
             raise InvenioWebSubmitFunctionError("cannot find fields to modify")
     #output some text
-    t = t+"<CENTER bgcolor=\"white\">The blog with URL '%s' has been found in the database.</CENTER><br />Please modify the following fields:<br />Then press the 'END' button at the bottom of the page<br /><br />\n" % rn
+    t = t + """<span style=padding-left:10px;> Please modify the following fields:</span>"""
     for field in fields:
         subfield = ""
         value = ""
         marccode = ""
         text = ""
         # retrieve and display the modification text
-        t = t + "<FONT color=\"darkblue\">\n"
+        t = t + "<FONT color=\"darkblue\">\n<br /><br /><span style=padding-left:30px;>"
         res = run_sql("SELECT modifytext FROM sbmFIELDDESC WHERE  name=%s", (field,))
         if len(res)>0:
-            t = t + "<small>%s</small> </FONT>\n" % res[0][0]
+            t = t + "<small>%s</small></span></FONT>\n" % res[0][0]
         # retrieve the marc code associated with the field
         res = run_sql("SELECT marccode FROM sbmFIELDDESC WHERE name=%s", (field,))
         if len(res) > 0:
@@ -265,7 +266,7 @@ def Create_Modify_Interface(parameters, curdir, form, user_info=None):
     t += '<input type="hidden" name="Create_Modify_Interface_DONE" value="DONE\n" />'
 
     # output some more text
-    t = t + "<br /><br /><CENTER><small><INPUT type=\"button\" width=400 height=50 name=\"End\" value=\"END\" onClick=\"document.forms[0].step.value = 2;user_must_confirm_before_leaving_page = false;document.forms[0].submit();\"></small></CENTER></H4>"
+    t = t + "<br /><br /><CENTER><small><INPUT type=\"button\" width=400 height=50 name=\"End\" value=\"Finish modification\" onClick=\"document.forms[0].step.value = 2;user_must_confirm_before_leaving_page = false;document.forms[0].submit();\"></small></CENTER></H4>"
 
     return t
 

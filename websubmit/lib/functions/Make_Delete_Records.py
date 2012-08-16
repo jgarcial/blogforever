@@ -28,6 +28,7 @@ from invenio.search_engine_utils import get_fieldvalues
 from invenio.bibtask import task_low_level_submission, bibtask_allocate_sequenceid
 from invenio.config import CFG_TMPDIR
 from invenio.textutils import wash_for_xml
+from invenio.search_engine_utils import get_fieldvalues
 
 def Make_Delete_Records(parameters, curdir, form, user_info=None):
     """
@@ -38,18 +39,19 @@ def Make_Delete_Records(parameters, curdir, form, user_info=None):
     """
 
     # let's get the blog's recid
-    try:
-        f = open("%s/SN" % curdir, "r")
-    except IOError:
-        ## Unable to read the SN file's content
-        msg = """Unable to correctly read the current submission's recid"""
-        raise InvenioWebSubmitFunctionError(msg)
+    global sysno
 
-    blog_recid = int(f.read().strip())
-    f.close()
-    # let's build the list of recids (blog + descendants) to delete
-    recids = get_blog_descendants(blog_recid)
-    recids.append(blog_recid)
+    recid = sysno
+
+    # let's check if we want to delete a whole blog or
+    # just a post
+    coll = get_fieldvalues(recid, '980__a')[0]
+    if coll == 'BLOG':
+        # let's build the list of recids (blog + descendants) to delete
+        recids = get_blog_descendants(recid)
+        recids.append(recid)
+    elif coll == 'BLOGPOST':
+        recids = [recid]
 
     # let's build the final xml
     marcxml_output = '<?xml version="1.0" encoding="UTF-8"?>\n'
@@ -75,12 +77,12 @@ def Make_Delete_Records(parameters, curdir, form, user_info=None):
     f.write(marcxml_output)
     f.close()
 
-    blog_url = get_fieldvalues(blog_recid, '520__u')[0]
+    url = get_fieldvalues(recid, '520__u')[0]
     sequence_id = bibtask_allocate_sequenceid(curdir)
     initial_file = os.path.join(curdir, "recmysql")
     tmp_fd, final_file = tempfile.mkstemp(dir=CFG_TMPDIR,
                                           prefix="%s_%s" % \
-                                          (blog_url.replace('/', '_'),
+                                          (url.replace('/', '_'),
                                            time.strftime("%Y-%m-%d_%H:%M:%S")))
 
     os.close(tmp_fd)
