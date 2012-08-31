@@ -26,6 +26,8 @@ from invenio.search_engine import print_record
 cfg_messages = {}
 cfg_messages["in_issue"] = {"en": "Here you can see the comments on this post: ",
                             "fr": "Ici vous pouvez voir les commentaires sur ce post:"}
+
+
 def format_element(bfo):
     """
     """
@@ -49,4 +51,4 @@ def escape_values(bfo):
     Called by BibFormat in order to check if output of this element
     should be escaped.
     """
-return 0
+    return 0
