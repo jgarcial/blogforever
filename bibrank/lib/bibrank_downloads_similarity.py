@@ -91,21 +91,22 @@ def calculate_reading_similarity_list(recid, type="pageviews"):
     from invenio.webblog_utils import get_parent_blog
     parent_blog = get_parent_blog(recid)
     res = []
-    if client_host_list != ():
-        client_host_list = str(database_tuples_to_single_list(client_host_list))
-        client_host_list = client_host_list.replace("L", "")
-        client_host_list = client_host_list.replace("[", "")
-        client_host_list = client_host_list.replace("]", "")
-
-        res = run_sql("SELECT CAST(b.value AS UNSIGNED), COUNT(DISTINCT(client_host)) AS c" \
-                  "  FROM rnkPAGEVIEWS v, bibrec_bib76x bb, bib76x b WHERE client_host IN (" + client_host_list + ")" + \
-                  "   AND v.id_bibrec != %s" \
-                  "   AND v.id_bibrec = bb.id_bibrec" \
-                  "   AND bb.id_bibxxx = b.id" \
-                  "   AND b.tag = '760__w'" \
-                  "   AND b.value != %s" \
-                  " GROUP BY b.value ORDER BY c",
-                  (recid, parent_blog))
+    if parent_blog:
+        if client_host_list != ():
+            client_host_list = str(database_tuples_to_single_list(client_host_list))
+            client_host_list = client_host_list.replace("L", "")
+            client_host_list = client_host_list.replace("[", "")
+            client_host_list = client_host_list.replace("]", "")
+    
+            res = run_sql("SELECT CAST(b.value AS UNSIGNED), COUNT(DISTINCT(client_host)) AS c" \
+                      "  FROM rnkPAGEVIEWS v, bibrec_bib76x bb, bib76x b WHERE client_host IN (" + client_host_list + ")" + \
+                      "   AND v.id_bibrec != %s" \
+                      "   AND v.id_bibrec = bb.id_bibrec" \
+                      "   AND bb.id_bibxxx = b.id" \
+                      "   AND b.tag = '760__w'" \
+                      "   AND b.value != %s" \
+                      " GROUP BY b.value ORDER BY c",
+                      (recid, parent_blog))
 
         # secondly look up all recids that were consulted by these client hosts,
         # and order them by the number of different client hosts reading them:
