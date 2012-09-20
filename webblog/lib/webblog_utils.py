@@ -44,7 +44,10 @@ def get_parent_blog(recid):
     parent_blog = get_fieldvalues(recid, '760__w')
 
     if parent_blog:
-        return int(parent_blog[0])
+        if parent_blog[0]:
+            return int(parent_blog[0])
+        else:
+            return None
     else:
         return None
 
@@ -58,7 +61,6 @@ def get_blog_descendants(recid):
         descendants += comments
 
     return descendants
-
 
 ##### POSTS #####
 
@@ -88,7 +90,10 @@ def get_parent_post(comment_recid):
 
     parent_post = get_fieldvalues(comment_recid, '773__w')
     if parent_post:
-        return int(parent_post[0])
+       if parent_post[0]:
+           return int(parent_post[0])
+       else:
+           return None
     else:
         return None
 
