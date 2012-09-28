@@ -27,7 +27,7 @@
 <br />
 <br />
 <div>
-<BFE_POST_COMMENTS />
+<BFE_POST_COMMENTS>
 </div>
 <div>
 <BFE_TAGS >
