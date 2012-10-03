@@ -35,13 +35,18 @@ def format_element(bfo):
     """
 
     current_language = bfo.lang
-    links = bfo.fields('8564_u')
+    links = bfo.fields('8564_')
 
     if links:
         menu_out = '<h4>%s:</h4>' % cfg_messages["in_issue"][current_language]
         for link in links:
-            menu_out += """<div class="litem"><a href="%s">%s</a></div>""" % (link, link)
-            recid_in_archive = perform_request_search(p='520__u:"%s"' % link)
+            link_url   = link.get('u')
+            link_data  = link.get('y', link_url)
+            link_title = link.get('z', '')
+
+            menu_out += """<div class="litem"><a href="%s"%s>%s</a></div>""" % (link_url, link_title and ' title="%s"' % link_title or '' , link_data)
+
+            recid_in_archive = perform_request_search(p = link_url, f = '520__u')
             # differentiate between links to sources inside
             # the archive and sources outside
             if recid_in_archive:
