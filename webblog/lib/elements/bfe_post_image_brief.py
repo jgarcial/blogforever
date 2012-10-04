@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 ## This file is part of CDS Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## Copyright (C) 2012 CERN.
 ##
 ## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -18,12 +18,12 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-BibFormat Element -
+BibFormat Element - displays image on brief format posts
 """
 
 def format_element(bfo):
     """
-
+    Displays image on brief format posts
     """
 
 #    attached_files = bfo.fields('8564__u')
@@ -41,7 +41,7 @@ def format_element(bfo):
 #        if name.find("snapshot") == -1 and (ext == "png" or ext == "jpg"):
 #            final_images = name
 
-    img = '<img src="http://cdsweb.cern.ch/record/1368911/files/BlogForever_image.png" width="110" height="110" hspace="10" align="left">'
+    # img = '<img src="http://cdsweb.cern.ch/record/1368911/files/BlogForever_image.png" width="110" height="110" hspace="10" align="left">'
 
     # http://pcuds99.cern.ch/record/1778/files/subID21
     # http://pcuds99.cern.ch/record/1778/files/TL_snapshot.png
@@ -49,7 +49,8 @@ def format_element(bfo):
 
     # VER bfe_photos
 
-    return '<div>' + img + '</div>'
+    # return '<div>' + img + '</div>'
+    return ""
 
 def escape_values(bfo):
     """
