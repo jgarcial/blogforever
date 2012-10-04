@@ -1,0 +1,6 @@
+SN---<:SN:>
+SuE---<:SuE:>
+BSI_URL---<:BSI_URL:>
+BSI_TITLE---<:BSI_TITLE:>
+BSI_TOPIC---<:BSI_TOPIC:>
+BSI_LICENSE---<:BSI_LICENSE:>
