@@ -30,9 +30,21 @@ Blog uploader mode options:
         -U, --blog_update      Update a list of blogs
 
 Examples:
-    $ bloguploader -i list_new_blogs.xml
-    $ bloguploader -d list_blogs_to_delete.xml
-    $ bloguploader -U list_blogs_to_update.xml
+    $ bloguploader -i list_new_blogs.csv
+    An example of 'list_new_blogs.csv' is:
+    http://aida.jiscinvolve.org/,aida,topic1,license1
+    http://vibel.jiscinvolve.org/,vibel,topic1,license1
+    http://astrodabis.jiscinvolve.org/wp/,astrodabis,topic1,license2
+
+    $ bloguploader -d list_blogs_to_delete.csv
+    An example of 'list_blogs_to_delete.csv' is:
+    http://aida.jiscinvolve.org/
+    http://vibel.jiscinvolve.org/
+
+    $ bloguploader -U list_blogs_to_update.csv
+    An example of 'list_blogs_to_update.csv' is:
+    http://aida.jiscinvolve.org/,Aida_update,topic3,license3
+    http://astrodabis.jiscinvolve.org/wp/,Astrodabis,trinity,topic3,license3
 
 """
 
@@ -176,7 +188,7 @@ def _create_marcxml_record_template(mode):
         <datafield tag="542" ind1="" ind2="">
             <subfield code="a">%(license)s</subfield>
         </datafield>
-        <datafield tag="650" ind1="1" ind2="4">
+        <datafield tag="654" ind1="" ind2="">
             <subfield code="a">%(topic)s</subfield>
         </datafield>"""
 
