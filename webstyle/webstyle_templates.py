@@ -1,5 +1,5 @@
-    ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## This file is part of Invenio.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -14,6 +14,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
 """
 WebStyle templates. Customize the look of pages of Invenio
 """
@@ -39,7 +40,6 @@ from invenio.config import \
      CFG_WEBSTYLE_TEMPLATE_SKIN, \
      CFG_INSPIRE_SITE
 
-from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO
 from invenio.messages import gettext_set_language, language_list_long, is_language_rtl
 from invenio.urlutils import make_canonical_urlargd, create_html_link
 from invenio.dateutils import convert_datecvs_to_datestruct, \
@@ -332,13 +332,16 @@ template function generated it.
         out = """\
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="%(ln_iso_639_a)s" xml:lang="%(ln_iso_639_a)s">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="%(ln_iso_639_a)s" xml:lang="%(ln_iso_639_a)s" xmlns:og="http://opengraphprotocol.org/schema/" >
 <head>
  <title>%(pageheadertitle)s</title>
  <link rev="made" href="mailto:%(sitesupportemail)s" />
  <link rel="stylesheet" href="%(cssurl)s/img/invenio%(cssskin)s.css" type="text/css" />
  <!--[if lt IE 8]>
     <link rel="stylesheet" type="text/css" href="%(cssurl)s/img/invenio%(cssskin)s-ie7.css" />
+ <![endif]-->
+ <!--[if gt IE 8]>
+    <style type="text/css">div.restrictedflag {filter:none;}</style>
  <![endif]-->
  <link rel="alternate" type="application/rss+xml" title="%(sitename)s RSS" href="%(rssurl)s" />
  <link rel="search" type="application/opensearchdescription+xml" href="%(siteurl)s/opensearchdescription" title="%(sitename)s" />
@@ -875,11 +878,11 @@ URI: http://%(host)s%(page)s
             <div class="bottom-left-folded">%(dates)s</div>
             <div class="bottom-right-folded" style="text-align:right;padding-bottom:2px;">
                 <span class="moreinfo" style="margin-right:10px;">%(similar)s</span></div>
-          </div>
-        <div class="bottom-left-folded">%(disclaimer)s</div>
-      </div>
-    </div>
-    <br/>
+            </div>
+            <div class="bottom-left-folded">%(disclaimer)s</div>
+            </div>
+            </div>
+            <br/>
     """ % {'similar' : similar,
            'dates' : creationdate and '<div class="recordlastmodifiedbox" style="position:relative;margin-left:1px">&nbsp;%(dates)s</div>' % {
                 'dates': _("Record created %(x_date_creation)s, last modified %(x_date_modification)s") % \
@@ -960,4 +963,41 @@ URI: http://%(host)s%(page)s
             'alerted' : admin_was_alerted and _("The system administrators have been alerted.") or '',
             'doubts' : _("In case of doubt, please contact %(x_admin_email)s.") % {'x_admin_email' : '<a href="mailto:%(admin)s">%(admin)s</a>' % {'admin' : CFG_SITE_SUPPORT_EMAIL}}
         }
+        return out
+
+    def tmpl_warning_message(self, ln, msg):
+        """
+        Produces a warning message for the specified text
+
+        Parameters:
+
+          - 'ln' *string* - The language to display the interface in
+
+          - 'msg' *string* - The message to display
+        """
+
+        # load the right message language
+        _ = gettext_set_language(ln)
+
+        return """<center><font color="red">%s</font></center>""" % msg
+
+    def tmpl_write_warning(self, msg, type='', prologue='', epilogue=''):
+        """
+        Returns formatted warning message.
+
+        Parameters:
+
+          - 'msg' *string* - The message string
+
+          - 'type' *string* - the warning type
+
+          - 'prologue' *string* - HTML code to display before the warning
+
+          - 'epilogue' *string* - HTML code to display after the warning
+        """
+
+        out = '\n%s<span class="quicknote">' % (prologue)
+        if type:
+            out += '%s: ' % type
+        out += '%s</span>%s' % (msg, epilogue)
         return out
