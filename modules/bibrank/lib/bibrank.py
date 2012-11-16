@@ -92,7 +92,9 @@ from invenio.bibrank_tag_based_indexer import \
      file_similarity_by_times_downloaded, \
      index_term_count, \
      record_view, \
-     average_score
+     average_score, \
+     weighted_average, \
+     archived_content
 from invenio.bibrank_word_indexer import word_similarity #@UnusedImport
 from invenio.bibrank_citerank_indexer import citerank #@UnusedImport
 from invenio.solrutils_bibrank_indexer import word_similarity_solr #@UnusedImport

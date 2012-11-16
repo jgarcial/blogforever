@@ -29,6 +29,7 @@ from invenio.config import \
 import invenio.access_control_engine as acce
 from invenio.messages import language_list_long
 from invenio.dbquery import run_sql
+from invenio.bibrank_record_sorter import drop_bibrank_portalbox
 
 def getnavtrail(previous = ''):
     navtrail = """<a class="navtrail" href="%s/help/admin">Admin Area</a> """ % (CFG_SITE_URL,)
@@ -675,6 +676,7 @@ def delete_rnk(rnkID, table=""):
         res = run_sql("DELETE FROM rnkMETHODNAME WHERE id_rnkMETHOD=%s" % rnkID)
         res = run_sql("DELETE FROM collection_rnkMETHOD WHERE id_rnkMETHOD=%s" % rnkID)
         res = run_sql("DELETE FROM rnkMETHODDATA WHERE id_rnkMETHOD=%s" % rnkID)
+        drop_bibrank_portalbox(id_bibrank=rnkID)
         if table:
             res = run_sql("truncate %s" % table)
             res = run_sql("truncate %sR" % table[:-1])

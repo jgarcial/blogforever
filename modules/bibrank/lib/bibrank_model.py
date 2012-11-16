@@ -193,6 +193,16 @@ class CollectionRnkMETHOD(db.Model):
     rnkMETHOD = db.relationship(RnkMETHOD, backref='collections')
 
 
+class BibrankPortalbox(db.Model):
+    """Represents a BibrankPortalbox record."""
+    __tablename__ = 'bibrank_portalbox'
+    id_bibrank = db.Column(db.Integer(11),
+                           nullable=False,
+                           primary_key=True)
+    id_portalbox = db.Column(db.Integer(11),
+                             nullable=False,
+                             primary_key=True)
+
 __all__ = ['RnkMETHOD',
            'RnkMETHODDATA',
            'RnkMETHODNAME',
@@ -207,4 +217,5 @@ __all__ = ['RnkMETHOD',
            'RnkEXTENDEDAUTHORS',
            'RnkRECORDSCACHE',
            'RnkSELFCITES',
-           'CollectionRnkMETHOD']
+           'CollectionRnkMETHOD',
+           'BibrankPortalbox']

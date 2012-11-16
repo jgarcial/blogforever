@@ -20,6 +20,9 @@
 INSERT INTO rnkMETHOD (id,name,last_updated) VALUES (1,'wrd','0000-00-00 00:00:00');
 INSERT INTO rnkMETHOD (id,name,last_updated) VALUES (2,'average_score','0000-00-00 00:00:00');
 INSERT INTO rnkMETHOD (id,name,last_updated) VALUES (3,'record_view','0000-00-00 00:00:00');
+INSERT INTO rnkMETHOD (id,name,last_updated) VALUES (4,'weighted_average','0000-00-00 00:00:00');
+INSERT INTO rnkMETHOD (id,name,last_updated) VALUES (5,'last_added','0000-00-00 00:00:00');
+
 INSERT INTO collection_rnkMETHOD (id_collection,id_rnkMETHOD,score) VALUES (1,1,100);
 INSERT INTO collection_rnkMETHOD (id_collection,id_rnkMETHOD,score) VALUES (1,2,100);
 INSERT INTO collection_rnkMETHOD (id_collection,id_rnkMETHOD,score) VALUES (1,3,100);

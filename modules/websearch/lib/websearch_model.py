@@ -539,6 +539,7 @@ class Portalbox(db.Model):
                 primary_key=True)
     title = db.Column(db.Text, nullable=False)
     body = db.Column(db.Text, nullable=False)
+    size = db.Column(db.Integer, nullable=False, default=2)
 
 
 def get_pbx_pos():

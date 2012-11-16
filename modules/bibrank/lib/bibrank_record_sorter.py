@@ -27,7 +27,6 @@ import re
 import ConfigParser
 import copy
 
-
 from invenio.config import \
      CFG_SITE_LANG, \
      CFG_ETCDIR, \
@@ -450,3 +449,105 @@ def find_citations(rank_method_code, recID, hitset, verbose):
         return (ret,"(", ")", "")
     else:
         return ((),"", "", "")
+
+
+def update_bibrank_portalbox(cfg_name, title, records):
+    """
+    Creates/updates a portalbox that related to a ranking method.
+
+    @param cfg_name: name of the bibrank configuration file
+    @type cfg_name: str
+
+    @param title: title of the portalbox
+    @type title: str
+
+    @param records: record IDs that are displayed on the portalbox
+    @type records: list
+    """
+
+    from flask import render_template
+    from invenio.websearch_model import Portalbox
+    from invenio.bibrank_model import BibrankPortalbox
+    from invenio.bibrank_model import RnkMETHOD
+    from invenio.sqlalchemyutils import db
+
+    id_bibrank = RnkMETHOD.query.filter(RnkMETHOD.name == cfg_name).one().id
+
+    body = render_template("bibrank_portalbox.html",
+                           records=records)
+
+    try:
+        bibrank_portalbox = (BibrankPortalbox.query
+                     .filter(BibrankPortalbox.id_bibrank
+                             == id_bibrank)
+                     .first())
+        portalbox = (Portalbox.query
+                     .filter(Portalbox.id
+                             == bibrank_portalbox.id_portalbox)
+                     .first())
+        portalbox.title = title
+        portalbox.body = body
+        db.session.commit()
+    except:
+        portalbox = Portalbox()
+        portalbox.title = title
+        portalbox.body = body
+        portalbox.size = 8
+
+        db.session.add(portalbox)
+        db.session.commit()
+
+        bibrank_portalbox = BibrankPortalbox()
+        bibrank_portalbox.id_bibrank = id_bibrank
+        bibrank_portalbox.id_portalbox = portalbox.id
+
+        db.session.add(bibrank_portalbox)
+        db.session.commit()
+
+
+def drop_bibrank_portalbox(cfg_name="", id_bibrank=0):
+    """
+    Removes the portalboxes of given ranking method
+
+    @param cfg_name: the name of the config file of the ranking method (.cfg
+        excluded)
+    @type cfg_name: str
+
+    @param id_bibrank: the id of the ranking method
+    @type id_bibrank: int
+    """
+
+    from invenio.websearch_model import Portalbox
+    from invenio.bibrank_model import BibrankPortalbox
+    from invenio.bibrank_model import RnkMETHOD
+    from invenio.sqlalchemyutils import db
+    from invenio.websearch_model import CollectionPortalbox
+    from sqlalchemy.sql import operators
+
+    if not id_bibrank:
+        id_bibrank = (RnkMETHOD
+                      .query
+                      .filter(RnkMETHOD.name == cfg_name)
+                      .one()
+                      .id)
+
+    (CollectionPortalbox
+     .query
+     .filter(operators
+             .in_op(CollectionPortalbox.id_portalbox,
+                    db.session.query(BibrankPortalbox.id_portalbox)
+                    .filter(BibrankPortalbox.id_bibrank == id_bibrank)))
+     .delete())
+
+    (Portalbox
+     .query
+     .filter(operators
+             .in_op(Portalbox.id,
+                    db.session.query(BibrankPortalbox.id_portalbox)
+                    .filter(BibrankPortalbox.id_bibrank == id_bibrank)))
+     .delete())
+
+    (BibrankPortalbox
+     .query
+     .filter(BibrankPortalbox.id_bibrank == id_bibrank)
+     .delete())

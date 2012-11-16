@@ -45,7 +45,11 @@ etc_DATA = bibrankgkb.cfg \
            record_view.cfg \
            average_score.cfg \
            template_record_view.cfg \
-           template_average_score.cfg
+           template_average_score.cfg \
+           template_weighted_average.cfg \
+           weighted_average.cfg \
+           last_added.cfg \
+           template_recently_archived_content.cfg
 
 EXTRA_DIST = bibrankgkb.cfg.in \
              bibrankgkb_jif_conv.kb \
@@ -74,6 +78,10 @@ EXTRA_DIST = bibrankgkb.cfg.in \
              record_view.cfg \
              average_score.cfg \
              template_record_view.cfg \
-             template_average_score.cfg
+             template_average_score.cfg \
+             template_weighted_average.cfg \
+             weighted_average.cfg \
+             last_added.cfg \
+             template_recently_archived_content.cfg
 
 CLEANFILES = *~ *.tmp

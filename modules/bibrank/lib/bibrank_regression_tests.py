@@ -27,12 +27,17 @@ from datetime import datetime
 from subprocess import Popen
 from mechanize import Browser
 
-from invenio.config import CFG_SITE_URL, CFG_SITE_RECORD, CFG_BINDIR
+from invenio.bibrank_tag_based_indexer import fromDB
+from invenio.config import CFG_SITE_URL, CFG_SITE_RECORD, CFG_BINDIR, CFG_ETCDIR
 from invenio.dbquery import run_sql
 from invenio.testutils import make_test_suite, run_test_suite, \
                               test_web_page_content, merge_error_messages
 from invenio.bibrank_bridge_utils import get_external_word_similarity_ranker
 from invenio.bibsched import get_last_taskid
+from invenio.bibrank_archived_content_indexer import records_in_time_interval_to_index
+from random import choice
+import ConfigParser
+
 
 class BibRankWebPagesAvailabilityTest(unittest.TestCase):
     """Check BibRank web pages whether they are up or not."""
@@ -269,6 +274,48 @@ class BibRankRecordViewRankingTest(unittest.TestCase):
         proc = Popen([command, str(task_id)])
         proc.wait()
 
+class BibRankWeightedAverageRankingTest(unittest.TestCase):
+    """Check bibrank weighted average ranking tools."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.records = {}
+
+        # Clean tables before test starts.
+        run_sql("DELETE from cmtRECORDCOMMENT")
+        # Clean rank method data.
+        run_sql("""
+            DELETE FROM    rnkMETHODDATA
+            WHERE          id_rnkMETHOD
+            IN                 (
+                SELECT        ID
+                FROM          rnkMETHOD
+                WHERE         name = 'weighted_average'
+                )
+            """)
+
+        for i in range(1, 10):
+            cls.records[i] = []
+
+        for i in range(100):
+            id_bibrec = choice(range(1, 10))
+            score = choice(range(1, 6))
+            run_sql("""
+                INSERT INTO     cmtRECORDCOMMENT
+                (id_bibrec, id_user, title, body, date_creation, star_score)
+                VALUES(%s, 1, "Resgression Test", "Regression Test", NOW(), %s)
+            """, (id_bibrec, score))
+            cls.records[id_bibrec].append(score)
+
+        command = "%s/bibrank" % CFG_BINDIR
+        proc = Popen([command, "-u", "admin"])
+        proc.wait()
+
+        # Manually run the bibrank task! Just imitate bibsched's operations.
+        task_id = get_last_taskid()
+        proc = Popen([command, str(task_id)])
+        proc.wait()
+
     def tearDown(self):
         query = "DELETE from rnkPAGEVIEWS"
         run_sql(query)
@@ -288,6 +335,147 @@ class BibRankRecordViewRankingTest(unittest.TestCase):
         if expected_result != search_results:
             self.fail("Expected to see in order %s, got %s." % \
                       (expected_result, search_results))
+    @classmethod
+    def tearDownClass(cls):
+        query = "DELETE from cmtRECORDCOMMENT"
+        run_sql(query)
+
+    def calculate_weighted_averages(self):
+        weighted_averages = {}
+
+        config_file = CFG_ETCDIR + "/bibrank/weighted_average.cfg"
+        config = ConfigParser.ConfigParser()
+        config.readfp(open(config_file))
+        minimum_review_number = float(config.get("weighted_average",
+                                                 "minimum_review_number"))
+        general_score_total = 0
+        general_score_number = 0
+        averages = {}
+
+        for key in self.records.keys():
+            general_score_number += len(self.records[key])
+            total_score = 0
+            for score in self.records[key]:
+                total_score += score
+            general_score_total += total_score
+            averages[key] = float(total_score) / float(len(self.records[key]))
+
+        general_average = (float(general_score_total) /
+                          float(general_score_number))
+
+        for key in self.records.keys():
+            review_number = len(self.records[key])
+            if review_number < minimum_review_number:
+                continue
+            weighted_averages[key] = float("%.4f" % (
+                (review_number / (review_number + minimum_review_number)) *
+                averages[key] + (minimum_review_number /
+                                 (review_number + minimum_review_number)) *
+                                                     general_average))
+
+        return weighted_averages
+
+    def test_weighted_average(self):
+        """Check if the weighted average ranking is working"""
+
+        db_records = fromDB("weighted_average")
+
+        weighted_averages = self.calculate_weighted_averages()
+
+        if set(db_records.keys()) != set(weighted_averages.keys()):
+            self.fail("Weigted average ranking doesn't check the number "
+                      "minimum reviews required")
+        for key in db_records.keys():
+            if abs(weighted_averages[key] - db_records[key]) > 0.001:
+                self.fail("Weigted average ranking doesn't seem to work well!")
+
+
+class BibrankArchivedContentTest(unittest.TestCase):
+    """
+    Test whether data collection function works as expected or not.
+    """
+
+    def test_record_sorter_by_date(self):
+        """bibrank - get records sorted by creation and modification date."""
+
+        # Get records by creation date.
+        records = run_sql("""
+            SELECT id, creation_date
+            FROM bibrec
+            ORDER BY creation_date DESC
+            LIMIT 10""")
+        data = {}
+
+        for record in records:
+            data[record[0]] = record[1].strftime("%Y-%m-%d %H:%M")
+
+        result = records_in_time_interval_to_index('creation', 10)
+        self.assertEqual(data, result,
+                         "Database result: %s, "
+                         "records_in_time_interval_to_index returns: %s" %
+                        (str(data), str(result)))
+
+        # Get records by modification date.
+        records = run_sql("""
+            SELECT id, modification_date
+            FROM bibrec
+            ORDER BY modification_date DESC
+            LIMIT 10""")
+
+        data = {}
+
+        for record in records:
+            data[record[0]] = record[1].strftime("%Y-%m-%d %H:%M")
+
+        result = records_in_time_interval_to_index('modification', 10)
+        self.assertEqual(data, result,
+                         "Database result: %s, "
+                         "records_in_time_interval_to_index returns: %s" %
+                        (str(data), str(result)))
+
+        # Get records on a date interval by creation_date.
+        min_date = str(run_sql("SELECT MIN(creation_date) FROM bibrec")[0][0])
+        max_date = str(run_sql("SELECT MAX(creation_date) FROM bibrec")[0][0])
+
+        records = run_sql("""
+            SELECT id, creation_date
+            FROM bibrec
+            WHERE creation_date >= "%s"
+            AND creation_date <= "%s"
+            ORDER BY creation_date DESC
+            LIMIT 100""" % (min_date, max_date))
+
+        data = {}
+
+        for record in records:
+            data[record[0]] = record[1].strftime("%Y-%m-%d %H:%M")
+
+        result = records_in_time_interval_to_index('creation', 100, min_date,
+                                                   max_date)
+        self.assertEqual(data, result,
+                         "Database result: %s, "
+                         "records_in_time_interval_to_index returns: %s" %
+                        (str(data), str(result)))
+
+        # Get records on a time interval by creation date
+        records = run_sql("""
+            SELECT id, creation_date
+            FROM bibrec
+            WHERE creation_date <= DATE_ADD(NOW(), INTERVAL -1 HOUR)
+            ORDER BY creation_date DESC
+            LIMIT 100""")
+
+        data = {}
+
+        for record in records:
+            data[record[0]] = record[1].strftime("%Y-%m-%d %H:%M")
+
+        result = records_in_time_interval_to_index('creation', 100, min_date,
+                                                   max_date)
+        self.assertEqual(data, result,
+                         "Database result: %s, "
+                         "records_in_time_interval_to_index returns: %s" %
+                        (str(data), str(result)))
 
 
 TESTS = [BibRankWebPagesAvailabilityTest,
@@ -295,7 +483,9 @@ TESTS = [BibRankWebPagesAvailabilityTest,
          BibRankCitationRankingTest,
          BibRankExtCitesTest,
          BibRankAverageScoreRankingTest,
-         BibRankRecordViewRankingTest]
+         BibRankRecordViewRankingTest,
+         BibRankWeightedAverageRankingTest,
+         BibrankArchivedContentTest]
 
 
 if not get_external_word_similarity_ranker():

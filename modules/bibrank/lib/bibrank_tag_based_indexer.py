@@ -41,6 +41,10 @@ from invenio.bibindex_engine import create_range_list
 from invenio.intbitset import intbitset
 from invenio.bibrank_record_view_indexer import record_view_to_index
 from invenio.bibrank_average_score_indexer import average_score_to_index
+from invenio.bibrank_archived_content_indexer import records_in_time_interval_to_index
+from invenio.search_engine_utils import get_fieldvalues
+from invenio.bibrank_record_sorter import update_bibrank_portalbox
+from invenio.bibrank_weighted_average_indexer import weighted_average_to_index
 
 options = {}
 
@@ -560,5 +564,83 @@ def average_score_exec(rank_method_code, cfg_name, config):
     time1 = time.time()
     dic = average_score_to_index()
     intoDB(dic, begin_date, rank_method_code)
+    time2 = time.time()
+    return {"time": time2 - time1}
+
+def weighted_average(run):
+    return bibrank_engine(run)
+
+
+def weighted_average_exec(rank_method_code, cfg_name, config):
+    """
+    Ranking by weighted average of reviews.
+    """
+    begin_date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    time1 = time.time()
+    dic = weighted_average_to_index(config.get("weighted_average",
+                                            "minimum_review_number"))
+    intoDB(dic, begin_date, rank_method_code)
+    indexes = sorted(dic, key=lambda y: dic[y], reverse=True)
+    limit = int(config.get("weighted_average", "display_on_portalbox_count"))
+
+    top_rated_records = []
+    if limit:
+        for record_id in indexes[:limit]:
+            title = get_fieldvalues(record_id, "245___")
+            if title:
+                top_rated_records.append({"id": record_id,
+                                          "title": title[0],
+                                          "score": dic[record_id]})
+    update_bibrank_portalbox(cfg_name,
+                             "Top Rated Records",
+                             top_rated_records)
+    time2 = time.time()
+    return {"time": time2 - time1}
+
+
+def archived_content(run):
+    return bibrank_engine(run)
+
+
+def archived_content_exec(rank_method_code, cfg_name, config):
+    """ranks content by their creation date."""
+    begin_date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    time1 = time.time()
+    date_type = config.get("archived_content",
+                           "date_type")
+    try:
+        limit = int(config.get("archived_content",
+                               "latest_records_number"))
+    except ValueError:
+        limit = 0
+    start_date = config.get("archived_content",
+                           "start_date").strip()
+    end_date = config.get("archived_content",
+                           "end_date").strip()
+    interval = config.get("archived_content",
+                           "interval").strip()
+    dic = records_in_time_interval_to_index(date_type=date_type, limit=limit,
+                                              start_from=start_date,
+                                              end_to=end_date,
+                                              interval=interval)
+    intoDB(dic, begin_date, rank_method_code)
+    indexes = sorted(dic, key=lambda y: dic[y], reverse=True)
+
+    try:
+        portalbox_count = int(config.get("archived_content",
+                           "display_on_portalbox_count"))
+        portalbox_records = []
+        if portalbox_count:
+            for record_id in indexes[:portalbox_count]:
+                title = get_fieldvalues(record_id, "245___")
+                if title:
+                    portalbox_records.append({"id": record_id,
+                                              "title": title[0],
+                                              "score": dic[record_id]})
+        update_bibrank_portalbox(cfg_name,
+                                 "Last Added Records",
+                                 portalbox_records)
+    except ValueError:
+        pass
     time2 = time.time()
     return {"time": time2 - time1}

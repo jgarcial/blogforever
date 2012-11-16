@@ -50,7 +50,9 @@ pylib_DATA = bibrankadminlib.py \
              bibrank_selfcites_unit_tests.py \
              bibrank_selfcites_regression_tests.py \
              bibrank_record_view_indexer.py \
-             bibrank_average_score_indexer.py
+             bibrank_average_score_indexer.py \
+             bibrank_weighted_average_indexer.py \
+             bibrank_archived_content_indexer.py
 
 EXTRA_DIST = $(pylib_DATA)
 

@@ -2861,6 +2861,13 @@ CREATE TABLE IF NOT EXISTS portalbox (
   UNIQUE KEY id (id)
 ) ENGINE=MyISAM;
 
+CREATE TABLE IF NOT EXISTS bibrank_portalbox (
+  id_bibrank int NOT NULL,
+  id_portalbox int NOT NULL,
+  lang varchar(5) NOT NULL DEFAULT 'en',
+  PRIMARY KEY (id_bibrank, id_portalbox)
+) ENGINE=MyISAM;
+
 -- tables for search examples:
 
 CREATE TABLE IF NOT EXISTS collection_example (

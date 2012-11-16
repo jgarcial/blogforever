@@ -924,6 +924,11 @@ INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) 
 INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) VALUES (30,93,'en','rt',100);
 INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) VALUES (31,94,'en','rt',100);
 INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) VALUES (32,95,'en','rt',100);
+INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) VALUES (1,96,'en','ne',100);
+INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) VALUES (1,97,'en','ne',90);
+
+INSERT INTO bibrank_portalbox (id_bibrank, id_portalbox, lang) VALUES (9, 96, 'en');
+INSERT INTO bibrank_portalbox (id_bibrank, id_portalbox, lang) VALUES (8, 97, 'en');
 
 INSERT INTO collectiondetailedrecordpagetabs(id_collection,tabs) VALUES(33,'');
 
@@ -1074,6 +1079,8 @@ INSERT INTO portalbox VALUES (92,'ABOUT ALEPH Theses','The ALEPH Theses collecti
 INSERT INTO portalbox VALUES (93,'ABOUT ISOLDE Papers','The ISOLDE Papers collection is a temporary collection that is being used for testing.');
 INSERT INTO portalbox VALUES (94,'ABOUT ISOLDE Internal Notes','The ISOLDE Internal Notes collection is a temporary restricted and hidden collection that is being used for testing.');
 INSERT INTO portalbox VALUES (95,'ABOUT Drafts','The Drafts collection is a temporary restricted collection that is being used for testing.');
+INSERT INTO portalbox VALUES (96,'Recently Added Records','No records have been added yet!');
+INSERT INTO portalbox VALUES (97,'Top Rated Recods','No records have been rated yet!');
 
 INSERT INTO sbmCOLLECTION VALUES (36,'Document Types');
 
@@ -1662,6 +1669,10 @@ INSERT INTO collection_rnkMETHOD (id_collection,id_rnkMETHOD,score) VALUES (15,6
 INSERT INTO rnkMETHOD (id,name,last_updated) VALUES (7,'selfcites','0000-00-00 00:00:00');
 INSERT INTO collection_rnkMETHOD (id_collection,id_rnkMETHOD,score) VALUES (1,7,10);
 INSERT INTO collection_rnkMETHOD (id_collection,id_rnkMETHOD,score) VALUES (15,7,80);
+INSERT INTO rnkMETHOD (id,name,last_updated) VALUES (8,'weighted_average','0000-00-00 00:00:00');
+INSERT INTO collection_rnkMETHOD (id_collection,id_rnkMETHOD,score) VALUES (1,8,0);
+
+INSERT INTO rnkMETHOD (id,name,last_updated) VALUES (9,'last_added','0000-00-00 00:00:00');
 
 INSERT INTO rnkMETHOD (id,name,last_updated) VALUES (8,'average_score','0000-00-00 00:00:00');
 INSERT INTO collection_rnkMETHOD (id_collection,id_rnkMETHOD,score) VALUES (1,8,0);
