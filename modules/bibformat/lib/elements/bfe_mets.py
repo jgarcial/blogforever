@@ -29,12 +29,17 @@ def format_element(bfo):
     Returns the METS representation of the corresponding record
     """
 
-    submission_id = bfo.control_field('002')
+    l = lambda x : [i for i in x]
+    final_formatted_record = ""
+    subid = bfo.control_field('002')
     record_collection = bfo.fields('980__a')[0]
     ingestion_pack = b.select(record_collection)
-    formatted_record = ingestion_pack.get_one(submission_id)['content']
-    xml_tree = etree.XML(formatted_record)
-    final_formatted_record = etree.tostring(xml_tree, pretty_print=True)
+    document = l(ingestion_pack.get_many(subid = subid))
+    if document:
+        formatted_record = document[0]['content']
+        xml_tree = etree.XML(formatted_record)
+        final_formatted_record = etree.tostring(xml_tree, pretty_print=True)
+
     return final_formatted_record
 
 def escape_values(bfo):
