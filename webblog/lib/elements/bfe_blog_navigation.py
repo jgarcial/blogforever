@@ -53,7 +53,10 @@ def format_element(bfo):
 
     menu_recids = get_posts(blog_recid, newest_first=True)
 
-    menu_out = '<h4>%s</h4>' % cfg_messages["in_issue"][current_language]
+    try:
+        menu_out = '<h4>%s</h4>' % cfg_messages["in_issue"][current_language]
+    except: # in english by default
+        menu_out = '<h4>%s</h4>' % cfg_messages["in_issue"]['en']
 
     for recid in menu_recids:
         if str(this_recid) == str(recid):

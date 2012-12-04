@@ -47,8 +47,8 @@ def format_element(bfo):
 
     out = '<div id="top"><div id="topbanner">&nbsp;</div>'
     out += '<div id="mainmenu"><table width="100%">'
-    out += '<tr><td class="left"><a href="%s/record/%s?%s">%s</a>' % (CFG_SITE_URL,
-                                                                     post_recid, bfo.lang, post_title)
+    out += '<tr><td class="left" style = "font-size: 1em;">Go to post: <a href="%s/record/%s?%s">%s</a>' % \
+                (CFG_SITE_URL, post_recid, bfo.lang, post_title)
 
     out += '<td class="right">%s</td>' % addition_date
     out += '</td></tr></table></div></div>'

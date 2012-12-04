@@ -62,10 +62,10 @@ def format_element(bfo):
                 var see_all_link = document.getElementById('see_all_link');
                 if (all_comments.style.display == 'none'){
                     all_comments.style.display = '';
-                    see_all_link.innerHTML = "Hide"
+                    see_all_link.innerHTML = "Show less comments"
                 } else {
                     all_comments.style.display = 'none';
-                    see_all_link.innerHTML = "Show all"
+                    see_all_link.innerHTML = "Show all comments"
                 }
             }
             </script>

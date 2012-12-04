@@ -45,7 +45,10 @@ def format_element(bfo):
     if blog_posts_recids:
         # let's print just the 3 latest posts
         latest_blog_posts_recids = blog_posts_recids[:3]
-        out += "<h4>%s</h4>" % cfg_messages["in_issue"][current_language]
+        try:
+            out += "<h4>%s</h4>" % cfg_messages["in_issue"][current_language]
+        except: # in english by default
+            out += "<h4>%s</h4>" % cfg_messages["in_issue"]['en']
 
         for post_recid in latest_blog_posts_recids:
             out += print_record(post_recid, format='hb')
@@ -64,10 +67,10 @@ def format_element(bfo):
                 var see_all_link = document.getElementById('see_all_link');
                 if (all_posts.style.display == 'none'){
                     all_posts.style.display = '';
-                    see_all_link.innerHTML = "Hide"
+                    see_all_link.innerHTML = "Show less posts"
                 } else {
                     all_posts.style.display = 'none';
-                    see_all_link.innerHTML = "Show all"
+                    see_all_link.innerHTML = "Show all posts"
                 }
             }
             </script>
