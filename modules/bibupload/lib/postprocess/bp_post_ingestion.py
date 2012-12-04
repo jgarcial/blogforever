@@ -60,6 +60,6 @@ def bp_post_ingestion(file_path):
         ingestion_pack = b.select(record_collection)
         # once we have all we need let's store the document
         # in its corresponding storage instance
-        ingestion_pack.store_one(id=submission_id, recid=record_id, content=final_xml, date=date)
+        ingestion_pack.store_one(subid=submission_id, recid=record_id, content=final_xml, date=date)
 
     return 1
