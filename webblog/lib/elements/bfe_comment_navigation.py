@@ -58,7 +58,10 @@ def format_element(bfo):
 
     menu_recids = get_comments(post_recid, newest_first=True)
 
-    menu_out = '<h4>%s</h4>' % cfg_messages["in_issue"][current_language]
+    try:
+        menu_out = '<h4>%s</h4>' % cfg_messages["in_issue"][current_language]
+    except:
+        menu_out = '<h4>%s</h4>' % cfg_messages["in_issue"]['en']
 
     for recid in menu_recids:
         if str(this_recid) == str(recid):

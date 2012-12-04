@@ -35,7 +35,8 @@ def format_element(bfo):
     """
 
     current_language = bfo.lang
-    links = bfo.fields('8564_')
+    links = bfo.fields('856_0')
+    menu_out = ""
 
     if links:
         menu_out = '<h4>%s:</h4>' % cfg_messages["in_issue"][current_language]
