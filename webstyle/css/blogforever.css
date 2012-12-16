@@ -1,0 +1,571 @@
+/*
+* -*- mode: text; coding: utf-8; -*-
+
+   This file replaces the file invenio.css for instances of a Blogforever repo.
+
+   This file is part of Invenio.
+   Copyright (C) 2009, 2010, 2011 CERN.
+
+   Invenio is free software; you can redistribute it and/or
+   modify it under the terms of the GNU General Public License as
+   published by the Free Software Foundation; either version 2 of the
+   License, or (at your option) any later version.
+
+   Invenio is distributed in the hope that it will be useful, but
+   WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with Invenio; if not, write to the Free Software Foundation, Inc.,
+   59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+*/
+
+.navtrailbox {
+   color: #36c;
+   background: #fff;
+   padding: 0px;
+   margin-top: 7px;
+   border-spacing: 0px;
+   border-collapse: collapse;
+   font-size: x-small;
+}
+.navtrailboxbody {
+   color: #36c;
+   padding: 0px 0px 0px 10px;
+   border-spacing: 0px;
+   background: #fff;
+   font-size: x-small;
+}
+a.navtrail:link {
+   color: #36c;
+   background: transparent;
+}
+a.navtrail:visited {
+   color: #36c;
+   background: transparent;
+}
+a.navtrail:active {
+   color: #36c;
+   background: transparent;
+}
+a.navtrail:hover {
+   color: #36c;
+   background: transparent;
+}
+.info {
+   color: #060;
+   background: transparent;
+}
+.snapshot {
+   color: #000;
+   background: transparent;
+   border: 2px solid #999;
+   margin: 10px 10px 0px 40px;
+}
+.pageheader {
+   color: #999;
+   font-size: x-small;
+   background: transparent;
+   padding: 0px;
+   margin: 0px;
+   width: 100%;
+}
+.pagebody {
+   color: #000;
+   background: transparent;
+   margin:0px;
+   padding: 20px;
+}
+.pagebodystripeleft {
+   color: #000;
+   background: #fff;
+   font-size: x-small;
+   width: 120px;
+   margin: 0px;
+   padding-left: 10px;
+   float: left;
+}
+.pagebodystripemiddle {
+   color: #000;
+   background: #fff;
+   padding: 0px;
+   margin: 0px;
+}
+.pagebodystriperight {
+   color: #000;
+   background: #fff;
+   font-size: x-small;
+   width: 120px;
+   float: right;
+}
+.pageboxlefttop {
+   color: #000;
+   background: transparent;
+   font-size: x-small;
+}
+.pageboxlefttopadd {
+   color: #000;
+   background: transparent;
+   font-size: x-small;
+}
+.pageboxleftbottom {
+   color: #000;
+   background: transparent;
+   font-size: x-small;
+}
+.pageboxleftbottomadd {
+   color: #000;
+   background: transparent;
+   font-size: x-small;
+}
+.pageboxrighttop {
+   color: #000;
+   background: transparent;
+   font-size: x-small;
+}
+.pageboxrighttopadd {
+   color: #000;
+   background: transparent;
+   font-size: x-small;
+}
+.pageboxrightbottom {
+   color: #000;
+   background: transparent;
+   font-size: x-small;
+}
+.pageboxrightbottomadd {
+   color: #000;
+   background: transparent;
+   font-size: x-small;
+}
+.pagefooter {
+   color: #666;
+   background: #fff;
+   font-size: x-small;
+   margin-top: 50px;
+   padding: 0px;
+   border-top: 1px solid #666;
+   width: 100%;
+   clear: both;
+}
+.pagefooterstripeleft {
+   color: #666;
+   background: #fff;
+   font-size: x-small;
+   margin-left: 5px;
+   width: 60%;
+   float: left;
+   text-align: left;
+}
+.pagefooterstriperight {
+   color: #666;
+   background: #fff;
+   margin-right: 5px;
+   font-size: x-small;
+   text-align: right;
+}
+a.footer:link {
+   color: #666;
+   background: transparent;
+}
+a.footer:visited {
+   color: #666;
+   background: transparent;
+}
+a.footer:active {
+   color: #666;
+   background: transparent;
+}
+a.footer:hover {
+   color: #666;
+   background: transparent;
+}
+.errorbox {
+   color: #000;
+   background: #ffcccc;
+   padding: 1px;
+   margin: 5px 30px 5px 30px;
+   border-collapse: collapse;
+   border: 2px solid #900;
+}
+.errorboxheader {
+   color: #000;
+   background: #ffcccc;
+   padding: 3px;
+   border-spacing: 0px;
+   font-weight: bold;
+   text-align: left;
+}
+.errorboxbody {
+   color: #000;
+   background: #ffcccc;
+   padding: 3px;
+}
+.searchbox {
+   color: #000;
+   background: #fff;
+   padding: 1px;
+   margin: 5px 0px 5px 0px;
+   border-collapse: collapse;
+   /*border-top: 1px solid #36c;*/
+}
+.home .searchbox {
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+.lightsearch input.formbutton{
+    font-size: medium;
+}
+.searchboxheader {
+   color: #000;
+   /*background: #f1f1f1;
+   padding: 3px;*/
+   border-spacing: 0px;
+   font-size: small;
+   text-align: left;
+}
+.searchboxbody {
+   color: #000;
+   background: #fff;
+   padding: 3px;
+}
+.narrowsearchbox {
+   color: #000;
+   background: #fff;
+   padding: 1px;
+   margin: 20px 20px 5px 0px;
+   border-collapse: collapse;
+   /*border-top: 1px solid #36c;*/
+}
+.narrowsearchboxheader {
+   color: #000;
+   /*background: #f1f1f1;*/
+   padding: 3px;
+   border-spacing: 0px;
+   font-size: small;
+   text-align: left;
+}
+.narrowsearchboxbody {
+   color: #000;
+   /*background: #fff;*/
+   padding: 3px;
+}
+.focusonsearchbox {
+   color: #000;
+   /*background: #f0f8ff;*/
+   padding: 1px;
+   margin: 20px 20px 5px 0px;
+   border-collapse: collapse;
+   /*border-top: 1px solid #36c;*/
+}
+.focusonsearchboxheader {
+   color: #000;
+   /*background: #e6e6fa;*/
+   padding: 3px;
+   border-spacing: 0px;
+   font-size: small;
+   text-align: left;
+}
+.focusonsearchboxbody {
+   color: #000;
+   /*background: #f0f8ff;*/
+   padding: 3px;
+}
+.searchalsosearchbox {
+   color: #000;
+   /*background: #fffbf5;*/
+   padding: 1px;
+   margin: 20px 20px 5px 0px;
+   border-collapse: collapse;
+   /*border-top: 1px solid #36c;*/
+}
+.searchalsosearchboxheader {
+   color: #000;
+   /*background: #ffeacc;*/
+   padding: 3px;
+   border-spacing: 0px;
+   font-size: small;
+   text-align: left;
+}
+.searchalsosearchboxbody {
+   color: #444;
+   /*background: #fffbf5;*/
+   padding: 3px;
+}
+.latestadditionsbox {
+   color: #000;
+   background: #fff;
+   padding: 5px;
+   margin: 5px 20px 5px 0px;
+   border-spacing: 5px;
+}
+.latestadditionsboxtimebody {
+   color: #000;
+   background: #fff;
+   padding: 3px;
+   white-space: nowrap;
+   text-align: right;
+   vertical-align: top;
+   font-size: xx-small;
+}
+.latestadditionsboxrecordbody {
+   color: #000;
+   background: #fff;
+   padding: 3px;
+   text-align: left;
+   vertical-align: top;
+   font-size: small;
+}
+.portalbox {
+   color: #000;
+   background: #fff;
+   margin: 0px 0px 15px 0px;
+   border-collapse: collapse;
+   border-top: 1px solid #abb;
+   font-size: small;
+   width: 100%;
+}
+.portalboxheader {
+   color: #000;
+   background: #f1f1f1;
+   padding: 2px;
+   border-spacing: 0px;
+   border-bottom: 1px solid #999;
+   text-align: left;
+   font-size: small;
+}
+.portalboxbody {
+   color: #000;
+   background: #fff;
+   padding: 2px;
+   font-size: small;
+}
+.admin_wvar, .admin_w200, .admin_wvar_nomargin {
+   color: #000;
+   background: white;
+   padding: 1px;
+   margin: 0px 0px 5px 20px;
+   border-spacing: 0px;
+   border-top: 1px solid #36c;
+}
+.admin_w200 {
+   width: 250px;
+}
+.admin_wvar_nomargin {
+   margin: 0px;
+}
+tr.admin_row_highlight:hover{
+   background-color:#eee;
+}
+tr.admin_row_highlight:hover td.extracolumn{
+   background-color:#fff;
+}
+.admin_row_color{
+   background-color:#EBF7FF;
+}
+.adminlabel {
+   width: 100px;
+   font-size: small;
+   background: #f1f1f1;
+   vertical-align: top;
+}
+.adminheader, .adminheaderleft, .adminheadercenter, .adminheaderright {
+   color: #000;
+   background: #f1f1f1;
+   border-spacing: 0px;
+   font-size: small;
+   padding: 3px 5px;
+   text-align: center;
+}
+.adminheaderleft  {
+   text-align: left;
+}
+.adminheaderright {
+   text-align: right;
+}
+.adminbutton {
+   color: #fff;
+   background: #36c;
+   font-weight: bold;
+   margin: 5px 10px 5px 10px;
+   border-collapse: collapse;
+   border-top: 1px solid #36c;
+}
+.admintd, .admintdleft, .admintdright {
+   font-size: small;
+   padding: 0px 10px;
+   text-align: center;
+   vertical-align: top;
+}
+.admintdleft {
+   text-align: left;
+}
+.admintdright {
+   text-align: right;
+}
+a.google:link {
+   color: #333;
+   background: transparent;
+}
+a.google:visited {
+   color: #333;
+   background: transparent;
+}
+a.google:active {
+   color: #333;
+   background: transparent;
+}
+a.google:hover {
+   color: #333;
+   background: transparent;
+}
+.googlebox {
+   color: #333;
+   background: #fff;
+   text-align: left;
+   margin-left: auto;
+   margin-right: auto;
+   margin-top: 50px;
+   padding: 10px;
+   font-size: small;
+   border-collapse: collapse;
+   border-top: 1px solid #fc0;
+}
+.googleboxheader {
+   color: #333;
+   background: #ffc;
+   font-weight: normal;
+   font-size: small;
+   vertical-align: top;
+}
+.googleboxbody {
+   color: #333;
+   background: #fff;
+   padding: 0px 5px 0px 5px;
+   font-size: small;
+   text-align: left;
+   vertical-align: top;
+}
+.youraccountbox {
+   color: #000;
+   background: #fff;
+   padding: 1px;
+   margin: 5px 0px 5px 0px;
+   border-collapse: collapse;
+   border-top: 1px solid #fc0;
+}
+.youraccountheader {
+   color: #333;
+   background: #ffc;
+   font-weight: normal;
+   font-size: small;
+   vertical-align: top;
+   text-align: left;
+}
+.youraccountbody {
+   color: #333;
+   background: #fff;
+   padding: 0px 5px 0px 5px;
+   margin-bottom:5px;
+   font-size: small;
+   text-align: left;
+   vertical-align: top;
+}
+th.youraccountheader a:link, th.youraccountheader a:visited {
+   color:#000000;
+   text-decoration:none;
+}
+th.youraccountheader a:hover {
+   text-decoration:underline;
+}
+
+/***************************/ 
+/** Added for Blogforever **/
+/***************************/
+
+.brand img {
+   height: 24px;
+   width: auto;
+   max-width: 130px;
+   opacity: 0.6;
+   position: relative;
+   margin: -6px -10px 0 0;
+   -webkit-transition: all .2s linear;
+   -moz-transition: all .2s linear;
+   transition: all .2s linear;
+}
+
+.brand:hover img {
+    opacity: 1;
+}
+
+.dropdown-menu .divider {border-bottom: 1px solid #DDD;}
+
+/* Sticky Footer styles */
+
+html, body {
+height: 100%;
+}
+
+.push {
+height: 150px;
+}
+
+.wrapper {
+min-height: 100%;
+height: auto !important;
+height: 100%;
+margin: 0 auto -150px;
+}
+
+.wrapper > .container {
+padding-top: 60px;
+}
+
+.footerwrapper {
+height: 150px;
+background: #143F0F;
+border-top: 1px solid #EEE;
+color:#eee;
+}
+
+.footerwrapper a {
+   color:#fff;
+}
+
+.footerwrapper > .container {
+padding-top: 15px;
+}
+
+
+/* Overwrite wrong bg colour on collapsed hover nav links */
+
+@media (max-width: 979px) {
+   .nav-collapse .nav > li > a:hover, .nav-collapse .dropdown-menu a:hover {
+   text-decoration: none;
+   color: white;
+   background-color: #24681D;
+   background-image: -moz-linear-gradient(top, #27701F, #205C19);
+   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#27701F), to(#205C19));
+   background-image: -webkit-linear-gradient(top, #27701F, #205C19); 
+   background-image: -o-linear-gradient(top, #27701F, #205C19);
+   background-image: linear-gradient(to bottom, #27701F, #205C19);   
+   background-repeat: repeat-x;
+   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff27701f', endColorstr='#ff205c19', GradientType=0);
+   }
+}
+
+/* Fix sticky footer at low resolutions */
+
+@media (max-width: 767px) {
+   .footerwrapper {
+   margin-right: -20px;
+   margin-left: -20px;
+   height:auto;
+   }
+   .footerwrapper .span6 {
+      margin-bottom:25px;
+   }
+
+}

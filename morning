@@ -1,0 +1,10 @@
+#!/bin/bash
+cd /src/invenio
+make
+sudo make install
+echo "invenio done"
+cd /src/blogforever
+make
+sudo make install
+service apache2 restart
+echo "blogforever done"

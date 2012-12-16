@@ -24,24 +24,7 @@
 ## {% include 'header.html' %}
 #}
 
-  <style>
-  ul.nav li.dropdown:hover ul.dropdown-menu{
-    display: block;
-    margin-top: 0px;
-  }
-
-  .brand img {
-    height: 20px;
-    width: auto!important;
-    max-width: 200%!important;
-    opacity: 0.6;
-  }
-
-  .brand:hover img {
-    opacity: 0.95;
-  }
-  </style>
-  <div class="navbar navbar-fixed-top navbar-inverse">
+  <div class="navbar navbar-fixed-top">
     <div class="navbar-inner">
       <div class="container">
         <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
@@ -50,7 +33,7 @@
             <span class="icon-bar"></span>
         </a>
         <a class="brand" href="{{ url_for('search.index') }}">
-          <img src="/img/site_logo.gif" alt="{{ config.CFG_SITE_NAME_INTL[g.ln] }}" />
+          <img src="/img/blogforever_logo.png" alt="{{ config.CFG_SITE_NAME_INTL[g.ln] }}" />
         </a>
         <ul class="nav pull-right">
           <li>
@@ -68,7 +51,6 @@
             <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span>&nbsp;</a>
           <ul class="dropdown-menu">
             <li><a href="{{ url_for('youraccount.display') }}">{{ _("Personalize") }}</a></li>
-            <li class="divider"></li>
             {% if current_user.is_guest %}
             <li><a href="{{ url_for('youraccount.login', referer=request.url) }}">
               <i class="icon icon-lock"></i> {{ _("Login") }}
@@ -105,4 +87,3 @@
   </div>
 
   <div class="visible-desktop" style="clear:both; height: 60px;"></div>
-

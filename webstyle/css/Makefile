@@ -2,8 +2,8 @@
 
 include ../../config.mk
 
-CSSFILES = invenio.css bull_StylesPlain.css
-CSSDIR = $(PREFIX)/var/www/img/
+CSSFILES = bootstrap.css blogforever.css font-awesome.css font-awesome-ie7.css
+CSSDIR = $(PREFIX)/var/www/css/
 
 all:
 	@echo "Done."
