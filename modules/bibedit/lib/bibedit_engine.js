@@ -6007,3 +6007,4 @@ function bindFocusHandlers() {
   $("#focuson_authors").on("click", onfocusauthor);
   $("#focuson_others").on("click", onfocusother);
 }
+
