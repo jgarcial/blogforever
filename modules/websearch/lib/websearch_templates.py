@@ -27,6 +27,7 @@ import string
 import re
 import locale
 from urllib import quote, urlencode
+from urlparse import urlparse
 from xml.sax.saxutils import escape as xml_escape
 
 from invenio.config import \
@@ -63,7 +64,8 @@ from invenio.config import \
      CFG_WEBSEARCH_SHOW_COMMENT_COUNT, \
      CFG_WEBSEARCH_SHOW_REVIEW_COUNT, \
      CFG_SITE_RECORD, \
-     CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT
+     CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT, \
+     CFG_DATABASE_NAME
 
 from invenio.search_engine_config import CFG_WEBSEARCH_RESULTS_OVERVIEW_MAX_COLLS_TO_PRINT
 
@@ -180,6 +182,21 @@ class Template:
                            'f3' : (str, ""),
                            'm3' : (str, ""),
                            'wl' : (int, CFG_WEBSEARCH_WILDCARD_LIMIT)}
+
+    # SRU common URL parameters
+    sru_default_urlargd = {'c'                 : (list, []),
+                            'cc'               : (str, ""),
+                            'operation'        : (str, ""),
+                            'version'          : (str, ""),
+                            'query'            : (str, ""),
+                            'startRecord'      : (int, ""),
+                            'maximumRecords'   : (int, ""),
+                            'recordPacking'    : (str, ""),
+                            'recordSchema'     : (str, ""),
+                            'resultSetTTL'     : (str, ""),
+                            'stylesheet'       : (str, ""),
+                            'extraRequestData' : (str, "")}
+    sru_protocol_version = "1.2"
 
     tmpl_openurl_accepted_args = {
             'id' : (list, []),
@@ -4630,4 +4647,95 @@ class Template:
             else:
                 out += '<format name="%s" type="%s" />\n' % (xml_escape(format_name), xml_escape(format_type))
         out += "</formats>"
+        return out
+
+    def tmpl_sru_explain(self):
+        """ Specification: http://www.loc.gov/standards/sru/specs/explain.html
+            The serverInfo fields are populated by invenio configuration vars
+            The indexInfo fields are populated by sql table idxINDEX """
+
+        site_url_elements = urlparse(CFG_SITE_URL)
+        site_port = site_url_elements.port if site_url_elements.port is not None else 80
+        site_sru_url = CFG_SITE_URL + "/sru"
+
+        out = """<?xml version="1.0"?>
+        <zs:explainResponse xmlns:zs="http://www.loc.gov/zing/srw/">
+          <zs:version>%s</zs:version>
+            <zs:record>
+              <zs:recordSchema>http://explain.z3950.org/dtd/2.0/</zs:recordSchema>
+                <zs:recordPacking>xml</zs:recordPacking>
+                <zs:recordData>
+                  <explain xmlns="http://explain.z3950.org/dtd/2.0/">
+                    <serverInfo>
+                      <host>%s</host>
+                      <port>%d</port>
+                      <database>%s</database>
+                    </serverInfo>
+                    <databaseInfo>
+                      <title>%s</title>
+                      <description lang="en" primary="true">%s</description>
+                    </databaseInfo>""" % (self.sru_protocol_version,
+                                        site_sru_url,
+                                        site_port,
+                                        CFG_DATABASE_NAME,
+                                        CFG_SITE_NAME,
+                                        CFG_SITE_NAME)
+
+        out += """<indexInfo>
+                      <set identifier="info:srw/cql-context-set/1/cql-v1.1" name="cql"/>
+                      <set identifier="info:srw/cql-context-set/1/dc-v1.1" name="dc"/>
+                      <set identifier="http://zing.z3950.org/cql/bath/2.0/" name="bath"/>"""
+        res = run_sql("""SELECT id, name, description FROM idxINDEX""")
+        if res:
+            for id, name, description in res:
+                out += """<index id="%d"><title>%s</title><map><name set="dc">%s</name></map></index>""" % (id, name, description)
+
+        out += """</indexInfo>
+        <schemaInfo>
+          <schema identifier="info:srw/schema/1/marcxml-v1.1" sort="false" name="marcxml">
+          <title>MARCXML</title>
+        </schema>
+        <schema identifier="info:srw/schema/1/dc-v1.1" sort="false" name="dc">
+          <title>Dublin Core</title>
+        </schema>
+        <schema identifier="http://www.loc.gov/mods" sort="false" name="mods2">
+          <title>MODS v2</title>
+        </schema>
+        <schema identifier="info:srw/schema/1/mods-v3.2" sort="false" name="mods">
+          <title>MODS v3</title>
+        </schema>
+      </schemaInfo>
+      <configInfo>
+        <default type="numberOfRecords">0</default>
+      </configInfo>
+        </explain>
+        </zs:recordData>
+        </zs:record>
+        </zs:explainResponse>"""
+        return out
+
+    def tmpl_sru_search_retrieve_prologue(self, params):
+        """ Specification: http://www.loc.gov/standards/sru/specs/search-retrieve.html """
+        out = """<?xml version="1.0"?>
+            <zs:searchRetrieveResponse xmlns:zs="http://www.loc.gov/zing/srw/">
+            <zs:version>%s</zs:version>
+            <zs:numberOfRecords>%d</zs:numberOfRecords>""" % \
+            (self.sru_protocol_version, params['number_of_records'])
+        return out
+
+    def tmpl_sru_search_retrieve_epilogue(self):
+        """ Specification: http://www.loc.gov/standards/sru/specs/search-retrieve.html
+            The end of the SRU searchRetrieve operation """
+        return "</zs:searchRetrieveResponse>"
+
+    def tmpl_sru_scan(self):
+        """ Specification: http://www.loc.gov/standards/sru/specs/scan.html
+            SRU scan operation not supported yet """
+        out = """<zs:diagnostics xmlns:diag="http://www.loc.gov/zing/srw/diagnostic/">
+                <diag:diagnostic>
+                    <diag:uri>info:srw/diagnostic</diag:uri>
+                    <diag:message>SRU scan operation not supported yet</diag:message>
+                    <diag:details>scan</diag:details>
+                    </diag:diagnostic>
+                </zs:diagnostics>"""
         return out
