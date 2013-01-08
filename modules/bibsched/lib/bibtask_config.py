@@ -26,7 +26,7 @@ from invenio.config import CFG_LOGDIR, CFG_PYLIBDIR, CFG_BLOGFOREVER_SITE
 
 # Which tasks are recognized as valid?
 CFG_BIBTASK_VALID_TASKS = ("bibindex", "bibupload", "bibreformat",
-                           "webcoll", "bibtaskex", "bibrank",
+                           "webcoll", "bibtaskex", "bibrank", "blogspam",
                            "oaiharvest", "oairepositoryupdater", "inveniogc",
                            "webstatadmin", "bibclassify", "bibexport",
                            "dbdump", "batchuploader", "bibauthorid", 'bibencode',
