@@ -2,7 +2,7 @@
 
 include ../../config.mk
 
-templates_DATA = websearch_blueprint.py
+LIBFILES = websearch_blueprint.py
 
 all:
 	$(foreach SUBDIR, $(SUBDIRS), cd $(SUBDIR) && make all && cd .. ;)
@@ -12,5 +12,6 @@ test:
 	@echo "Not implemented."
 
 install:
-	$(INSTALL) $(templates_DATA)
+	$(INSTALL) $(LIBFILES) $(LIBDIR)/python/invenio
+	$(foreach SUBDIR, $(SUBDIRS), cd $(SUBDIR) && make install && cd .. ;)
 	@echo "Done.  You may want to restart Apache now."

@@ -132,13 +132,12 @@
     {% block body %}
     {{ body }}
     {% endblock body %}
-  <hr/>
+ 
 </div>
 <div class="push"></div>
 </div> <!-- /.wrapper -->
 <div class="footerwrapper">
 <footer class="container">
-
     {% block pagefooteradd %}{{ pagefooteradd|safe }}{% endblock pagefooteradd %}
   <!-- replaced page footer -->
   {% include 'footer.html' %}

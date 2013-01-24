@@ -2,7 +2,7 @@
 
 include ../../config.mk
 
-IMGFILES = blogforever_logo.png header_background.gif site_logo_small.gif
+IMGFILES = blogforever_logo.png header_background.gif site_logo_small.gif sample1.png sample2.png sample3.png sample4.png
 IMGDIR = $(PREFIX)/var/www/img/
 
 all:

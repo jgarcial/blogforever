@@ -41,18 +41,25 @@
 
 {% block body %}
 
-{{ search_form(collection) }}
 
-<h1>I AM THE BLOGFOREVER WEBSEARCH_INDEX PAGE</h1>
+<header class="jumbotron masthead centered">
+    <h1>Atlantis Blogs</h1>
+    <p>A Blogforever project preserving and disseminating blogs <br>from the citizens of Atlantis.</p>
+</header>
 
-<div class="row websearch clearfix"><!-- row 2 -->
+<div class="row hero search-index"><h1 class="centered">Search our collection:</h1>
+  {{ search_form(collection) }}
+</div>
+
+
+<div class="row websearch narrow-by clearfix"><!-- row 2 -->
   {{ portalbox_sidebar(portalboxes.lt, class="span2") }}
 
   {% if collection.collection_children_r %}
-    <div class="span{{ '4' if collection.collection_children_v else '8' }} collection clearfix">
-      <h4>{{ _("Narrow by collections") }}</h4>
-      {{ collection_tree(collection.collection_children_r, limit=2, class="nav nav-list clearfix") }}
-    </div>
+    
+      <h3>{{ _("Narrow by collections") }}:</h3>
+      {{ collection_tree(collection.collection_children_r, limit=2, class="clearfix browse") }}
+    
   {% else %}
       <div class="span{{ '4' if collection.collection_children_v else '8' }}">
       {% if collection.is_restricted %}
@@ -105,6 +112,68 @@
   {% endif %}
 
 </div>
+</div> <!-- /container -->
+
+<div class="green-bg">
+    <div class="container">
+<div class="marketing">
+  <h1>More Blogforever repositories:</h1>
+  <p class="marketing-byline">See what other institutions are doing with Blogforever blog repositories</p>
+  <ul class="thumbnails example-sites">
+    <li class="span3">
+      <a href="#" class="thumbnail">
+        <img src="/img/sample1.png" alt="Sample archive">
+        <h4>Repository One</h4>
+        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed Thurs.</p>
+      </a>
+    </li>
+    <li class="span3">
+      <a href="#" class="thumbnail">
+        <img src="/img/sample2.png" alt="Sample archive">
+        <h4>Repository Two</h4>
+        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed Thurs.</p>
+      </a>
+    </li>
+    <li class="span3">
+      <a href="#" class="thumbnail">
+        <img src="/img/sample3.png" alt="Sample archive">
+        <h4> Repository Three</h4>
+        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed Thurs.</p>
+      </a>
+    </li>
+    <li class="span3">
+     <a href="#" class="thumbnail">
+        <img src="/img/sample4.png" alt="Sample archive">
+        <h4> Repository Four</h4>
+        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed Thurs.</p>
+      </a>
+    </li>
+  </ul>
+  
+    <hr class="soften">
+      
+    <h1>Why is blog preservation important?</h1>
+  <p class="marketing-byline">Preserving Atlantis's blogosphere for future generations.</p>
+  <div class="row">
+    <div class="span4">
+      <h2><i class="icon icon-folder-open"></i> Archiving</h2>
+      <p>Sed ut unde omnis iste perspiciatis natus error sit voluptatem accusantium doloremque laudantium, Totam aperiam rem, eaque ipsa quae from illo inventore veritatis et vitae dicta sunt quasi architecto beatae explicabo. Nemo enim Ipsam voluptatem quia sit voluptas aspernatur aut aut odit fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam , quis nostrum exercitationem ullam corporis consectetuer laboriosam, nisi ut aliquid ex ea commodi consequatur? vel eum Quis autem qui jure reprehenderit in ea voluptate velit esse quam nihil molestiae consequatur, vel illum eum qui dolorem fugiat nulla pariatur voluptas quo? </p>
+    </div>
+    <div class="span4">
+     
+      <h2><i class="icon icon-briefcase"></i> Preservation</h2>
+      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed Thurs eiusmod tempor incididunt ut labore et dolore magna Aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+    </div>
+    <div class="span4">
+      <h2><i class="icon icon-bullhorn"></i> Dissemination</h2>
+      <p>At vero eos et accusamus iusto odio et qui dignissimos ducimus blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et fuga dolorum. Et Harum quidem rerum est facilis et expedita distinctio. Nam libero tempore est nobis cum soluta eligendi optional cumque impedit quo nihil minus id quod placeat facere possimus maxim, omnis voluptas assumenda est omnis dolor repellendus. Temporibus autem quibusdam et aut aut officiis debitis rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae. Itaque earum rerum hic tenetur a sapiente Delectus, ut aut aut reiciendis voluptatibus maiores alias consequatur perferendis doloribus asperiores repellat.</p>
+    </div>
+  </div><!--/row-->
+  
+<p class="pull-right"><a href="#">Back to top</a></p>
+</div><!-- /.marketing -->
+    </div><!-- /container -->
+  </div>
 
 <script>
 (function($) {
