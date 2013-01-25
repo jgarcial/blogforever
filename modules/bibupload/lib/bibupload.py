@@ -85,6 +85,11 @@ from invenio.bibdocfile import BibRecDocs, file_strip_ext, normalize_format, \
     bibdocfile_url_p, CFG_BIBDOCFILE_AVAILABLE_FLAGS, guess_format_from_url, \
     BibRelation, MoreInfo
 
+from invenio.pluginutils import PluginContainer, get_callable_documentation, \
+    check_arguments_compatibility
+
+from invenio.bibtask_config import CFG_BIBUPLOAD_PREPROCESS_PATH, CFG_BIBUPLOAD_POSTPROCESS_PATH
+
 from invenio.search_engine import search_pattern
 
 #Statistic variables
@@ -127,7 +132,12 @@ def resolve_identifier(tmps, identifier):
     else:
         return int(identifier)
 
-
+def _load_plugins():
+    """
+    Load all the bibsched tasklets into the global variable _PLUGINS.
+    """
+    return PluginContainer(os.path.join(CFG_BIBUPLOAD_PREPROCESS_PATH, 'bp_*.py'))
+_PLUGINS = _load_plugins()
 
 _re_find_001 = re.compile('<controlfield\\s+tag=("001"|\'001\')\\s*>\\s*(\\d*)\\s*</controlfield>', re.S)
 def bibupload_pending_recids():
@@ -2494,9 +2504,11 @@ Examples:
   --special-treatment=MODE\tif "oracle" is specified, when used together with --callback_url,
 \t\t\tPOST an application/x-www-form-urlencoded request where the JSON message is encoded
 \t\t\tinside a form field called "results".
+  --pre-plugin\t\tuse the plugin passed as argument to pre-process the submitted file.
+  --post-plugin\t\tuse the plugin passed as argument to pre-process the submitted file.
 """,
             version=__revision__,
-            specific_params=("ircazdS:fno",
+            specific_params=("ircazdS:fnoy:p:",
                  [
                    "insert",
                    "replace",
@@ -2513,6 +2525,8 @@ Examples:
                    "callback-url=",
                    "nonce=",
                    "special-treatment=",
+                   "pre-plugin=",
+                   "post-plugin=",
                  ]),
             task_submit_elaborate_specific_parameter_fnc=task_submit_elaborate_specific_parameter,
             task_run_fnc=task_run_core)
@@ -2594,6 +2608,16 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args): # pylint: 
 
     elif key in ("--force",):
         task_set_option('force', True)
+        fix_argv_paths([args[0]])
+        task_set_option('file_path', os.path.abspath(args[0]))
+    # Pre- and Post- processing options
+    elif key in ("--pre-plugin",):
+        task_set_option('pre-plugin', value)
+        fix_argv_paths([args[0]])
+        task_set_option('file_path', os.path.abspath(args[0]))
+
+    elif key in ("--post-plugin",):
+        task_set_option('post-plugin', value)
         fix_argv_paths([args[0]])
         task_set_option('file_path', os.path.abspath(args[0]))
 
@@ -2784,7 +2808,12 @@ def task_run_core():
     write_message("STAGE 0:", verbose=2)
 
     if task_get_option('file_path') is not None:
-        write_message("start preocessing", verbose=3)
+        if task_get_option('pre-plugin'):
+            write_message("start pre-processing", verbose=3)
+            _PLUGINS.enable_plugin(task_get_option('pre-plugin'))
+            _PLUGINS[task_get_option('pre-plugin')](task_get_option('file_path'))
+
+        write_message("start processing", verbose=3)        
         task_update_progress("Reading XML input")
         recs = xml_marc_to_records(open_marc_file(task_get_option('file_path')))
         stat['nb_records_to_upload'] = len(recs)

@@ -59,6 +59,9 @@ to verify its correctness.</p>
 be configured for these files.  If the files have to be coverted into
 MARCXML from some other format, structured or not, this is usually
 done beforehand via <a href="bibconvert-admin">BibConvert</a> module.
+You can also use plugins to pre- and post-process the upload. In the
+<a href="<CFG_SITE_URL>/help/hacking/">hacking guide</a>you will find
+instructions on how to create and use these plugins.
 </p>
 
 <p>Note that if you are using external system numbers for your

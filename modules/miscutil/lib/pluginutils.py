@@ -161,7 +161,7 @@ class PluginContainer(object):
 
         @param plugin_name: the plugin name.
         @type plugin_name: string
-        @raise KeyError: if the plugin does not exists.
+        @raise KeyError: if the plugin does not exist.
         """
         self._plugin_map[plugin_name]['enabled'] = True
 
@@ -171,7 +171,7 @@ class PluginContainer(object):
 
         @param plugin_name: the plugin name.
         @type plugin_name: string
-        @raise KeyError: if the plugin does not exists.
+        @raise KeyError: if the plugin does not exist.
         """
         self._plugin_map[plugin_name]['enabled'] = False
 
@@ -183,7 +183,7 @@ class PluginContainer(object):
         @type plugin_name: string
         @return: True if the plugin is correctly enabled..
         @rtype: bool
-        @raise KeyError: if the plugin does not exists.
+        @raise KeyError: if the plugin does not exist.
         """
         return self._plugin_map[plugin_name]['enabled']
 
@@ -195,7 +195,7 @@ class PluginContainer(object):
         @type plugin_name: string
         @return: the filesystem path.
         @rtype: string
-        @raise KeyError: if the plugin does not exists.
+        @raise KeyError: if the plugin does not exist.
         """
         return self._plugin_map[plugin_name]['plugin_path']
 
@@ -206,7 +206,7 @@ class PluginContainer(object):
         @param plugin_name: the plugin name,
         @type plugin_name: string
         @return: the plugin
-        @raise KeyError: if the plugin does not exists or is not enabled.
+        @raise KeyError: if the plugin does not exist or is not enabled.
         """
         if self._plugin_map[plugin_name]['enabled']:
             return self._plugin_map[plugin_name]['plugin']
@@ -384,7 +384,7 @@ class PluginContainer(object):
                 self._plugin_map[plugin_name]['enabled'] is True:
             return self._plugin_map[plugin_name]['plugin']
         else:
-            raise KeyError('"%s" does not exists or is not correctly enabled' %
+            raise KeyError('"%s" does not exist or is not correctly enabled' %
                 plugin_name)
 
     def __contains__(self, plugin_name):

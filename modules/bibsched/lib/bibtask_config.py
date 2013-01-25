@@ -120,3 +120,5 @@ CFG_BIBTASK_DEFAULT_TASK_SETTINGS = {
 }
 
 CFG_BIBTASK_TASKLETS_PATH = os.path.join(CFG_PYLIBDIR, 'invenio', 'bibsched_tasklets')
+CFG_BIBUPLOAD_PREPROCESS_PATH = os.path.join(CFG_PYLIBDIR, 'invenio', 'bibupload_preprocess')
+CFG_BIBUPLOAD_POSTPROCESS_PATH = os.path.join(CFG_PYLIBDIR, 'invenio', 'bibupload_postprocess')

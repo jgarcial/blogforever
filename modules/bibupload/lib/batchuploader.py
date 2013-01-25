@@ -42,6 +42,9 @@ from invenio.bibtask import task_init, task_set_option, \
      write_message, task_sleep_now_if_required
 from invenio.batchuploader_engine import document_upload
 
+from invenio.pluginutils import PluginContainer, get_callable_documentation, \
+     check_arguments_compatibility
+
 def task_submit_elaborate_specific_parameter(key, value, opts, args):
     """ Given the string key, checks its meaning and returns True if
         has elaborated the key.
@@ -53,6 +56,12 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
     elif key in ('-m', '--metadata'):
         task_set_option('metadata', "metadata")
         return True
+    elif key in ('--pre-plugin',):
+        task_set_option('pre-plugin', value)
+        return True
+    elif key in ('--post-plugin',):
+        task_set_option('post-plugin', value)
+        return True
     return False
 
 def task_run_core():
@@ -63,6 +72,11 @@ def task_run_core():
     tempfile.tempdir = CFG_TMPSHAREDDIR
     daemon_dir = CFG_BATCHUPLOADER_DAEMON_DIR[0] == '/' and CFG_BATCHUPLOADER_DAEMON_DIR \
                  or CFG_PREFIX + '/' + CFG_BATCHUPLOADER_DAEMON_DIR
+
+    ## JG: Need to check if it exists, and warn that absolute path is needed
+    if task_get_option('path'):
+        daemon_dir = task_get_option('path')
+
     # Check if directory /batchupload exists
     if not task_get_option('documents'):
         # Metadata upload
@@ -93,8 +107,23 @@ def task_run_core():
                     filename = tempfile.mktemp(prefix=metafile + "_" + time.strftime("%Y%m%d%H%M%S", time.localtime()) + "_")
                     shutil.copy(os.path.join(files_dir, metafile), filename)
                     # Send bibsched task
+
+                    ## JG: create plugins arguments to be passed to bibupload
+                    if task_get_option('pre-plugin'):
+                        pre_plugin_arg = "--pre-plugin=" + task_get_option('pre-plugin')
+                    else:
+                        pre_plugin_arg = ""
+
+                    if task_get_option('post-plugin'):
+                        post_plugin_arg = "--post-plugin=" + task_get_option('post-plugin')
+                    else:
+                        post_plugin_arg = ""
+
                     mode = "-" + folder[0]
-                    jobid = str(task_low_level_submission('bibupload', 'batchupload', mode, filename))
+                    
+                    # Send bibsched task
+                    jobid = str(task_low_level_submission('bibupload', 'batchupload', mode, filename, pre_plugin_arg, post_plugin_arg))
+
                     # Move file to done folder
                     filename = metafile + "_" + time.strftime("%Y%m%d%H%M%S", time.localtime()) + "_" + jobid
                     os.rename(os.path.join(files_dir, metafile), os.path.join(files_done_dir, filename))
@@ -137,9 +166,12 @@ def main():
     invenio configuration file.\n""",
             help_specific_usage=""" -m, --metadata\t Batch Uploader will look for metadata files in the corresponding folders
  -d, --documents\t Batch Uploader will look for documents in the corresponding folders
-                                """,
+ --pre-plugin\t\tuse the plugin passed as argument to pre-process the submitted file.
+ --post-plugin\t\tuse the plugin passed as argument to pre-process the submitted file.
+""",
+
             version=__revision__,
-            specific_params=("md:", ["metadata", "documents"]),
+            specific_params=("md:a:p:", ["metadata", "documents", "pre-plugin=", "post-plugin="]),
             task_submit_elaborate_specific_parameter_fnc=task_submit_elaborate_specific_parameter,
             task_run_fnc=task_run_core)
 

@@ -973,6 +973,18 @@ def _task_run(task_run_fnc):
     _TASK_PARAMS['task_starting_time'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 
     sleeptime = _TASK_PARAMS['sleeptime']
+
+    #Lets call the pre-process tasklets
+    if task_get_task_param("pre-process"):
+        split = re.compile(r"(bst_.*)\[(.*)\]")
+        for tasklet in task_get_task_param("pre-process"):
+            if not split.match(tasklet): # wrong syntax
+                _usage(1, "There is an error in the pre processing option "
+                        "for this task.")
+            
+            aux_tasklet = split.match(tasklet)
+            _TASKLETS[aux_tasklet.group(1)](**eval("dict(%s)" % (aux_tasklet.group(2))))
+
     try:
         try:
             if callable(task_run_fnc) and task_run_fnc():

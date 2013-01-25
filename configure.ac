@@ -766,6 +766,8 @@ AC_CONFIG_FILES([config.nice  \
      modules/bibupload/doc/admin/Makefile \
      modules/bibupload/doc/hacking/Makefile \
      modules/bibupload/lib/Makefile \
+     modules/bibupload/lib/preprocess/Makefile \
+     modules/bibupload/lib/postprocess/Makefile \
      modules/elmsubmit/Makefile \
      modules/elmsubmit/bin/Makefile \
      modules/elmsubmit/bin/elmsubmit \
