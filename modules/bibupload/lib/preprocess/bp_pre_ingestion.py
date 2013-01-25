@@ -21,89 +21,245 @@
    Inserts METS file in mongoDB.
 """
 
-import sys
 import os
-import time
-import fileinput
+from xml.dom.minidom import parseString
+from invenio.search_engine import perform_request_search
 from invenio.config import CFG_BATCHUPLOADER_DAEMON_DIR, \
                            CFG_PREFIX
 
-def transform_mets_to_marcxml(filename, mets_filename, attachments_dir, submissionID):
-    marc_file = open(filename, 'w')
-    marc_file.write('<?xml version="1.0" encoding="UTF-8"?>\n')
-    marc_file.write('<collection xmlns="http://www.loc.gov/MARC21/slim">\n')
-    marc_file.write('<record>\n')
-    ## JG: put submissionID in marc
-    marc_file.write(submissionID_tag_template(submissionID))
-    in_marc = False
-    for line in fileinput.input(mets_filename):
-        if line.find("</marc:") > -1:
-            if line.find("</marc:record>") == -1:
-                marc_file.write(line.replace("<marc:", "<").replace("</marc:", "</")+'\n')
-            in_marc = False
-        elif line.find("<marc:") > -1 or in_marc:
-            if line.find("<marc:record>") == -1:
-                marc_file.write(line.replace("<marc:", "<").replace("</marc:", "</")+'\n')
-            in_marc = True
-    ## JG: add FFT
-    marc_file.write(produce_FFT_tags(attachments_dir))
-    marc_file.write('</record>\n')
-    marc_file.write('</collection>\n')
-    marc_file.close()
-    return 1
+from HTMLParser import HTMLParser
 
-def submissionID_tag_template(submissionID):
-    ## JG: assuming 002 is the tag for the submissionID
-    out = """<controlfield tag="002">%s</controlfield>\n""" % (submissionID)
-    return out
+class HTMLStyleWasher(HTMLParser):
 
-def get_submissionID(file_path):
-    filename = os.path.basename(file_path)
-    return filename[:filename.find(".xml")]
+    def __init__(self, recid):
+        HTMLParser.__init__(self)
+        self.tag_black_list = ('style',
+                               'iframe',
+                               'script',)
+        self.attribute_black_list = ('color',
+                                     'style',
+                                     'class',
+                                     'id',)
+        self.recid = recid
+        self.output = ''
+        self.black_listed_tag_count = 0
 
-def FFT_tag_template(filename, attachments_dir):
-    ## JG: The path needs to be absolute!
-    out = """<datafield tag="FFT" ind1=" " ind2=" ">
-                <subfield code="a">%s</subfield>
-                <subfield code="t"></subfield>
-                <subfield code="d"></subfield>
-            </datafield>\n""" % (os.path.join(attachments_dir, filename))
-    return out
+    def handle_starttag(self, tag, attrs):
+        if tag in self.tag_black_list:
+            self.black_listed_tag_count += 1
+        else:
+            self.output += '<' + tag
+            for (attr, value) in attrs:
+                if attr not in self.attribute_black_list:
+                    self.output += ' %s="%s"' % (attr, value)
+            self.output += '>'
 
-def produce_FFT_tags(attachments_dir):
-    ## JG: Has to check if the files are different copies of the same item
-    ## and produce the tags accordingly
+    def handle_endtag(self, tag):
+        if tag in self.tag_black_list:
+            if self.black_listed_tag_count:
+                self.black_listed_tag_count -= 1
+        else:
+            self.output += '</' + tag + '>'
 
-    out = ""
-    files_list = os.listdir(attachments_dir)
-    for attached_file in files_list:
-        out += FFT_tag_template(attached_file, attachments_dir)
-    return out
+    def handle_startendtag(self, tag, attrs):
+        self.handle_starttag(tag, attrs)
+
+    def handle_data(self, data):
+        if self.black_listed_tag_count == 0:
+            self.output += data
+
+    def handle_charref(self, name):
+        self.output += '&#' + name + ';'
+
+    def handle_entityref(self, name):
+        self.output += '&' + name + ';'
+
+    def clean(self, html):
+        self.reset()
+        self.output = ''
+        self.black_listed_tag_count = 0
+        self.feed(html)
+        self.close()
+
+
+
+class MetsIngestion:
+
+    def __init__(self, file_path):
+	from invenio.bibupload import create_new_record
+        self.file_path = file_path
+        self.file_name = os.path.basename(self.file_path)
+        self.submission_id = self.file_name[:self.file_name.find(".xml")]
+        self.daemon_dir = CFG_BATCHUPLOADER_DAEMON_DIR[0] == '/' and CFG_BATCHUPLOADER_DAEMON_DIR \
+                          or CFG_PREFIX + '/' + CFG_BATCHUPLOADER_DAEMON_DIR
+        self.attachments_dir = self.daemon_dir + "/mets/" + self.submission_id
+        self.mets_file_name = os.path.join(self.attachments_dir, self.file_name + '_mets')
+        self.recid = create_new_record()
+        self.marc_record = None
+        self.record_type = None
+        f = open(self.file_path, 'r')
+        mets = f.read()
+        f.close()
+        self.dom = parseString(mets)
+
+
+    def create_fft_tag_node(self, file_name):
+        ## JG: The path needs to be absolute!
+
+        new_node = self.dom.createElement('datafield')
+        new_node.setAttribute('tag', 'FFT')
+        new_node.setAttribute('ind1', '')
+        new_node.setAttribute('ind2', '')
+
+        sub_node1 = self.dom.createElement('subfield')
+        sub_node1.setAttribute('code', 'a')
+        sub_node1.appendChild(self.dom.createTextNode(os.path.join(self.attachments_dir, file_name)))
+
+        sub_node2 = self.dom.createElement('subfield')
+        sub_node2.setAttribute('code', 't')
+        sub_node2.appendChild(self.dom.createTextNode(""))
+
+        sub_node3 = self.dom.createElement('subfield')
+        sub_node3.setAttribute('code', 'd')
+        sub_node3.appendChild(self.dom.createTextNode(""))
+
+        new_node.appendChild(sub_node1)
+        new_node.appendChild(sub_node2)
+        new_node.appendChild(sub_node3)
+
+        return new_node
+
+
+    def get_attached_files_list(self):
+        return os.listdir(self.attachments_dir)
+
+
+    def produce_fft_nodes(self):
+        ## JG: Has to check if the files are different copies of the same item
+        ## and produce the tags accordingly
+        out = []
+        try:
+            files_list = self.get_attached_files_list()
+            for attached_file in files_list:
+                out.append(self.create_fft_tag_node(attached_file))
+	    return out
+        except:
+            pass
+
+
+    def find_marc_node(self):
+        for dmdSec in self.dom.firstChild.childNodes:
+            if dmdSec.localName == 'dmdSec':
+                for mdWrap in dmdSec.childNodes:
+                    if mdWrap.localName == 'mdWrap':
+                        for xmlData in mdWrap.childNodes:
+                            if xmlData.localName == 'xmlData':
+                                for record in xmlData.childNodes:
+                                    if record.localName == 'record':
+                                        return record
+
+
+    def create_control_tag_node(self, tag, content):
+        new_node = self.dom.createElement('controlfield')
+        new_node.setAttribute('tag', tag)
+        new_node.appendChild(self.dom.createTextNode(str(content)))
+        return new_node
+
+
+    def generate_marc_xml(self):
+        marc_output = '<?xml version="1.0" encoding="UTF-8"?>\n'
+        marc_output += '<collection xmlns="http://www.loc.gov/MARC21/slim">\n'
+        if self.marc_record is not None:
+            marc_output += self.marc_record.toxml()
+        marc_output += '</collection>\n'
+        return marc_output.encode('utf-8')
+
+
+    def extract_record_type(self):
+        if self.record_type == None:
+            for tag in self.marc_record.getElementsByTagName('datafield'):
+                if tag.getAttribute('tag')=='980':
+                    for subfield in tag.getElementsByTagName('subfield'):
+                        if subfield.getAttribute('code')=='a':
+                            return subfield.firstChild.data
+
+
+    def insert_parent_blog_recid(self):
+        for tag in self.marc_record.getElementsByTagName('datafield'):
+            if tag.getAttribute('tag')=='760':
+                for subfield in tag.getElementsByTagName('subfield'):
+                    if subfield.getAttribute('code')=='o':
+                        parent_blog_url =  subfield.firstChild.data
+                        try:
+                            parent_blog_recid = perform_request_search(p='520__u:' + parent_blog_url)[0]
+                        except:
+                            parent_blog_recid = ''
+                        new_node = self.dom.createElement('subfield')
+                        new_node.setAttribute('code', 'w')
+                        new_node.appendChild(self.dom.createTextNode(str(parent_blog_recid)))
+                        tag.appendChild(new_node)
+
+
+    def insert_parent_post_recid(self):
+        for tag in self.marc_record.getElementsByTagName('datafield'):
+            if tag.getAttribute('tag')=='773':
+                for subfield in tag.getElementsByTagName('subfield'):
+                    if subfield.getAttribute('code')=='w':
+                        parent_post_url =  subfield.firstChild.data
+                        try:
+                            parent_post_recid = perform_request_search(p='520__u:' + parent_post_url)[0]
+                        except:
+                            parent_post_recid = ''
+                        new_node = self.dom.createElement('subfield')
+                        new_node.setAttribute('code', 'w')
+                        new_node.appendChild(self.dom.createTextNode(str(parent_post_recid)))
+                        tag.appendChild(new_node)
+
+
+    def transform_mets_to_marc(self):
+        self.marc_record = self.transform_marc(self.find_marc_node())
+        self.marc_record.appendChild(self.create_control_tag_node('001', self.recid))
+        self.marc_record.appendChild(self.create_control_tag_node('002', self.submission_id))
+        for fft_node in self.produce_fft_nodes():
+            self.marc_record.appendChild(fft_node)
+        self.record_type = self.extract_record_type()
+        if self.record_type == 'BLOGPOST':
+            self.insert_parent_blog_recid()
+        if self.record_type == 'COMMENT':
+            self.insert_parent_post_recid()
+
+
+    def transform_marc(self, node):
+        new_node = self.dom.createElement(node.localName)
+
+        if node.nodeType == 1:
+            for attr in node._attrs:
+                new_node.setAttribute(attr, node.getAttribute(attr))
+
+            for sub_node in node.childNodes:
+                new_node.appendChild(self.transform_marc(sub_node))
+
+        elif node.nodeType == 3:
+            new_node = node.cloneNode(True)
+            if node.parentNode.getAttribute('code') == 'a' \
+                    and node.parentNode.parentNode.getAttribute('tag') == '520':
+                sw = HTMLStyleWasher(self.recid)
+                sw.clean(node.data)
+                new_node.data = sw.output
+        return new_node
+
 
 def bp_pre_ingestion(file_path):
     """
-
     @param: file_path
     @type: string
     """
-
-    # attachments_dir = file_path[:-4]
-    filename = os.path.basename(file_path)
-    submissionID = get_submissionID(file_path)
-
-    daemon_dir = CFG_BATCHUPLOADER_DAEMON_DIR[0] == '/' and CFG_BATCHUPLOADER_DAEMON_DIR \
-                 or CFG_PREFIX + '/' + CFG_BATCHUPLOADER_DAEMON_DIR
-    attachments_dir = daemon_dir + "/mets/" + submissionID
-
-    ## JG: check md5
-
-    ## JG: move mets to attached files dir
-    mets_filename = os.path.join(attachments_dir, filename + '_mets')
-    os.rename(file_path, mets_filename)
-
-    ## JG: create marc
-    transform_mets_to_marcxml(file_path, mets_filename, attachments_dir, submissionID)
-
-    ## JG: remove style tagsq
+    m = MetsIngestion(file_path)
+    os.rename(file_path, m.mets_file_name)
+    m.transform_mets_to_marc()
+    marc_file = open(m.file_path, 'w')
+    marc_file.write(m.generate_marc_xml())
+    marc_file.close()
 
     return 1
+
