@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011 CERN.
+## Copyright (C) 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,16 +17,17 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""BlogForever ingestion post-processing.
-   Inserts METS file in mongoDB.
+"""BlogForever ingestion pre-processing.
+   Extracts the MARC record contained in the given METS and
+   enriches it with the required tags.
 """
 
 import os
 from xml.dom.minidom import parseString
-from invenio.search_engine import perform_request_search
+from invenio.search_engine import perform_request_search, get_record
+from invenio.bibrecord import record_get_field_value
 from invenio.config import CFG_BATCHUPLOADER_DAEMON_DIR, \
                            CFG_PREFIX
-
 from HTMLParser import HTMLParser
 
 class HTMLStyleWasher(HTMLParser):
@@ -142,7 +143,7 @@ class MetsIngestion:
             files_list = self.get_attached_files_list()
             for attached_file in files_list:
                 out.append(self.create_fft_tag_node(attached_file))
-	    return out
+            return out
         except:
             pass
 
