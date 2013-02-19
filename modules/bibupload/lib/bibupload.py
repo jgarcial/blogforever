@@ -136,7 +136,9 @@ def _load_plugins():
     """
     Load all the bibsched tasklets into the global variable _PLUGINS.
     """
-    return PluginContainer(os.path.join(CFG_BIBUPLOAD_PREPROCESS_PATH, 'bp_*.py'))
+    process_plugins = PluginContainer(os.path.join(CFG_BIBUPLOAD_PREPROCESS_PATH, 'bp_*.py'))
+    process_plugins.add_plugin_pathnames(os.path.join(CFG_BIBUPLOAD_POSTPROCESS_PATH, 'bp_*.py'))
+    return process_plugins
 _PLUGINS = _load_plugins()
 
 _re_find_001 = re.compile('<controlfield\\s+tag=("001"|\'001\')\\s*>\\s*(\\d*)\\s*</controlfield>', re.S)
@@ -2772,6 +2774,10 @@ def bibupload_records(records, opt_mode = None, opt_tag = None,
                 if callback_url:
                     results_for_callback['results'].append({'recid': error[1], 'success': False, 'error_message': error[2]})
             elif error[0] == 0:
+                if task_get_option('post-plugin'):
+                    write_message("starting post-processing", verbose=3)
+                    _PLUGINS.enable_plugin(task_get_option('post-plugin'))
+                    _PLUGINS[task_get_option('post-plugin')](task_get_option('file_path'))
                 if callback_url:
                     from invenio.search_engine import print_record
                     results_for_callback['results'].append({'recid': error[1], 'success': True, "marcxml": print_record(error[1], 'xm'), 'url': "%s/%s/%s" % (CFG_SITE_URL, CFG_SITE_RECORD, error[1])})
@@ -2835,6 +2841,7 @@ def task_run_core():
         else:
             write_message("   Error bibupload failed: No record found",
                         verbose=1, stream=sys.stderr)
+
         callback_url = task_get_option("callback_url")
         if callback_url:
             nonce = task_get_option("nonce")
