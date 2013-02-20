@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -15,7 +15,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""BlogForever Access Control Config. """
+"""Invenio Access Control Config. """
 
 __revision__ = \
     "$Id$"
@@ -70,9 +70,14 @@ CFG_ACC_EMPTY_ROLE_DEFINITION_SER = None
 # List of tags containing (multiple) emails of users who should authorize
 # to access the corresponding record regardless of collection restrictions.
 if CFG_CERN_SITE:
-    CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS = ['859__f', '270__m', '506__m']
+    CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS = ['859__f', '270__m']
 else:
     CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS = ['8560_f']
+
+if CFG_CERN_SITE:
+    CFG_ACC_GRANT_VIEWER_RIGHTS_TO_EMAILS_IN_TAGS = ['506__m']
+else:
+    CFG_ACC_GRANT_VIEWER_RIGHTS_TO_EMAILS_IN_TAGS = []
 
 # Use external source for access control?
 
@@ -103,7 +108,6 @@ elif CFG_OPENAIRE_SITE:
     CFG_EXTERNAL_AUTHENTICATION = {
     "Local": None,
     "OpenAIRE": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=False, external_id_attribute_name="id"),
-    "ZOpenAIRE": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=True)
     }
 elif CFG_INSPIRE_SITE:
     # INSPIRE specific robot configuration
@@ -178,6 +182,7 @@ DEF_ACTIONS = (
                ('cfgwebsubmit', 'configure WebSubmit', '', 'no'),
                ('cfgbibrank', 'configure BibRank', '', 'no'),
                ('cfgwebcomment', 'configure WebComment', '', 'no'),
+               ('cfgweblinkback', 'configure WebLinkback' , '', 'no'),
                ('cfgoaiharvest', 'configure OAI Harvest', '', 'no'),
                ('cfgoairepository', 'configure OAI Repository', '', 'no'),
                ('cfgbibindex', 'configure BibIndex', '', 'no'),
@@ -210,6 +215,7 @@ DEF_ACTIONS = (
                (VIEWRESTRCOLL, 'view restricted collection', 'collection', 'no'),
                ('cfgwebjournal', 'configure WebJournal', 'name,with_editor_rights', 'no'),
                ('viewcomment', 'view comments', 'collection', 'no'),
+               ('viewlinkbacks', 'view linkbacks', 'collection', 'no'),
                ('sendcomment', 'send comments', 'collection', 'no'),
                ('attachcommentfile', 'attach files to comments', 'collection', 'no'),
                ('attachsubmissionfile', 'upload files to drop box during submission', '', 'no'),
@@ -224,6 +230,7 @@ DEF_ACTIONS = (
                ('viewstatistics', 'view statistics', 'collection', 'yes'),
                ('runbibcirculation', 'run BibCirculation', '', 'no'),
                ('moderatecomments', 'moderate comments', 'collection', 'no'),
+               ('moderatelinkbacks', 'moderate linkbacks', 'collection', 'no'),
                ('runbatchuploader', 'run batchuploader', 'collection', 'yes'),
                ('runbibtasklet', 'run BibTaskLet', '', 'no'),
                ('claimpaper_view_pid_universe', 'View the Claim Paper interface', '', 'no'),
@@ -231,7 +238,8 @@ DEF_ACTIONS = (
                ('claimpaper_claim_others_papers', 'Claim papers for others', '', 'no'),
                ('claimpaper_change_own_data', 'Change data associated to his own person ID', '', 'no'),
                ('claimpaper_change_others_data', 'Change data of any person ID', '', 'no'),
-               ('runbibtasklet', 'run BibTaskLet', '', 'no')
+               ('runbibtasklet', 'run BibTaskLet', '', 'no'),
+               ('cfgbibsched', 'configure BibSched', '', 'no')
               )
 
 # Default authorizations
@@ -294,6 +302,7 @@ CFG_ACC_ACTIVITIES_URLS = {
     'cfgbibrank' : (_("Configure BibRank"), "%s/admin/bibrank/bibrankadmin.py?ln=%%s" % CFG_SITE_URL),
     'cfgwebaccess' : (_("Configure WebAccess"), "%s/admin/webaccess/webaccessadmin.py?ln=%%s" % CFG_SITE_URL),
     'cfgwebcomment' : (_("Configure WebComment"), "%s/admin/webcomment/webcommentadmin.py?ln=%%s" % CFG_SITE_URL),
+    'cfgweblinkback' : (_("Configure WebLinkback"), "%s/admin/weblinkback/weblinkbackadmin.py?ln=%%s" % CFG_SITE_URL),
     'cfgwebsearch' : (_("Configure WebSearch"), "%s/admin/websearch/websearchadmin.py?ln=%%s" % CFG_SITE_URL),
     'cfgwebsubmit' : (_("Configure WebSubmit"), "%s/admin/websubmit/websubmitadmin.py?ln=%%s" % CFG_SITE_URL),
     'cfgwebjournal' : (_("Configure WebJournal"), "%s/admin/webjournal/webjournaladmin.py?ln=%%s" % CFG_SITE_URL),
