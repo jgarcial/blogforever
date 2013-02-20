@@ -22,7 +22,7 @@ __revision__ = \
 
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_SITE, \
-     CFG_CERN_SITE
+     CFG_CERN_SITE, CFG_BLOGFOREVER_SITE
 from invenio.dbquery import run_sql
 from invenio.bibrank_downloads_indexer import database_tuples_to_single_list
 from invenio.search_engine_utils import get_fieldvalues
@@ -76,12 +76,14 @@ def calculate_reading_similarity_list(recid, type="pageviews"):
         tablename = "rnkDOWNLOADS"
     else: # default
         tablename = "rnkPAGEVIEWS"
+
     # firstly compute the set of client hosts who consulted recid:
     client_host_list = run_sql("SELECT DISTINCT(client_host)" + \
                                "  FROM " + tablename + \
                                " WHERE id_bibrec=%s " + \
                                "   AND client_host IS NOT NULL",
                                (recid,))
+
     # secondly look up all recids that were consulted by these client hosts,
     # and order them by the number of different client hosts reading them:
     res = []
@@ -90,10 +92,30 @@ def calculate_reading_similarity_list(recid, type="pageviews"):
         client_host_list = client_host_list.replace("L", "")
         client_host_list = client_host_list.replace("[", "")
         client_host_list = client_host_list.replace("]", "")
+
+    # BF: let's find the parent blog of the current blog record (blog, post, comment),
+    # group the results by blog and then display to the user the blogs
+    # that were read by people who also read the parent blog of the current
+    # record (blog, post, comment)
+    if CFG_BLOGFOREVER_SITE:
+        from invenio.webblog_utils import get_parent_blog
+        parent_blog = get_parent_blog(recid)
+        if parent_blog:
+            res = run_sql("SELECT CAST(b.value AS UNSIGNED), COUNT(DISTINCT(client_host)) AS c" \
+                      "  FROM rnkPAGEVIEWS v, bibrec_bib76x bb, bib76x b WHERE client_host IN (" + client_host_list + ")" + \
+                      "   AND v.id_bibrec != %s" \
+                      "   AND v.id_bibrec = bb.id_bibrec" \
+                      "   AND bb.id_bibxxx = b.id" \
+                      "   AND b.tag = '760__w'" \
+                      "   AND b.value != %s" \
+                      " GROUP BY b.value ORDER BY c",
+                      (recid, parent_blog))
+    else:
         res = run_sql("SELECT id_bibrec,COUNT(DISTINCT(client_host)) AS c" \
                       "  FROM " + tablename + \
                       " WHERE client_host IN (" + client_host_list + ")" + \
                       "   AND id_bibrec != %s" \
                       " GROUP BY id_bibrec ORDER BY c DESC LIMIT 10",
                       (recid,))
+
     return res
