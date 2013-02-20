@@ -22,7 +22,7 @@
 __revision__ = "$Id$"
 
 import os
-from invenio.config import CFG_LOGDIR, CFG_PYLIBDIR
+from invenio.config import CFG_LOGDIR, CFG_PYLIBDIR, CFG_BLOGFOREVER_SITE
 
 # Which tasks are recognized as valid?
 CFG_BIBTASK_VALID_TASKS = ("bibindex", "bibupload", "bibreformat",
@@ -118,6 +118,10 @@ CFG_BIBTASK_DEFAULT_TASK_SETTINGS = {
         'collections'  : [],
     },
 }
+
+if CFG_BLOGFOREVER_SITE:
+    CFG_BIBTASK_VALID_TASKS += ("bloguploader", )
+    CFG_BIBTASK_DEFAULT_TASK_SETTINGS["bloguploader"] = {}
 
 CFG_BIBTASK_TASKLETS_PATH = os.path.join(CFG_PYLIBDIR, 'invenio', 'bibsched_tasklets')
 CFG_BIBUPLOAD_PREPROCESS_PATH = os.path.join(CFG_PYLIBDIR, 'invenio', 'bibupload_preprocess')
