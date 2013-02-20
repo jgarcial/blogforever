@@ -1,8 +1,8 @@
 # $Id$
 
-include config.mk
+include ../../config.mk
 
-SUBDIRS = miscutil webaccess webblog websearch webstyle websubmit
+SUBDIRS = templates
 
 all:
 	$(foreach SUBDIR, $(SUBDIRS), cd $(SUBDIR) && make all && cd .. ;)
@@ -10,11 +10,10 @@ all:
 
 test:
 	$(foreach SUBDIR, $(SUBDIRS), cd $(SUBDIR) && make test && cd .. ;)
+	python $(LIBDIR)/python/invenio/template.py --check-custom-templates -v3
 	@echo "Done.  Please run make install now."
 
 install:
+	#$(INSTALL) $(LIBFILES) $(LIBDIR)/python/invenio
 	$(foreach SUBDIR, $(SUBDIRS), cd $(SUBDIR) && make install && cd .. ;)
 	@echo "Done.  You may want to restart Apache now."
-
-install-yes-i-know:
-	@echo "If you are really sure you want to install *all* then launch \"make install-yes-i-know\""
