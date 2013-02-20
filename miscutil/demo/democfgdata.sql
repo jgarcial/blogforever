@@ -15,10 +15,10 @@ INSERT INTO collectionname VALUES (5,'en','ln','Pages');
 INSERT INTO collectionname VALUES (6,'en','ln','Provisional Blogs');
 INSERT INTO collectionname VALUES (7,'en','ln','Rejected Blogs');
 
-INSERT INTO collection_collection VALUES (1,2,'r',60);
-INSERT INTO collection_collection VALUES (1,3,'r',40);
-INSERT INTO collection_collection VALUES (1,4,'r',30);
-INSERT INTO collection_collection VALUES (1,5,'r',20);
+INSERT INTO collection_collection VALUES (1,2,'r',20);
+INSERT INTO collection_collection VALUES (1,3,'r',30);
+INSERT INTO collection_collection VALUES (1,4,'r',40);
+INSERT INTO collection_collection VALUES (1,5,'r',50);
 
 
 -- set the 'websearch_instantbrowse_by_field' plugin up to
@@ -117,14 +117,17 @@ INSERT INTO sbmFIELDDESC VALUES ('DPI_END',NULL,'','D',NULL,NULL,NULL,NULL,NULL,
 INSERT INTO sbmFIELDDESC VALUES ('MBI_CONT',NULL,'','D',NULL,NULL,NULL,NULL,NULL,'<div align=\"center\">\r\n<input type=\"button\" class=\"adminbutton\" width=\"400\" height=\"50\" name=\"endS\" value=\"Continue\" onclick=\"finish();\" />\r\n</div>','2012-07-26','2012-10-15',NULL,NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('MBI_SELECT',NULL,'','S',NULL,NULL,NULL,NULL,NULL,'<select name=\"MBI_SELECT[]\" multiple size=\"3\">\r\n <option selected value=\"BSI_TITLE\">Title</option>\r\n <option value=\"BSI_TOPIC\">Topic</option>\r\n <option value=\"BSI_LICENSE\">License</option>\r\n</select>\r\n','2012-07-26','2012-10-19',NULL,NULL,0);
 
-INSERT INTO sbmACTION VALUES ('Submit a Blog', 'SBI', 'running', '2012-08-10', '2012-08-10', '', 'Submit a Blog');
-INSERT INTO sbmACTION VALUES ('Modify a Blog', 'MBI', 'modify', '2012-08-10', '2012-08-10', '', 'Modify a Blog');
+UPDATE sbmACTION SET lactname="Submit a Blog", statustext="Submit a Blog" WHERE sactname="SBI";
+UPDATE sbmACTION SET lactname="Modify a Blog", statustext="Modify a Blog" WHERE sactname="MBI";
+-- INSERT INTO sbmACTION VALUES ('Submit a Blog', 'SBI', 'running', '2012-08-10', '2012-08-10', '', 'Submit a Blog');
+-- INSERT INTO sbmACTION VALUES ('Modify a Blog', 'MBI', 'modify', '2012-08-10', '2012-08-10', '', 'Modify a Blog');
 INSERT INTO sbmACTION VALUES ('Delete a Blog', 'DBI', 'delete', '2012-08-10', '2012-08-10', '', 'Delete a Blog');
 INSERT INTO sbmACTION VALUES ('Delete a Post', 'DPI', 'delete', '2012-08-10', '2012-08-10', '', 'Delete a Post');
 INSERT INTO sbmACTION VALUES ('Approve Blog Submission', 'APS', 'approve', '2012-08-10', '2012-08-10', '', 'Approve Blog Submission');
 INSERT INTO sbmACTION VALUES ('Approve Blog Modification', 'APM', 'approve', '2012-08-10', '2012-08-10', '', 'Approve Blog Modification');
 INSERT INTO sbmACTION VALUES ('Approve Post Deletion', 'APO', 'approve', '2012-08-10', '2012-08-10', '', 'Approve Post Deletion');
-INSERT INTO sbmACTION VALUES ('Approve Blog Deletion', 'APP', 'approve', '2012-08-10', '2012-08-10', '', 'Approve Blog Deletion');
+UPDATE sbmACTION SET lactname="Approve Blog Deletion", statustext="Approve Blog Deletion" WHERE sactname="APP";
+-- INSERT INTO sbmACTION VALUES ('Approve Blog Deletion', 'APP', 'approve', '2012-08-10', '2012-08-10', '', 'Approve Blog Deletion');
 
 INSERT INTO sbmFUNCTIONS VALUES ('DBI','BSI','DBI_Mail_Blog_Deleted_to_User',50,1);
 INSERT INTO sbmFUNCTIONS VALUES ('DBI','BSI','DBI_Mail_Notification_to_User',40,1);
