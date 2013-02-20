@@ -2,7 +2,7 @@
 
 include config.mk
 
-SUBDIRS = webblog webstyle bibrank websubmit miscutil webaccess bibsched
+SUBDIRS = miscutil webaccess webblog webstyle websubmit  
 
 all:
 	$(foreach SUBDIR, $(SUBDIRS), cd $(SUBDIR) && make all && cd .. ;)
