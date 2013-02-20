@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -14,7 +14,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-
 """
 WebStyle templates. Customize the look of pages of Invenio
 """
@@ -28,7 +27,10 @@ import urllib
 import sys
 import string
 
+from flask import g, current_app
+from invenio.jinja2utils import render_template_to_string
 from invenio.config import \
+     CFG_SITE_RECORD, \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
      CFG_SITE_NAME_INTL, \
@@ -38,10 +40,12 @@ from invenio.config import \
      CFG_VERSION, \
      CFG_WEBSTYLE_INSPECT_TEMPLATES, \
      CFG_WEBSTYLE_TEMPLATE_SKIN, \
-     CFG_INSPIRE_SITE
+     CFG_INSPIRE_SITE, \
+     CFG_WEBLINKBACK_TRACKBACK_ENABLED
 
 from invenio.messages import gettext_set_language, language_list_long, is_language_rtl
-from invenio.urlutils import make_canonical_urlargd, create_html_link
+from invenio.urlutils import make_canonical_urlargd, create_html_link, \
+                             get_canonical_and_alternates_urls
 from invenio.dateutils import convert_datecvs_to_datestruct, \
                               convert_datestruct_to_dategui
 from invenio.bibformat import format_record
@@ -111,7 +115,8 @@ class Template:
                   body="", lastupdated=None, pagefooteradd="", uid=0,
                   secure_page_p=0, navmenuid="", metaheaderadd="",
                   rssurl=CFG_SITE_URL+"/rss",
-                  show_title_p=True, body_css_classes=None):
+                  show_title_p=True, body_css_classes=None,
+                  show_header=True, show_footer=True):
 
         """Creates a complete page
 
@@ -177,6 +182,10 @@ class Template:
 
           - 'body_css_classes' *list* - list of classes to add to the body tag
 
+          - 'show_header' *boolean* - tells whether page header should be displayed or not
+
+          - 'show_footer' *boolean* - tells whether page footer should be displayed or not
+
            Output:
 
           - HTML code of the page
@@ -184,8 +193,9 @@ class Template:
 
         # load the right message language
         _ = gettext_set_language(ln)
-
-        out = self.tmpl_pageheader(req,
+        out = ''
+        if show_header:
+            out += self.tmpl_pageheader(req,
                                    ln = ln,
                                    headertitle = title,
                                    description = description,
@@ -200,7 +210,8 @@ class Template:
                                    secure_page_p = secure_page_p,
                                    navmenuid=navmenuid,
                                    rssurl=rssurl,
-                                   body_css_classes=body_css_classes) + """
+                                   body_css_classes=body_css_classes)
+        out += """
 <div class="pagebody">
   <div class="pagebodystripeleft">
     <div class="pageboxlefttop">%(boxlefttop)s</div>
@@ -241,7 +252,9 @@ class Template:
 
   'body' : body,
 
-  } + self.tmpl_pagefooter(req, ln = ln,
+  }
+        if show_footer:
+            out += self.tmpl_pagefooter(req, ln = ln,
                            lastupdated = lastupdated,
                            pagefooteradd = pagefooteradd)
         return out
@@ -301,6 +314,18 @@ class Template:
             body_css_classes = []
         body_css_classes.append(navmenuid)
 
+        uri = req.unparsed_uri
+        headerLinkbackTrackbackLink = ''
+        if CFG_WEBLINKBACK_TRACKBACK_ENABLED:
+            from invenio.weblinkback_templates import get_trackback_auto_discovery_tag
+            # Embed a link in the header to subscribe trackbacks
+            # TODO: This hack must be replaced with the introduction of the new web framework
+            recordIndexInURI = uri.find('/' + CFG_SITE_RECORD + '/')
+            # substring found --> offer trackback link in header
+            if recordIndexInURI != -1:
+                recid = uri[recordIndexInURI:len(uri)].split('/')[2].split("?")[0] #recid might end with ? for journal records
+                headerLinkbackTrackbackLink = get_trackback_auto_discovery_tag(recid)
+
         if CFG_WEBSTYLE_INSPECT_TEMPLATES:
             inspect_templates_message = '''
 <table width="100%%" cellspacing="0" cellpadding="2" border="0">
@@ -329,95 +354,11 @@ template function generated it.
             pageheadertitle = headertitle + ' - ' + sitename
 
 
-        out = """\
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="%(ln_iso_639_a)s" xml:lang="%(ln_iso_639_a)s" xmlns:og="http://opengraphprotocol.org/schema/" >
-<head>
- <title>%(pageheadertitle)s</title>
- <link rev="made" href="mailto:%(sitesupportemail)s" />
- <link rel="stylesheet" href="%(cssurl)s/img/invenio%(cssskin)s.css" type="text/css" />
- <!--[if lt IE 8]>
-    <link rel="stylesheet" type="text/css" href="%(cssurl)s/img/invenio%(cssskin)s-ie7.css" />
- <![endif]-->
- <!--[if gt IE 8]>
-    <style type="text/css">div.restrictedflag {filter:none;}</style>
- <![endif]-->
- <link rel="alternate" type="application/rss+xml" title="%(sitename)s RSS" href="%(rssurl)s" />
- <link rel="search" type="application/opensearchdescription+xml" href="%(siteurl)s/opensearchdescription" title="%(sitename)s" />
- <link rel="unapi-server" type="application/xml" title="unAPI" href="%(unAPIurl)s" />
- <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
- <meta http-equiv="Content-Language" content="%(ln)s" />
- <meta name="description" content="%(description)s" />
- <meta name="keywords" content="%(keywords)s" />
- <script type="text/javascript" src="%(cssurl)s/js/jquery.min.js"></script>
- %(metaheaderadd)s
-</head>
-<body%(body_css_classes)s lang="%(ln_iso_639_a)s"%(rtl_direction)s>
-<div class="pageheader">
-%(inspect_templates_message)s
-<!-- replaced page header -->
-<div class="headerlogo">
-<table class="headerbox" cellspacing="0">
- <tr>
-  <td align="right" valign="top" colspan="12">
-  <div class="userinfoboxbody">
-    %(userinfobox)s
-  </div>
-  <div class="headerboxbodylogo">
-   <a href="%(siteurl)s?ln=%(ln)s">%(sitename)s</a>
-  </div>
-  </td>
- </tr>
- <tr class="menu">
-       <td class="headermoduleboxbodyblank">
-             &nbsp;
-       </td>
-       <td class="headermoduleboxbodyblank">
-             &nbsp;
-       </td>
-       <td class="headermoduleboxbody%(search_selected)s">
-             <a class="header%(search_selected)s" href="%(siteurl)s/?ln=%(ln)s">%(msg_search)s</a>
-       </td>
-       <td class="headermoduleboxbodyblank">
-             &nbsp;
-       </td>
-       <td class="headermoduleboxbody%(submit_selected)s">
-             <a class="header%(submit_selected)s" href="%(siteurl)s/submit?ln=%(ln)s">%(msg_submit)s</a>
-       </td>
-       <td class="headermoduleboxbodyblank">
-             &nbsp;
-       </td>
-       <td class="headermoduleboxbody%(personalize_selected)s">
-             %(useractivities)s
-       </td>
-       <td class="headermoduleboxbodyblank">
-             &nbsp;
-       </td>
-       <td class="headermoduleboxbody%(help_selected)s">
-             <a class="header%(help_selected)s" href="%(siteurl)s/help/%(langlink)s">%(msg_help)s</a>
-       </td>
-       %(adminactivities)s
-       <td class="headermoduleboxbodyblanklast">
-             &nbsp;
-       </td>
- </tr>
-</table>
-</div>
-<table class="navtrailbox">
- <tr>
-  <td class="navtrailboxbody">
-   %(navtrailbox)s
-  </td>
- </tr>
-</table>
-<!-- end replaced page header -->
-%(pageheaderadd)s
-</div>
-        """ % {
+        data = {
           'rtl_direction': is_language_rtl(ln) and ' dir="rtl"' or '',
           'siteurl' : CFG_SITE_URL,
           'sitesecureurl' : CFG_SITE_SECURE_URL,
+          'canonical_and_alternate_urls' : self.tmpl_canonical_and_alternate_urls(uri),
           'cssurl' : secure_page_p and CFG_SITE_SECURE_URL or CFG_SITE_URL,
           'cssskin' : CFG_WEBSTYLE_TEMPLATE_SKIN != 'default' and '_' + CFG_WEBSTYLE_TEMPLATE_SKIN or '',
           'rssurl': rssurl,
@@ -453,10 +394,73 @@ template function generated it.
           'msg_submit' : _("Submit"),
           'msg_personalize' : _("Personalize"),
           'msg_help' : _("Help"),
-          'languagebox' : self.tmpl_language_selection_box(req, ln),
           'unAPIurl' : cgi.escape('%s/unapi' % CFG_SITE_URL),
+          'linkbackTrackbackLink': headerLinkbackTrackbackLink,
           'inspect_templates_message' : inspect_templates_message
         }
+
+        for k, v in data.iteritems():
+            if isinstance(v, unicode):
+                data[k] = v.encode('utf-8')
+
+        out = """\
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="%(ln_iso_639_a)s" xml:lang="%(ln_iso_639_a)s" xmlns:og="http://opengraphprotocol.org/schema/" >
+<head>
+ <title>%(pageheadertitle)s</title>
+ <link rev="made" href="mailto:%(sitesupportemail)s" />
+ <link rel="stylesheet" href="%(cssurl)s/img/invenio%(cssskin)s.css" type="text/css" />
+ <!--[if lt IE 8]>
+    <link rel="stylesheet" type="text/css" href="%(cssurl)s/img/invenio%(cssskin)s-ie7.css" />
+ <![endif]-->
+ <!--[if gt IE 8]>
+    <style type="text/css">div.restrictedflag {filter:none;}</style>
+ <![endif]-->
+ <link rel="stylesheet" href="%(siteurl)s/css/bootstrap.min.css" type="text/css" />
+ <link rel="stylesheet" href="%(siteurl)s/css/bootstrap-responsive.min.css" type="text/css" />
+ %(canonical_and_alternate_urls)s
+ <link rel="alternate" type="application/rss+xml" title="%(sitename)s RSS" href="%(rssurl)s" />
+ <link rel="search" type="application/opensearchdescription+xml" href="%(siteurl)s/opensearchdescription" title="%(sitename)s" />
+ <link rel="unapi-server" type="application/xml" title="unAPI" href="%(unAPIurl)s" />
+ %(linkbackTrackbackLink)s
+ <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta http-equiv="Content-Language" content="%(ln)s" />
+ <meta name="description" content="%(description)s" />
+ <meta name="keywords" content="%(keywords)s" />
+ <script type="text/javascript" src="%(cssurl)s/js/jquery.min.js"></script>
+ <script type="text/javascript" src="%(cssurl)s/js/bootstrap.js"></script>
+ %(metaheaderadd)s
+</head>
+<body%(body_css_classes)s lang="%(ln_iso_639_a)s"%(rtl_direction)s>
+<div class="pageheader">
+%(inspect_templates_message)s
+<!-- replaced page header -->
+<table class="navtrailbox">
+ <tr>
+  <td class="navtrailboxbody">
+   %(navtrailbox)s
+  </td>
+ </tr>
+</table>
+<!-- end replaced page header -->
+%(pageheaderadd)s
+</div>
+        """ % data
+
+        out += render_template_to_string('header.html').encode('utf-8')
+        return out
+
+    def tmpl_canonical_and_alternate_urls(self, url):
+        """
+        Return the snippet of HTML to be put within the HTML HEAD tag in order
+        to declare the canonical and language alternate URLs of a page.
+        """
+        canonical_url, alternate_urls = get_canonical_and_alternates_urls(url)
+        out = """  <link rel="canonical" href="%s" />\n""" % cgi.escape(canonical_url, True)
+        for ln, alternate_url in alternate_urls.iteritems():
+            ln = ln.replace('_', '-') ## zh_CN -> zh-CN
+            out += """  <link rel="alternate" hreflang="%s" href="%s" />\n""" % (ln, cgi.escape(alternate_url, True))
         return out
 
     def tmpl_pagefooter(self, req=None, ln=CFG_SITE_LANG, lastupdated=None,
@@ -482,56 +486,27 @@ template function generated it.
         if lastupdated and lastupdated != '$Date$':
             if lastupdated.startswith("$Date: ") or \
             lastupdated.startswith("$Id: "):
-                lastupdated = convert_datestruct_to_dategui(\
-                                 convert_datecvs_to_datestruct(lastupdated),
-                                 ln=ln)
-            msg_lastupdated = _("Last updated") + ": " + lastupdated
-        else:
-            msg_lastupdated = ""
+                lastupdated = convert_datecvs_to_datestruct(lastupdated)
 
         out = """
 <div class="pagefooter">
 %(pagefooteradd)s
-<!-- replaced page footer -->
- <div class="pagefooterstripeleft">
-  %(sitename)s&nbsp;::&nbsp;<a class="footer" href="%(siteurl)s/?ln=%(ln)s">%(msg_search)s</a>&nbsp;::&nbsp;<a class="footer" href="%(siteurl)s/submit?ln=%(ln)s">%(msg_submit)s</a>&nbsp;::&nbsp;<a class="footer" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(msg_personalize)s</a>&nbsp;::&nbsp;<a class="footer" href="%(siteurl)s/help/%(langlink)s">%(msg_help)s</a>
-  <br />
-  %(msg_poweredby)s <a class="footer" href="http://invenio-software.org/">Invenio</a> v%(version)s
-  <br />
-  %(msg_maintainedby)s <a class="footer" href="mailto:%(sitesupportemail)s">%(sitesupportemail)s</a>
-  <br />
-  %(msg_lastupdated)s
- </div>
- <div class="pagefooterstriperight">
-  %(languagebox)s
- </div>
-<!-- replaced page footer -->
-</div>
+</div>""" % {
+          'pagefooteradd': pagefooteradd
+        }
+
+        from datetime import datetime
+        try:
+            lastupdated = datetime(*lastupdated[:7])
+        except:
+            lastupdated = None
+
+        out += render_template_to_string('footer.html',
+                                      lastupdated=lastupdated).encode('utf-8')
+        out += """
 </body>
 </html>
-        """ % {
-          'siteurl': CFG_SITE_URL,
-          'sitesecureurl': CFG_SITE_SECURE_URL,
-          'ln': ln,
-          'langlink': '?ln=' + ln,
-
-          'sitename': CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME),
-          'sitesupportemail': CFG_SITE_SUPPORT_EMAIL,
-
-          'msg_search': _("Search"),
-          'msg_submit': _("Submit"),
-          'msg_personalize': _("Personalize"),
-          'msg_help': _("Help"),
-
-          'msg_poweredby': _("Powered by"),
-          'msg_maintainedby': _("Maintained by"),
-
-          'msg_lastupdated': msg_lastupdated,
-          'languagebox': self.tmpl_language_selection_box(req, ln),
-          'version': CFG_VERSION,
-
-          'pagefooteradd': pagefooteradd,
-        }
+        """
         return out
 
     def tmpl_language_selection_box(self, req, language=CFG_SITE_LANG):
@@ -819,7 +794,6 @@ URI: http://%(host)s%(page)s
                        'record_brief':record_brief}
 
         out = restriction_flag + out
-
         return out
 
     def detailed_record_container_bottom(self, recid, tabs, ln=CFG_SITE_LANG,
