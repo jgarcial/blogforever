@@ -700,24 +700,131 @@ padding: 0 30px 0 0;
 text-decoration: none;
 }
 
-.narrow-by h3 {
-   float:left;
+.narrow-by ul {
+margin: 0;
 }
 
 .narrow-by {
+padding: 30px 0 40px 0;
+}
+
+
+/* Search box styles */
+
+.search-collections .searchbox-title {
+float: left;
+}
+
+.search-collections form {
+margin: 0;
+}
+
+.search-index .searchbox-title label {
+font-size: 24.5px;
+line-height: 40px;
+margin: 10px 0;
+font-weight: bold;
+text-rendering: optimizelegibility;
+}
+
+.search-index .search-wrap {
+float: left;
+width: 100%;
+}
+
+.search-index .search-forms {
+padding: 0;
 margin: 0 auto;
-width: 80%;
-padding: 0 0 15px 0
+list-style-type: none;
+float: left;
+position: relative;
+left: 50%;
+}
+
+.search-index .search-forms form {
+float: left;
+position: relative;
+right: 50%;
+}
+
+.search-collections .form-horizontal.search-input {
+float: left;
+}
+
+.search-collections .form-inline.search-settings {
+float: right;
+}
+
+.search-collections .searchbox-title {
+padding: 5px 15px 0px;
+}
+
+.search-index .row {
+   margin-left:0;
+}
+
+.search-index .input-append .add-on, .search-index .input-prepend .add-on {
+display: inline-block;
+width: auto;
+height: 30px;
+min-width: 24px;
+padding: 6px 6px;
+font-size: 14px;
+font-weight: normal;
+line-height: 30px;
+text-align: center;
+text-shadow: 0 1px 0 #ffffff;
+background-color: #eeeeee;
+border: 1px solid #ccc;
+}
+
+.search-index .input-prepend.input-append input {
+height: 34px;
+font-size:24px;
+}
+
+.search-index .search-btn {
+padding: 11px 19px;
+font-size: 17.5px;
+-webkit-border-radius: 6px;
+-moz-border-radius: 6px;
+border-radius: 6px;
+}
+
+.search-index #searchdropdown .btn .caret {
+margin-top: 13px;
+}
+
+#settingsdropdown {
+margin-left: 3px;
 }
 
 
-/* Undo search box styles on index page */
-
-.search-index label {
-display: none;
+.icon-col-Pages:before {
+   content: "\f0c5";
+}
+.icon-col-Blogs:before {
+   content: "\f02d";
 }
 
-.search-index .well.well-small {
-border: 0;
-background: transparent;
+.icon-col-Comments:before {
+   content: "\f086";
+}
+
+.icon-col-Posts:before {
+   content: "\f016";
+}
+
+.marketing .pull-right {
+padding-bottom: 40px;
+}
+
+@media (max-width: 767px) {
+.browse > li {
+width: 100%;
+}
+.search-index .input-prepend.input-append input {
+height: 44px;
+}
+
 }

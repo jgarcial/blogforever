@@ -41,23 +41,26 @@
 
 {% block body %}
 
-
+<div class="search-index">
 <header class="jumbotron masthead centered">
     <h1>Atlantis Blogs</h1>
     <p>A Blogforever project preserving and disseminating blogs <br>from the citizens of Atlantis.</p>
 </header>
 
-<div class="row hero search-index"><h1 class="centered">Search our collection:</h1>
+<div class="row hero centered">
   {{ search_form(collection) }}
 </div>
 
 
-<div class="row websearch narrow-by clearfix"><!-- row 2 -->
+<div class="row websearch narrow-by clearfix search-wrap"><!-- row 2 -->
+  
+  
   {{ portalbox_sidebar(portalboxes.lt, class="span2") }}
 
   {% if collection.collection_children_r %}
     
-      <h3>{{ _("Narrow by collections") }}:</h3>
+      <h3 class="span9 offset3">{{ _("Narrow by collections") }}:</h3>
+      <div class="span9 offset3">
       {{ collection_tree(collection.collection_children_r, limit=2, class="clearfix browse") }}
     
   {% else %}
@@ -111,7 +114,9 @@
     {{ portalbox_sidebar(portalboxes.rt, class="offset2 span2") }}
   {% endif %}
 
-</div>
+  </div> <!-- /span9 offset3 -->
+</div> <!-- /row -->
+</div> <!-- /search-index -->
 </div> <!-- /container -->
 
 <div class="green-bg">
@@ -121,31 +126,31 @@
   <p class="marketing-byline">See what other institutions are doing with Blogforever blog repositories</p>
   <ul class="thumbnails example-sites">
     <li class="span3">
-      <a href="#" class="thumbnail">
-        <img src="/img/sample1.png" alt="Sample archive">
-        <h4>Repository One</h4>
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed Thurs.</p>
+      <a href="http://bf1.csd.auth.gr/" class="thumbnail">
+        <img src="/img/bf1-screenshot.jpg" alt="BF1 case study repository">
+        <h4>Case study repository BF1</h4>
+        <p>Explore 1,342 records</p>
+      </a>
+    </li>
+    <li class="span3">
+      <a href="http://bf3.itc.auth.gr/" class="thumbnail">
+        <img src="/img/bf3-screenshot.jpg" alt="Sample archive">
+        <h4>Case study repository BF2</h4>
+        <p>Explore 9,467 records</p>
       </a>
     </li>
     <li class="span3">
       <a href="#" class="thumbnail">
-        <img src="/img/sample2.png" alt="Sample archive">
-        <h4>Repository Two</h4>
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed Thurs.</p>
-      </a>
-    </li>
-    <li class="span3">
-      <a href="#" class="thumbnail">
-        <img src="/img/sample3.png" alt="Sample archive">
+        <img src="/img/bf3-screenshot.jpg" alt="Sample archive">
         <h4> Repository Three</h4>
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed Thurs.</p>
+        <p>Adipisicing elit, sed Thurs.</p>
       </a>
     </li>
     <li class="span3">
      <a href="#" class="thumbnail">
-        <img src="/img/sample4.png" alt="Sample archive">
+        <img src="/img/bf3-screenshot.jpg" alt="Sample archive">
         <h4> Repository Four</h4>
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed Thurs.</p>
+        <p>Lorem ipsum dolor sit amet</p>
       </a>
     </li>
   </ul>
@@ -180,5 +185,4 @@
   $('[rel=tooltip]').tooltip();
 })(jQuery);
 </script>
-
 {% endblock %}
