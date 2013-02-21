@@ -61,19 +61,19 @@
       {{ collection_tree(collection.collection_children_r, limit=2, class="nav nav-list clearfix") }}
     </div>
   {% else %}
-      <div class="span{{ '4' if collection.collection_children_v else '8' }}">
+      <div class="span{{ '4' if collection.collection_children_v else '12' }}">
       {% if collection.is_restricted %}
         <strong>{{ _('This collection is restricted. If you are authorized to access it, please click on the Search button.') }}</strong>
       {% else %}
         {% if collection.reclist %}
         {% for recid in collection.reclist %}
           <div class="row-fluid">
-            <div class="span1">
-              <small style="font-size:70%;">
+            <div class="span1 offset1">
+              <small>
                 {{ get_creation_date(recid, fmt="%Y-%m-%d<br />%H:%i")|safe }}
               </small>
             </div>
-            <div class="span11">
+            <div class="span10">
               {{ format_record(recid, 'hb', ln=g.ln)|safe }}
                 <p>
                   <a href="{{ url_for('record.metadata', recid=recid, ln=g.ln) }}">

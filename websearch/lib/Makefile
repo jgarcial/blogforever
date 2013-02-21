@@ -2,7 +2,7 @@
 
 include ../../config.mk
 
-LIBFILES = websearch_blueprint.py
+LIBFILES = websearch_blueprint.py websearch_templates.py
 
 all:
 	$(foreach SUBDIR, $(SUBDIRS), cd $(SUBDIR) && make all && cd .. ;)
