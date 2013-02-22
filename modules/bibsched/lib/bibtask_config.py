@@ -121,6 +121,7 @@ CFG_BIBTASK_DEFAULT_TASK_SETTINGS = {
 
 if CFG_BLOGFOREVER_SITE:
     CFG_BIBTASK_VALID_TASKS += ("bloguploader", )
+    CFG_BIBTASK_MONOTASKS = ("dbdump", "inveniogc")
     CFG_BIBTASK_DEFAULT_TASK_SETTINGS["bloguploader"] = {}
 
 CFG_BIBTASK_TASKLETS_PATH = os.path.join(CFG_PYLIBDIR, 'invenio', 'bibsched_tasklets')
