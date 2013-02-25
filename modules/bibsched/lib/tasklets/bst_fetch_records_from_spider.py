@@ -79,7 +79,7 @@ def process_record(client, api_key, match):
                 attach = client.service.GetDocument(api_key, match.Object.DocumentId, file.Filename)
                 if validate_content(content=decodestring(attach), md5_hash=file.MD5):
                     f = open(path_mets_attachedfiles_doc + \
-                                time.strftime("%Y-%m-%d_%H:%M:%S") + "_" + file.Filename, 'w')
+                                time.strftime("%Y-%m-%d_%H:%M:%S") + "_" + file.Type, 'w')
                     f.write(decodestring(attach))
                     f.close()
                 else:
@@ -100,9 +100,15 @@ def process_record(client, api_key, match):
         last_id_file = open("/tmp/last_id", "w")
         last_id_file.write(repr(match.Object.Id))
         last_id_file.close()
-        task_low_level_submission('bibupload', 'batchupload', '-r', \
-                                    path_metadata_file, '--pre-plugin=bp_pre_ingestion', '--post-plugin=bp_post_ingestion')
-        write_message("Uploaded blog record %s " % metadata_file_name)
+
+        if os.path.exists(path_metadata_file):
+            task_low_level_submission('bibupload', 'batchupload', '-r', \
+                                        path_metadata_file, '--pre-plugin=bp_pre_ingestion', '--post-plugin=bp_post_ingestion')
+            write_message("Uploaded blog record %s " % metadata_file_name)
+        else:
+            error_file = open("/tmp/error_file", "a")
+            error_file.write("No file %s \n" % metadata_file_name)
+            error_file.close()
     else:
         error_file = open("/tmp/error_file", "a")
         error_file.write("METS validation failed in %s \n" % metadata_file_name)
@@ -219,7 +225,8 @@ def bst_fetch_records_from_spider(api_key, url):
     last_id = get_last_id()
     # Set limits to get the total of results to retrieved
     id_start = last_id
-    id_max = sys.maxint
+#    id_max = sys.maxint
+    id_max = 2147483647
     sr = create_search_request(client, page_size = 1, page_number = 0, \
                                 query = "Type:(Post OR Comment OR Blog) AND Id:["+str(id_start)\
                                 +" TO "+str(id_max)+"]")

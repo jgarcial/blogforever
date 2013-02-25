@@ -29,6 +29,7 @@ from invenio.bibrecord import record_get_field_value
 from invenio.config import CFG_BATCHUPLOADER_DAEMON_DIR, \
                            CFG_PREFIX
 from HTMLParser import HTMLParser
+from invenio.bibtask import  write_message, task_update_progress
 
 class HTMLStyleWasher(HTMLParser):
 
@@ -190,31 +191,37 @@ class MetsIngestion:
             if tag.getAttribute('tag')=='760':
                 for subfield in tag.getElementsByTagName('subfield'):
                     if subfield.getAttribute('code')=='o':
-                        parent_blog_url =  subfield.firstChild.data
                         try:
-                            parent_blog_recid = perform_request_search(p='520__u:' + parent_blog_url)[0]
+                            parent_blog_url =  subfield.firstChild.data
+                            parent_blog_recid = perform_request_search(p='520__u:' + parent_blog_url)
+                            if parent_blog_recid:
+                                new_node = self.dom.createElement('subfield')
+                                new_node.setAttribute('code', 'w')
+                                new_node.appendChild(self.dom.createTextNode(str(parent_blog_recid[0])))
+                                tag.appendChild(new_node)
                         except:
-                            parent_blog_recid = ''
-                        new_node = self.dom.createElement('subfield')
-                        new_node.setAttribute('code', 'w')
-                        new_node.appendChild(self.dom.createTextNode(str(parent_blog_recid)))
-                        tag.appendChild(new_node)
+                            error_file = open("/tmp/error_file", "a")
+                            error_file.write("Insert parent blog failed to %s \n" % self.file_name)
+                            error_file.close()
 
 
     def insert_parent_post_recid(self):
         for tag in self.marc_record.getElementsByTagName('datafield'):
             if tag.getAttribute('tag')=='773':
                 for subfield in tag.getElementsByTagName('subfield'):
-                    if subfield.getAttribute('code')=='w':
-                        parent_post_url =  subfield.firstChild.data
+                    if subfield.getAttribute('code')=='o':
                         try:
-                            parent_post_recid = perform_request_search(p='520__u:' + parent_post_url)[0]
+                            parent_post_url =  subfield.firstChild.data
+                            parent_post_recid = perform_request_search(p='520__u:' + parent_post_url)
+                            if parent_post_recid:
+                                new_node = self.dom.createElement('subfield')
+                                new_node.setAttribute('code', 'w')
+                                new_node.appendChild(self.dom.createTextNode(str(parent_post_recid[0])))
+                                tag.appendChild(new_node)
                         except:
-                            parent_post_recid = ''
-                        new_node = self.dom.createElement('subfield')
-                        new_node.setAttribute('code', 'w')
-                        new_node.appendChild(self.dom.createTextNode(str(parent_post_recid)))
-                        tag.appendChild(new_node)
+                            error_file = open("/tmp/error_file", "a")
+                            error_file.write("Insert parent post failed to %s \n" % self.file_name)
+                            error_file.close()
 
 
     def transform_mets_to_marc(self):
@@ -255,9 +262,26 @@ def bp_pre_ingestion(file_path):
     @param: file_path
     @type: string
     """
-    m = MetsIngestion(file_path)
+    try:
+        m = MetsIngestion(file_path)
+    except:
+        error_file = open("/tmp/error_file", "a")
+        error_file.write("No such as file %s \n" % (file_path))
+        error_file.close()
+        return
+    task_update_progress("Pre-processing blog record %s" % m.mets_file_name)
+    # METS file will be stored as one of the attached files
+    # under /mets/file_name, while the extracted MARC will be
+    # under /metadata/replace
     os.rename(file_path, m.mets_file_name)
-    m.transform_mets_to_marc()
+    try:
+        m.transform_mets_to_marc()
+    except:
+        error_file = open("/tmp/error_file", "a")
+        error_file.write("No METS, directly MARC %s \n" % (file_path))
+        error_file.close()
+        return
+
     marc_file = open(m.file_path, 'w')
     marc_file.write(m.generate_marc_xml())
     marc_file.close()

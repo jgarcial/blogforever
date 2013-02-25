@@ -23,9 +23,12 @@
 """
 
 import os
-from invenio.search_engine import perform_request_search
+from invenio.search_engine import search_pattern
 from invenio import bibingest as b
 import datetime
+from invenio.config import CFG_BATCHUPLOADER_DAEMON_DIR, \
+                           CFG_PREFIX
+from invenio.bibtask import  write_message, task_update_progress
 from lxml import etree
 
 def bp_post_ingestion(file_path):
@@ -36,9 +39,18 @@ def bp_post_ingestion(file_path):
     """
 
     file_name = os.path.basename(file_path)
+    task_update_progress("Post-processing blog record %s" % file_name)
     submission_id = file_name[:file_name.find(".xml")]
+    # Let's build the path where the corresponding METS is stored
+    batchupload_dir = CFG_BATCHUPLOADER_DAEMON_DIR[0] == '/' and CFG_BATCHUPLOADER_DAEMON_DIR \
+                          or CFG_PREFIX + '/' + CFG_BATCHUPLOADER_DAEMON_DIR
+    path_mets_attachedfiles = batchupload_dir + "/mets/"
+    file_path = path_mets_attachedfiles + submission_id + "/" + file_name + "_mets"
     # let's search for the corresponding record_id
-    record_id = perform_request_search(p = '002__:"%s"' % submission_id)[0]
+    try:
+        record_id = search_pattern(p = '002__:%s' % submission_id)[0]
+    except:
+        raise Exception("Record not found in the database")
     # let's open the mets xml file from the filesystem
     f = open(file_path, 'r')
     mets_file = f.read()
@@ -47,9 +59,15 @@ def bp_post_ingestion(file_path):
     xml_tree = etree.XML(mets_file)
     # to define the namespaces
     namespaces = {'mets': 'http://www.loc.gov/mets/', 'marc': 'http://www.loc.gov/marc/'}
-    # let's get in which collection we have to store the given document by using xpath
-    record_collection = xml_tree.xpath("mets:dmdSec/mets:mdWrap/mets:xmlData/marc:record/marc:datafield[@tag='980']/marc:subfield[@code='a']/text()", \
-                                        namespaces=namespaces)[0].strip()
+    try:
+        # let's get in which collection we have to store the given document by using xpath
+        record_collection = xml_tree.xpath("mets:dmdSec/mets:mdWrap/mets:xmlData/marc:record/marc:datafield[@tag='980']/marc:subfield[@code='a']/text()", \
+                                            namespaces=namespaces)[0].strip()
+    except:
+        error_file = open("/tmp/error_file", "a")
+        error_file.write("METS file not found %s" % file_path +"\n")
+        error_file.close()
+        record_collection = "DEFAULT"
     # to get the final XML without the xml declaration header
     final_xml = etree.tostring(xml_tree, pretty_print=True, xml_declaration=True)
     # to save the final xml with bibingest
