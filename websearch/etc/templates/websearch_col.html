@@ -75,15 +75,6 @@
             </div>
             <div class="span10">
               {{ format_record(recid, 'hb', ln=g.ln)|safe }}
-                <p>
-                  <a href="{{ url_for('record.metadata', recid=recid, ln=g.ln) }}">
-                    {{ _("Detailed record") }}
-                  </a>
-                   -
-                  <a href="{{ url_for('.search', p="recid:%d" % recid, rm='wrd', ln=ln) }}">
-                    {{ _("Similar records") }}
-                  </a>
-                </p>
              </div>
           </div>
         {% endfor %}
