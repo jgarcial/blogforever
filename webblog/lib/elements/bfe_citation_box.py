@@ -32,13 +32,13 @@ def format_element(bfo):
     Displays the description of how users should cite
     any content of the archive. The citation includes:
     For blogs: "title".
-    (record_creation_date). record_url
+    Date created: creation_date. record_url
     Retrieved from the original "original_url"
     For blog posts: author. "title". Blog: "blog_title".
-    (record_creation_date). record_url
-    Retrieved from the original "original_url"
+    Date created: creation_date. record_url
+    Date posted: posted_date. Retrieved from the original "original_url"
     For comments: author. Blog post: "post_title".
-    (record_creation_date). record_url
+    Date created: creation_date. record_url
     Retrieved from the original "original_url"
     """
 
@@ -49,9 +49,9 @@ def format_element(bfo):
     if coll in ["BLOGPOST", "COMMENT"]:
         author = bfo.fields('100__a')[0]
         try:
-            original_creation_date = bfo.fields('269__c')[0]
+            posted_date = bfo.fields('269__c')[0]
         except:
-            original_creation_date = ""
+            posted_date = ""
 
     try:
         title = bfo.fields('245__a')[0]
@@ -78,11 +78,11 @@ def format_element(bfo):
         except:
             blog_title = 'Untitled'
 
-        description = """<table style="border:1px solid black;"><tr><td>\
+        out = """<table style="border:1px solid black;"><tr><td>\
         <span><b>%s</b>. '%s'. Blog: '%s'. </br> \
-        (%s). <i>'%s'</i> </br> \
-        Retrieved from the original <i>'%s'</i><span></td></tr></table>""" \
-        % (author, title, blog_title, record_creation_date, record_url, original_url)
+        Date created: %s. <i>'%s'</i> </br>\
+        Date posted: %s. Retrieved from the original post <i>'%s'</i>. <span></td></tr></table>""" \
+        % (author, title, blog_title, record_creation_date, record_url, posted_date, original_url)
 
     elif coll == "COMMENT":
         # we will also show the post's title of
@@ -94,39 +94,18 @@ def format_element(bfo):
         except:
             post_title = 'Untitled'
 
-        description = """<table style="border:1px solid black;"><tr><td>\
+        out = """<table style="border:1px solid black;"><tr><td>\
         <span><b>%s. </b>Blog post: '%s'.</br> \
-        (%s). <i>'%s'</i> </br> \
-        Retrieved from the original <i>'%s'</i><span></td></tr></table>""" \
+        Date created: %s. <i>'%s'</i> </br> \
+        Retrieved from the original comment <i>'%s'</i><span></td></tr></table>""" \
         % (author, post_title, record_creation_date, record_url, original_url)
 
     else: # coll == "BLOG"
-        description = """<table style="border:1px solid black;"><tr><td>\
+        out = """<table style="border:1px solid black;"><tr><td>\
         <span>'%s' </br> \
-        (%s). <i>'%s'</i> </br> \
-        Retrieved from the original <i>'%s'</i><span></td></tr></table>""" \
+        Date created: %s. <i>'%s'</i> </br> \
+        Retrieved from the original blog <i>'%s'</i><span></td></tr></table>""" \
         % (title, record_creation_date, record_url, original_url)
-
-    out = """
-        <script type="text/javascript">
-        function displayCitationDescription(){
-            var description = document.getElementById('description');
-            var citation_link = document.getElementById('citation_link');
-            if (description.style.display == 'none'){
-                description.style.display = '';
-                citation_link.innerHTML = "Hide citation description"
-            } else {
-                description.style.display = 'none';
-                citation_link.innerHTML = "How to cite this"
-            }
-        }
-        </script>
-        """
-
-    out += '<span id="description" style="">' + description + '</span>'
-    out += '<a class="moreinfo" id="citation_link" \
-            href="javascript:void(0)" onclick="displayCitationDescription()""></a>'
-    out += '<script type="text/javascript">displayCitationDescription()</script>'
 
     return out
 

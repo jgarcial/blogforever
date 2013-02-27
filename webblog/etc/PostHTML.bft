@@ -7,6 +7,10 @@
 	<BFE_POST_HEADER />
 </div>
 
+<div class="bfe-post-header">
+	<BFE_POST_POSTED_DATE />
+</div>
+
 <div class="row">
 
 

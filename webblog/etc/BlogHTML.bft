@@ -1,5 +1,5 @@
 <name>Blog HTML</name>
-<description>First draft to display blog posts</description>
+<description>First draft to display blogs</description>
 
 <div class="blog-record-page">
 	<div class="bfe-bulletin-header">

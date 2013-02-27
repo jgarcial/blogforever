@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 ## This file is part of CDS Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2013 CERN.
 ##
 ## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,35 +17,29 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 """
-BibFormat Element - creates the post header
+BibFormat Element - creates the posted date of a blog post
 """
 
 from invenio.bibformat_engine import BibFormatObject
 from invenio.config import CFG_SITE_URL
-from invenio.webblog_utils import get_parent_blog
-
+from invenio.messages import gettext_set_language
 
 def format_element(bfo):
     """
-    Formats posts header using the blog's name and
-    the date in which the post was created
+    Formats the date in which the post was posted
     """
 
     this_recid = bfo.control_field('001')
 
-    blog_recid = get_parent_blog(this_recid)
-    blog_rec = BibFormatObject(blog_recid)
+    _ = gettext_set_language(bfo.lang)
+
     try:
-        blog_title = blog_rec.fields('245__a')[0]
+        posted_date = bfo.fields('269__c')[0]
     except:
-        blog_title = 'Untitled'
+        posted_date = ""
 
-    out = '<div id="top"><div id="topbanner">&nbsp;</div>'
-    out += '<div id="mainmenu"><table width="100%">'
-    out += '<tr><td class="left" style = "font-size: 1em;">Go to blog: <a href="%s/record/%s?%s">%s</a>' % \
-            (CFG_SITE_URL, blog_recid, bfo.lang, blog_title)
-    out += '</td></tr></table></div></div>'
-
+#    out += '<span class="posted-on"> %s: </span> <span class="post-date"> %s </span>' % (_("Posted on"), posted_date)
+    out = '<span> %s: %s </span>' % (_("Posted on"), posted_date)
     return out
 
 
@@ -55,3 +49,5 @@ def escape_values(bfo):
     should be escaped.
     """
     return 0
+
+
