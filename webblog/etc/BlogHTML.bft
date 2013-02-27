@@ -1,39 +1,33 @@
 <name>Blog HTML</name>
 <description>First draft to display blog posts</description>
-<link href="<BFE_SERVER_INFO var="weburl"/>/img/bull_StylesPlain.css" rel="stylesheet" media="all" type="text/css" />
-<link href="<BFE_SERVER_INFO var="weburl"/>/img/bull_print.css" rel="stylesheet" media="print" type="text/css" />
+
+<div class="blog-record-page">
+	<div class="bfe-bulletin-header">
+		<BFE_BULLETIN_HEADER />
+	</div>
+
+	<div class="bfe-post-thumbnail">
+		<BFE_POST_THUMBNAIL />
+	</div> <!-- end bfe-post-thumbnail -->
+
+	<div class="text" >
+		<BFE_TITLE prefix='<h2 class="articleTitle">' suffix='</h2>' />
+		<BFE_BLOG_URL_LINK />
+
+			<div>
+				<BFE_BLOG_POSTS>
+			</div>
+
+			<div>
+				<BFE_CITATION_BOX>
+			</div>
+
+			<div>
+				<BFE_TAGS>
+			</div> 
+	</div> <!-- end text -->
 
 
-<BFE_BULLETIN_HEADER />
-<div id="container">
-<table id="middle">
-<tr>
-<td valign="top">
-<div class="menuleft">
-<br />
-<BFE_POST_THUMBNAIL />
-</div>
-</td>
-<td>
-<div class="text" >
-<BFE_TITLE prefix='<h2 class="articleTitle">' suffix='</h2>' />
-<BFE_BLOG_URL_LINK />
-<br /><br />
-<div>
-<BFE_BLOG_POSTS>
-</div>
-<br />
-<br />
-<div>
-<BFE_CITATION_BOX>
-</div>
-<div>
-<BFE_TAGS>
-</div>
-</div>
-</td>
-</tr>
-</table>
+	<div id="bottom">  </div>
 
-<div id="bottom">  </div>
-</div>
+</div> <!-- end blog-record-page -->

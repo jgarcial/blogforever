@@ -1,6 +1,7 @@
 <name>Comment HTML brief</name>
 <description>Brief HTML format.</description>
 
+<i class="icon-col-Comments"></i>
 <BFE_AUTHORS limit="4" extension=" ;<em> et al</em> " highlight="no"/>
 
 <BFE_ADDITIONAL_REPORT_NUMBERS

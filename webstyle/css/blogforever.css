@@ -593,7 +593,7 @@ margin-bottom: 26px;
 
 .jumbotron h1 {
 margin-bottom: 9px;
-font-size: 81px;
+font-size: 71px;
 font-weight: bold;
 letter-spacing: -1px;
 line-height: 1;
@@ -602,8 +602,8 @@ line-height: 1;
 .masthead p {
 margin-left: 5%;
 margin-right: 5%;
-font-size: 30px;
-line-height: 36px;
+font-size: 25px;
+line-height: 32px;
 }
 .jumbotron p {
 margin-bottom: 18px;
@@ -830,6 +830,36 @@ padding-left: 0.3em;
 
 .marketing .pull-right {
 padding-bottom: 40px;
+}
+
+/* Posts Page */
+
+.bfe-links-menu a {
+word-wrap: break-word;
+}
+
+.associated-content .litem {
+padding: 10px 0 10px 5px;
+border-bottom: 1px solid #eeeeee;
+}
+
+.bfe-post-header table {
+background-color: #ffffff;
+}
+
+.bfe-citation-box {
+padding: 20px 0;
+}
+
+.bfe-post-header .left {
+font-size: 24.5px;
+line-height: 40px;
+font-weight: bold;
+padding: 0 0 25px;
+}
+
+.blog-record-page table {
+background: #ffffff;
 }
 
 @media (max-width: 767px) {
