@@ -3608,6 +3608,16 @@ class Template:
         out = """\n</collection>"""
         return out
 
+    def tmpl_xml_mets_prologue(self):
+        """Creates XML METS prologue."""
+        out = """<mets xmlns="http://www.loc.gov/mets/">\n"""
+        return out
+
+    def tmpl_xml_mets_epilogue(self):
+        """Creates XML METS epilogue."""
+        out = """\n</mets>"""
+        return out
+
     def tmpl_xml_mods_prologue(self):
         """Creates XML MODS prologue."""
         out = """<modsCollection xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"\n
