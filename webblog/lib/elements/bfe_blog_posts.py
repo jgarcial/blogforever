@@ -56,30 +56,31 @@ def format_element(bfo):
 
         all_posts = ""
         all_blog_posts_recids = blog_posts_recids[3:]
-        for post_recid in all_blog_posts_recids:
-            all_posts += print_record(post_recid, format='hb')
-            all_posts += "<hr class=subtle />"
+        if all_blog_posts_recids:
+            for post_recid in all_blog_posts_recids:
+                all_posts += print_record(post_recid, format='hb')
+                all_posts += "<hr class=subtle />"
 
-        out += """
-            <script type="text/javascript">
-            function displayAllPosts(){
-                var all_posts = document.getElementById('all_posts');
-                var see_all_link = document.getElementById('see_all_link');
-                if (all_posts.style.display == 'none'){
-                    all_posts.style.display = '';
-                    see_all_link.innerHTML = "Show less posts"
-                } else {
-                    all_posts.style.display = 'none';
-                    see_all_link.innerHTML = "Show all posts"
+            out += """
+                <script type="text/javascript">
+                function displayAllPosts(){
+                    var all_posts = document.getElementById('all_posts');
+                    var see_all_link = document.getElementById('see_all_link');
+                    if (all_posts.style.display == 'none'){
+                        all_posts.style.display = '';
+                        see_all_link.innerHTML = "Show less posts"
+                    } else {
+                        all_posts.style.display = 'none';
+                        see_all_link.innerHTML = "Show all posts"
+                    }
                 }
-            }
-            </script>
-            """
+                </script>
+                """
 
-        out += '<span id="all_posts" style="">' + all_posts + '</span>'
-        out += '<a class="moreinfo" id="see_all_link" \
-                href="javascript:void(0)" onclick="displayAllPosts()""></a>'
-        out += '<script type="text/javascript">displayAllPosts()</script>'
+            out += '<span id="all_posts" style="">' + all_posts + '</span>'
+            out += '<a class="moreinfo" id="see_all_link" \
+                    href="javascript:void(0)" onclick="displayAllPosts()""></a>'
+            out += '<script type="text/javascript">displayAllPosts()</script>'
 
     return out
 

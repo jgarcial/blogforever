@@ -51,30 +51,31 @@ def format_element(bfo):
 
         all_comments = ""
         all_post_comments_recids = post_comments_recids[2:]
-        for comment_recid in all_post_comments_recids:
-            all_comments += print_record(comment_recid, format='hb')
-            all_comments += "<br />"
+        if all_post_comments_recids:
+            for comment_recid in all_post_comments_recids:
+                all_comments += print_record(comment_recid, format='hb')
+                all_comments += "<br />"
 
-        out += """
-            <script type="text/javascript">
-            function displayAllComments(){
-                var all_comments = document.getElementById('all_comments');
-                var see_all_link = document.getElementById('see_all_link');
-                if (all_comments.style.display == 'none'){
-                    all_comments.style.display = '';
-                    see_all_link.innerHTML = "Show less comments"
-                } else {
-                    all_comments.style.display = 'none';
-                    see_all_link.innerHTML = "Show all comments"
+            out += """
+                <script type="text/javascript">
+                function displayAllComments(){
+                    var all_comments = document.getElementById('all_comments');
+                    var see_all_link = document.getElementById('see_all_link');
+                    if (all_comments.style.display == 'none'){
+                        all_comments.style.display = '';
+                        see_all_link.innerHTML = "Show less comments"
+                    } else {
+                        all_comments.style.display = 'none';
+                        see_all_link.innerHTML = "Show all comments"
+                    }
                 }
-            }
-            </script>
-            """
+                </script>
+                """
 
-        out += '<span id="all_comments" style="">' + all_comments + '</span>'
-        out += '<a class="moreinfo" id="see_all_link" \
-                href="javascript:void(0)" onclick="displayAllComments()""></a>'
-        out += '<script type="text/javascript">displayAllComments()</script>'
+            out += '<span id="all_comments" style="">' + all_comments + '</span>'
+            out += '<a class="moreinfo" id="see_all_link" \
+                    href="javascript:void(0)" onclick="displayAllComments()""></a>'
+            out += '<script type="text/javascript">displayAllComments()</script>'
 
     return out
 

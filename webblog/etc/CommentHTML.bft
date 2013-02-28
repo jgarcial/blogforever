@@ -6,8 +6,6 @@
 
 
 	<div class="span9" >
-
-
 		<BFE_COMMENT_AUTHOR prefix='<h2 class="articleTitle"> ' suffix='</h2>' />
 	
 	<div class="post-text">
