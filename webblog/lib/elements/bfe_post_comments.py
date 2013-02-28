@@ -24,7 +24,7 @@ the corresponding post
 """
 
 from invenio.webblog_utils import get_comments
-from invenio.search_engine import print_record
+from invenio.search_engine import call_bibformat
 
 
 cfg_messages = {}
@@ -46,14 +46,13 @@ def format_element(bfo):
         out += "<h4>%s</h4>" % cfg_messages["in_issue"][current_language]
 
         for comment_recid in latest_post_comments_recids:
-            out += print_record(comment_recid, format='hb')
-            out += "<br />"
+            out += call_bibformat(comment_recid, format='hb')
 
         all_comments = ""
         all_post_comments_recids = post_comments_recids[2:]
         if all_post_comments_recids:
             for comment_recid in all_post_comments_recids:
-                all_comments += print_record(comment_recid, format='hb')
+                all_comments += call_bibformat(comment_recid, format='hb')
                 all_comments += "<br />"
 
             out += """

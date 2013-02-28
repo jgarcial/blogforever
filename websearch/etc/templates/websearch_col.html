@@ -69,9 +69,9 @@
         {% for recid in collection.reclist %}
           <div class="row-fluid">
             <div class="span1 offset1">
-              <small>
+<!--              <small>
                 {{ get_creation_date(recid, fmt="%Y-%m-%d<br />%H:%i")|safe }}
-              </small>
+              </small>-->
             </div>
             <div class="span10">
               {{ format_record(recid, 'hb', ln=g.ln)|safe }}

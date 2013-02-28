@@ -24,7 +24,7 @@ corresponding blog
 """
 
 from invenio.webblog_utils import get_posts
-from invenio.search_engine import print_record
+from invenio.search_engine import call_bibformat
 
 
 cfg_messages = {}
@@ -51,15 +51,13 @@ def format_element(bfo):
             out += "<h4>%s</h4>" % cfg_messages["in_issue"]['en']
 
         for post_recid in latest_blog_posts_recids:
-            out += print_record(post_recid, format='hb')
-            out += "<hr class=subtle />"
+            out += call_bibformat(post_recid, format='HB')
 
         all_posts = ""
         all_blog_posts_recids = blog_posts_recids[3:]
         if all_blog_posts_recids:
             for post_recid in all_blog_posts_recids:
-                all_posts += print_record(post_recid, format='hb')
-                all_posts += "<hr class=subtle />"
+                all_posts += call_bibformat(post_recid, format='HB')
 
             out += """
                 <script type="text/javascript">
