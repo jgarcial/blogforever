@@ -5,17 +5,10 @@
 <i class="icon-col-Posts"></i>
 <strong><BFE_TITLE_BRIEF highlight="no"/></strong>
 <br />
-<BFE_AUTHORS limit="4" prefix="" extension=" ;<em> et al</em> " highlight="no"/>
+<BFE_AUTHORS />
 
-<table>
-<tr>
-<td valign="top">
+<div class="post-text">
 <BFE_POST_CONTENT_BRIEF limit="1" prefix="<br /><small>" suffix="</small>"
-highlight="no" contextual="no" escape="4"/>
-</td>
-<td valign="top">
-<BFE_POST_IMAGE_BRIEF>
-</td>
-</tr>
-</table>
+highlight="no" contextual="no" escape="0"/>
+</div>
 <br />

@@ -5,9 +5,9 @@
 <i class="icon-col-Blogs"></i>
 <strong><BFE_TITLE_BRIEF highlight="no"/></strong>
 <br />
-<BFE_AUTHORS limit="4" prefix="" extension=" ;<em> et al</em> " highlight="no"/>
 
-
+<div class="post-text">
 <BFE_ABSTRACT limit="1" prefix="<br /><small>" suffix="</small>"
 highlight="no" contextual="no"/>
+</div>
 <br />

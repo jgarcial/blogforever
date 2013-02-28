@@ -41,7 +41,9 @@ def format_element(bfo, highlight="no", multilang='no'):
             post_title = post_rec.fields('245__a')[0]
         except:
             post_title = 'Untitled'
-        title = "Comment on %s" % escape(post_title)
+
+        parent_type = bfo.field('773__4')
+        title = "Comment on %s: %s" % (escape(parent_type.lower()), escape(post_title))
 
     else:
         try:

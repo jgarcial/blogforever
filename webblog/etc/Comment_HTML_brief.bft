@@ -6,7 +6,8 @@
 <br />
 <BFE_AUTHORS limit="4" extension=" ;<em> et al</em> " highlight="no"/>
 
+<div class="post-text">
 <BFE_ABSTRACT limit="3" prefix="<br /><small>" suffix="</small>"
 highlight="no" contextual="no"/>
-<br />
+</div>
 <br />
