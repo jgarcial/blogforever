@@ -34,10 +34,6 @@
 			<BFE_COMMENT_NAVIGATION />
 		</div>
 
-		<div class="bfe-post-thumbnail">
-			<BFE_POST_THUMBNAIL />
-		</div>
-
 	</div>
 
 

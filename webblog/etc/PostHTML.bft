@@ -46,10 +46,6 @@
 		<BFE_BLOG_NAVIGATION />
 		</div> <!-- end bfe-blog-navigation -->
 
-		<div class="bfe-post-thumbnail">	
-		<BFE_POST_THUMBNAIL />
-		</div>
-
 		<div class="bfe-links-menu">
 		<BFE_LINKS_MENU>
 		</div>

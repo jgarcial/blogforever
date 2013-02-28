@@ -10,7 +10,11 @@
 			<div class="bfe-blog-url-link">
 				<BFE_BLOG_URL_LINK />
 			</div>
-				
+
+			<div class="bfe-post-thumbnail">
+				<BFE_SNAPSHOT/>
+			</div> <!-- end bfe-post-thumbnail -->
+
 			<div class="bfe-blog-posts">
 				<BFE_BLOG_POSTS>
 			</div>
@@ -24,11 +28,6 @@
 		<div class="bfe-bulletin-header">
 			<BFE_BULLETIN_HEADER />
 		</div>
-
-		<div class="bfe-post-thumbnail">
-			<BFE_POST_THUMBNAIL />
-		</div> <!-- end bfe-post-thumbnail -->
-
 		<div class="bfe-citation-box">
 			<BFE_CITATION_BOX>
 		</div>
