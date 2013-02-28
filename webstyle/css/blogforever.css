@@ -862,12 +862,19 @@ padding: 0 0 25px;
 background: #ffffff;
 }
 
-#post-from-blog a:before {
-content: "\f02d";
+#post-from-blog a:before, #comment-on-post a:before {
 font-family: FontAwesome;
 display: inline-block;
 width: 1.25em;
 text-align: center;
+}
+
+#comment-on-post a:before {
+content: "\f016";
+}
+
+#post-from-blog a:before {
+content: "\f02d";
 }
 
 .post-extra-data {
@@ -891,11 +898,17 @@ font-weight: 200;
 line-height: 50px;
 }
 
+h2.articleTitle {
+font-size: 32.5px;
+font-weight: 200;
+line-height: 40px;
+}
+
 .post-from-blog h3 {font-weight: 200;}
 
 .post-from-blog h3 a {font-weight:600;}
 
-.bfe-blog-navigation {padding: 5px 0 0;}
+.bfe-blog-navigation, .bfe-comment-navigation {padding: 5px 0 0;}
 
 /* BLOG */
 

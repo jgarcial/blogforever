@@ -45,14 +45,12 @@ def format_element(bfo):
     except:
         addition_date = ""
 
-    out = '<div id="top"><div id="topbanner">&nbsp;</div>'
-    out += '<div id="mainmenu"><table width="100%">'
-    out += '<tr><td class="left" style = "font-size: 1em;">Go to post: <a href="%s/record/%s?%s">%s</a>' % \
+    out = '<div id="comment-on-post">'
+    out += '<h3>Comment on post: <a href="%s/record/%s?%s">%s</a> </h3>' % \
                 (CFG_SITE_URL, post_recid, bfo.lang, post_title)
 
-    out += '<td class="right">%s</td>' % addition_date
-    out += '</td></tr></table></div></div>'
-    out += '<div id="mainphoto"></div>'
+    out += '<div class="pull-right">%s</div>' % addition_date
+    out += '</div>'
 
     return out
 
