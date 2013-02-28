@@ -5,15 +5,12 @@
 	<div class="span12">
 		<BFE_TITLE prefix='<h2 class="articleTitle"> <i class="icon-col-Blogs"></i>' suffix='</h2>' />
 	</div>
-	<div class="text span9">
+	<div class="text span9 pull-right">
 
 			<div class="bfe-blog-url-link">
 				<BFE_BLOG_URL_LINK />
 			</div>
 
-			<div class="bfe-post-thumbnail">
-				<BFE_SNAPSHOT/>
-			</div> <!-- end bfe-post-thumbnail -->
 
 			<div class="bfe-blog-posts">
 				<BFE_BLOG_POSTS>
@@ -22,9 +19,14 @@
 			<div>
 				<BFE_TAGS>
 			</div> 
-	</div> <!-- end text -->
+	</div> <!-- end text span9 -->
 
 	<div class="span3">
+
+		<div class="bfe-snapshot">
+				<BFE_SNAPSHOT/>
+		</div> <!-- end bfe-snapshot -->
+
 		<div class="bfe-bulletin-header">
 			<BFE_BULLETIN_HEADER />
 		</div>

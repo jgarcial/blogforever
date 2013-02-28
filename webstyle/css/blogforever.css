@@ -910,6 +910,16 @@ line-height: 40px;
 
 .bfe-blog-navigation, .bfe-comment-navigation {padding: 5px 0 0;}
 
+.snapshot-thumb {
+max-height: 350px;
+overflow: hidden;
+margin-bottom: 10px;
+}
+
+.bfe-disclaimer a {
+color: #333333;
+}
+
 /* BLOG */
 
 h2 [class^="icon-"] {
@@ -937,6 +947,14 @@ padding: 10px 0 0;
 
 .bfe-blog-url-link {
 padding: 15px 0 5px;
+}
+
+.bfe-snapshot p {
+color: #000;
+}
+
+.bfe-snapshot a:hover {
+text-decoration:none;
 }
 
 @media (max-width: 767px) {

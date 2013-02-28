@@ -32,7 +32,6 @@ def format_element(bfo):
     this_recid = bfo.control_field('001')
     files = bfo.fields('8564_')
 
-    thumbnail_url = ''
     snapshot_url = ''
 
     for f in files:
@@ -40,8 +39,22 @@ def format_element(bfo):
             snapshot_url = f['u']
 
     img = """<img src="%s"> """ % snapshot_url
-    out = '<a href="%s">%s</a>' % (snapshot_url, img)
-
+    out = """<h4>Snapshot:</h4> <div class="well well-small"> 
+            <a href="#SnapshotModal" data-toggle="modal"><div class="snapshot-thumb">%s</div> <small>
+            <p>This is a snapshot of this blog as it appeared when it was archived. Click to enlarge</p></small></a></div> """ % (img)
+    out += """<!-- Snapshot Modal -->
+            <div id="SnapshotModal" class="modal fade" tabindex="-1" role="dialog">
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h3 id="myModalLabel">Blog snapshot</h3>
+                  </div>
+                  <div class="modal-body">
+                        <img src="%s" />
+                  </div>
+                  <div class="modal-footer">
+                    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+                  </div>
+            </div>""" % snapshot_url
     return out
 
 def escape_values(bfo):

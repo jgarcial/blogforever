@@ -37,7 +37,7 @@ def format_element(bfo):
 
     # assemble the HTML output
 
-    out = """<strong>Original URL: </strong> <a href="%s">%s</a>""" % (blog_url, blog_url)
+    out = """<h4>Original URL: </h4> <a href="%s">%s</a>""" % (blog_url, blog_url)
 
     return out
 
