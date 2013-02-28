@@ -1,4 +1,4 @@
-<name>Blog HTML</name>
+mate<name>Blog HTML</name>
 <description>First draft to display blogs</description>
 
 <div class="row blog-record-page">
@@ -32,7 +32,7 @@
 			<BFE_CITATION_BOX>
 		</div>
 
-		<div class="bfe-citation-box">
+		<div class="bfe-disclaimer">
 			<BFE_DISCLAIMER>
 		</div>
 	</div>

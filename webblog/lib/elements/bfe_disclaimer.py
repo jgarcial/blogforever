@@ -36,10 +36,10 @@ def format_element(bfo):
     elem_url = bfo.field('520__u')
     out = ""
 
-    elem_html_url = """<a href = '%(url)s'>here</a>""" % {'url': elem_url}
-    disclaimer_content = "The content of this %s is an archived copy and not the original, to go to the original click" % coll.lower()
+    elem_html_url = """<a href = '%(url)s'>To go to the original click here</a>""" % {'url': elem_url}
+    disclaimer_content = "<strong>Disclaimer: </strong> The content of this %s is an archived copy. " % coll.lower()
     out = """<div class="bottom-left-folded">%(disclaimer)s</div>
-    """ % {'disclaimer': '<div class="recordlastmodifiedbox" style="position:relative;margin-left:1px">&nbsp;%(disclaimer_content)s  %(url)s</div>' %
+    """ % {'disclaimer': '<div class="disclaimer alert">&nbsp;%(disclaimer_content)s  %(url)s</div>' %
            {'disclaimer_content': disclaimer_content,
             'url': elem_html_url}}
 
