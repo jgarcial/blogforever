@@ -9,6 +9,6 @@
 
 <div class="post-text">
 <BFE_POST_CONTENT_BRIEF limit="1" prefix="<br /><small>" suffix="</small>"
-highlight="no" contextual="no" escape="0"/>
+highlight="no" contextual="no" escape="4"/>
 </div>
 <br />
