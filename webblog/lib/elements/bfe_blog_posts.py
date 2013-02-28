@@ -52,13 +52,13 @@ def format_element(bfo):
 
         for post_recid in latest_blog_posts_recids:
             out += print_record(post_recid, format='hb')
-            out += "<br />"
+            out += "<hr class=subtle />"
 
         all_posts = ""
         all_blog_posts_recids = blog_posts_recids[3:]
         for post_recid in all_blog_posts_recids:
             all_posts += print_record(post_recid, format='hb')
-            all_posts += "<br />"
+            all_posts += "<hr class=subtle />"
 
         out += """
             <script type="text/javascript">

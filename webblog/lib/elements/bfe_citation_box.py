@@ -78,10 +78,11 @@ def format_element(bfo):
         except:
             blog_title = 'Untitled'
 
-        out = """<table style="border:1px solid black;"><tr><td>\
-        <span><b>%s</b>. '%s'. Blog: '%s'. </br> \
+        out = """<h4>Citation:</h4> 
+        <div class="well well-large">
+        <span><b>%s </b>: '%s'. Blog: '%s'. </br> \
         Date created: %s. <i>'%s'</i> </br>\
-        Date posted: %s. Retrieved from the original post <i>'%s'</i>. <span></td></tr></table>""" \
+        Date posted: %s. Retrieved from the original post <i>'%s'</i>. </span> </div>""" \
         % (author, title, blog_title, record_creation_date, record_url, posted_date, original_url)
 
     elif coll == "COMMENT":
@@ -94,17 +95,19 @@ def format_element(bfo):
         except:
             post_title = 'Untitled'
 
-        out = """<table style="border:1px solid black;"><tr><td>\
+        out = """<h4>Citation:</h4>
+        <div class="well well-large">\
         <span><b>%s. </b>Blog post: '%s'.</br> \
         Date created: %s. <i>'%s'</i> </br> \
-        Retrieved from the original comment <i>'%s'</i><span></td></tr></table>""" \
+        Retrieved from the original comment <i>'%s'</i></span> </div>""" \
         % (author, post_title, record_creation_date, record_url, original_url)
 
     else: # coll == "BLOG"
-        out = """<table style="border:1px solid black;"><tr><td>\
+        out = """<h4>Citation:</h4>
+        <div class="well well-large">\
         <span>'%s' </br> \
         Date created: %s. <i>'%s'</i> </br> \
-        Retrieved from the original blog <i>'%s'</i><span></td></tr></table>""" \
+        Retrieved from the original blog <i>'%s'</i></span> </div>""" \
         % (title, record_creation_date, record_url, original_url)
 
     return out

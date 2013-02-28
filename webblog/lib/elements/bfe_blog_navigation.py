@@ -26,7 +26,7 @@ from invenio.webblog_utils import get_parent_blog, get_posts
 
 
 cfg_messages = {}
-cfg_messages["in_issue"] = {"en": "Also in this blog: ",
+cfg_messages["in_issue"] = {"en": "Other posts in this blog: ",
                             "fr": "Aussi dans ce blog: "}
 
 

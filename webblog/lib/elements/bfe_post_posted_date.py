@@ -39,7 +39,7 @@ def format_element(bfo):
         posted_date = ""
 
 #    out += '<span class="posted-on"> %s: </span> <span class="post-date"> %s </span>' % (_("Posted on"), posted_date)
-    out = '<span> %s: %s </span>' % (_("Posted on"), posted_date)
+    out = '<span class="post-posted-date"> %s: %s </span>' % (_("Posted on"), posted_date)
     return out
 
 

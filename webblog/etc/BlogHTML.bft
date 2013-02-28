@@ -1,31 +1,39 @@
 <name>Blog HTML</name>
 <description>First draft to display blogs</description>
 
-<div class="blog-record-page">
-	<div class="bfe-bulletin-header">
-		<BFE_BULLETIN_HEADER />
+<div class="row blog-record-page">
+	<div class="span12">
+		<BFE_TITLE prefix='<h2 class="articleTitle"> <i class="icon-col-Blogs"></i>' suffix='</h2>' />
 	</div>
-
-	<div class="bfe-post-thumbnail">
-		<BFE_POST_THUMBNAIL />
-	</div> <!-- end bfe-post-thumbnail -->
-
-	<div class="text" >
-		<BFE_TITLE prefix='<h2 class="articleTitle">' suffix='</h2>' />
-		<BFE_BLOG_URL_LINK />
-
-			<div>
-				<BFE_BLOG_POSTS>
+	<div class="text span9">
+		
+			<div class="bfe-blog-url-link">
+				<BFE_BLOG_URL_LINK />
 			</div>
-
-			<div>
-				<BFE_CITATION_BOX>
+				
+			<div class="bfe-blog-posts">
+				<BFE_BLOG_POSTS>
 			</div>
 
 			<div>
 				<BFE_TAGS>
 			</div> 
 	</div> <!-- end text -->
+
+	<div class="span3">
+		<div class="bfe-bulletin-header">
+			<BFE_BULLETIN_HEADER />
+		</div>
+
+		<div class="bfe-post-thumbnail">
+			<BFE_POST_THUMBNAIL />
+		</div> <!-- end bfe-post-thumbnail -->
+
+		<div class="bfe-citation-box">
+				<BFE_CITATION_BOX>
+		</div>
+
+	</div>
 
 
 	<div id="bottom">  </div>

@@ -7,17 +7,21 @@
 	<BFE_POST_HEADER />
 </div>
 
-<div class="bfe-post-header">
-	<BFE_POST_POSTED_DATE />
-</div>
 
 <div class="row">
 
 
 	<div class="text span9 pull-right">
-		<BFE_TITLE prefix='<h2 class="articleTitle">' suffix='</h2>'/>
-		<BFE_ABSTRACT escape="0" />
-		<BFE_WEBJOURNAL_ARTICLE_AUTHOR prefix="<br/>by " separator=", " display_email="no"/>
+		
+		<BFE_TITLE prefix='<h1 class="articleTitle">' suffix='</h1>'/>
+		<div class="post-extra-data">
+			<BFE_POST_POSTED_DATE />
+			<BFE_WEBJOURNAL_ARTICLE_AUTHOR prefix="<br/>By: " separator=", " display_email="no"/>
+		</div>
+
+		<div class="post-text">
+			<BFE_ABSTRACT escape="0" />
+		</div>
 
 			<div class="bfe-citation-box">	
 				<BFE_CITATION_BOX>

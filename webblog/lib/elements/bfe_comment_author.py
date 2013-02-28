@@ -41,7 +41,7 @@ def format_element(bfo, separator=" ", highlight='no'):
 
     author = bfo.field('100__a')
     current_language = bfo.lang
-    out = """<a href = "%s/search?ln=%s&p=%s&f=author">%s</a> %s:""" % (CFG_SITE_URL, current_language, author, author, \
+    out = """<a href = "%s/search?ln=%s&p=%s&f=author"> <i class="icon-col-Comments"></i> %s</a> %s:""" % (CFG_SITE_URL, current_language, author, author, \
                                                                         cfg_messages["in_issue"][current_language])
 
     return out

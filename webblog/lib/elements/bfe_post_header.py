@@ -40,11 +40,10 @@ def format_element(bfo):
     except:
         blog_title = 'Untitled'
 
-    out = '<div id="top"><div id="topbanner">&nbsp;</div>'
-    out += '<div id="mainmenu"><table width="100%">'
-    out += '<tr><td class="left" style = "font-size: 1em;">Go to blog: <a href="%s/record/%s?%s">%s</a>' % \
+    out = '<div id="post-from-blog">'
+    out += '<h3>Post from blog: <a href="%s/record/%s?%s">%s</a></h3>' % \
             (CFG_SITE_URL, blog_recid, bfo.lang, blog_title)
-    out += '</td></tr></table></div></div>'
+    out += '</div>'
 
     return out
 

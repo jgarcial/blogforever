@@ -58,33 +58,30 @@ def format_element(bfo):
         date  = weekday + ' ' + date.strftime('%d') + ' ' + monthname + ' ' + date.strftime('%Y')
 
     # assemble the HTML output
-    out = '<div id="top"><div id="topbanner">&nbsp;</div>'
     if len(issue_numbers) > 0:
         out += '<span class="printLogo">%s, %s</span>' % (" & ".join(["%s" % issue.split("/")[0] for issue in issue_numbers]), date)
-    out += '<div id="mainmenu"><table width="100%">'
-    out += '<tr>'
+    out += '<div id="mainmenu">'
+    out += ''
     if len(issue_numbers) > 0:
         issue_number, issue_year = issue_numbers[-1].split('/')
-        out += '<td class="left"><a href="%s/journal/CERNBulletin/%s/%s" target="_blank">%s: %s, %s</a></td>' % \
+        out += '<a href="%s/journal/CERNBulletin/%s/%s" target="_blank">%s: %s, %s</a>' % \
                (CFG_SITE_URL, issue_year, issue_number,
                 cfg_messages["published_in"][preferred_ln],
                 " & ".join(["%s" % issue for issue in issue_numbers]),
                 date)
     if len(report_number) > 0:
-        out += '<td class="right">%s</td>' % report_number[0]
-    out += '</tr>'
+        out += '<div>%s</div>' % report_number[0]
+    out += ''
 
-    out += '<tr>'
+    out += '<div class="available-languages">'
     if len(available_languages) > 1:
         if current_language == "en" and "fr" in available_languages:
             #TODO: server name generic
-            out += '<td class="left"><a href="%s/record/%s?ln=fr">&gt;&gt; french version</a></td>' % (CFG_SITE_URL, this_recid)
+            out += '<div class="left"><a href="%s/record/%s?ln=fr">&gt;&gt; french version</a></div>' % (CFG_SITE_URL, this_recid)
         elif current_language == "fr" and "en" in available_languages:
-            out += '<td class="left"><a href="%s/record/%s?ln=en">&gt;&gt; version anglaise</a></td>' % (CFG_SITE_URL, this_recid)
+            out += '<div class="left"><a href="%s/record/%s?ln=en">&gt;&gt; version anglaise</a></div>' % (CFG_SITE_URL, this_recid)
 
-    out += '<td class="right"></td>'
-    out += '</tr>'
-    out += '</table></div><div id="mainphoto"></div></div>'
+    out += '</div><div id="mainphoto"></div></div>'
 
     return out
 

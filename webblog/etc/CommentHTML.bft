@@ -1,38 +1,41 @@
 <name>Comment HTML</name>
 <description>First draft to display blog comments</description>
-<link href="<BFE_SERVER_INFO var="weburl"/>/img/bull_StylesPlain.css" rel="stylesheet" media="all" type="text/css" />
-<link href="<BFE_SERVER_INFO var="weburl"/>/img/bull_print.css" rel="stylesheet" media="print" type="text/css" />
 
 
-<BFE_COMMENT_HEADER />
-<div id="container">
-<table id="middle">
-<tr>
-<td valign="top" style="padding-left:10px">
-<div class="menuleft">
-<BFE_COMMENT_NAVIGATION />
-</div>
-</td>
-<td valign="top" style="padding-left:30px">
-<div class="text" >
-<BFE_COMMENT_AUTHOR prefix='<h2 class="articleTitle">' suffix='</h2>' />
-<BFE_ABSTRACT escape="0" />
-<br />
-<br />
-<div>
-<BFE_CITATION_BOX>
-</div>
-</div>
-</td>
-<td valign="top">
-<div class="menuleft">
-<br />
-<BFE_POST_THUMBNAIL />
-</div>
-</td>
-</tr>
-</table>
+<div class="row comment-record">
 
-<div id="bottom">  </div>
 
-</div>
+	<div class="span9" >
+
+
+		<BFE_COMMENT_AUTHOR prefix='<h2 class="articleTitle"> ' suffix='</h2>' />
+	
+	<div class="post-text">
+		<BFE_ABSTRACT escape="0" />
+	</div>
+
+	<div class="bfe-comment-header">
+		<BFE_COMMENT_HEADER />
+	</div>
+
+	<div class="bfe-citation-box">	
+		<BFE_CITATION_BOX>
+	</div>
+
+	</div> <!-- end span9 -->
+
+	<div class="span3 pull-left">
+
+		<div class="bfe-comment-navigation">
+			<BFE_COMMENT_NAVIGATION />
+		</div>
+
+		<div class="bfe-post-thumbnail">
+			<BFE_POST_THUMBNAIL />
+		</div>
+
+	</div>
+
+	
+
+</div> <!-- end row -->
