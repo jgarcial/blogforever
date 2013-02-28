@@ -22,7 +22,8 @@
 __revision__ = "$Id$"
 from invenio.config import CFG_SITE_SECURE_URL
 from cgi import escape
-from urllib import quote
+from invenio.webblog_utils import get_parent_post
+from invenio.bibformat_engine import BibFormatObject
 
 
 def format_element(bfo, highlight="no", multilang='no'):
@@ -32,10 +33,21 @@ def format_element(bfo, highlight="no", multilang='no'):
     @param highlight: highlights the words corresponding to search query if set to 'yes'
     """
 
-    try:
-        title = bfo.field('245__a')
-    except:
-        title = 'Untitled'
+    if bfo.field('980__a') == "COMMENT":
+        this_recid = bfo.control_field('001')
+        post_recid = get_parent_post(this_recid)
+        post_rec = BibFormatObject(post_recid)
+        try:
+            post_title = post_rec.fields('245__a')[0]
+        except:
+            post_title = 'Untitled'
+        title = "Comment on %s" % escape(post_title)
+
+    else:
+        try:
+            title = bfo.field('245__a')
+        except:
+            title = 'Untitled'
 
     this_recid = bfo.control_field('001')
     current_language = bfo.lang
