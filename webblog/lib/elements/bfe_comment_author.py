@@ -17,32 +17,26 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 """
-BibFormat Element - creates the blog navigation menu
+BibFormat Element - displays the author of a comment record
 """
-from invenio.search_engine import search_pattern, record_exists
-from invenio.bibformat_engine import BibFormatObject
+
 from invenio.config import CFG_SITE_URL
-from invenio.webblog_utils import get_parent_blog, get_posts
-
-
 import cgi
 
 cfg_messages = {}
 cfg_messages["in_issue"] = {"en": "wrote",
                             "fr": "a écrit"}
 
-def format_element(bfo, separator=" ", highlight='no'):
+def format_element(bfo):
     """
-    Prints the titles of a record.
-
-    @param separator: separator between the different titles
-    @param highlight: highlights the words corresponding to search query if set to 'yes'
+    Displays the author of a comment record
     """
 
     author = bfo.field('100__a')
     current_language = bfo.lang
-    out = """<a href = "%s/search?ln=%s&p=%s&f=author"> <i class="icon-col-Comments"></i> %s</a> %s:""" % (CFG_SITE_URL, current_language, author, author, \
-                                                                        cfg_messages["in_issue"][current_language])
+    out = """<a href = "%s/search?ln=%s&p=%s&f=author"> <i class="icon-col-Comments"></i> %s</a> %s:""" % \
+                (CFG_SITE_URL, current_language, author, author, \
+                 cfg_messages["in_issue"][current_language])
 
     return out
     

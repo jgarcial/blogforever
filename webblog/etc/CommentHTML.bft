@@ -10,7 +10,7 @@
 	<div class="span9 pull-right" >
 
 		<div class="bfe-commment-author">
-			<BFE_COMMENT_AUTHOR prefix='<h1 class="articleTitle"> ' suffix='</h1>' />
+			<BFE_COMMENT_AUTHOR prefix='<h4> ' suffix='</h4>' />
 		</div>
 	
 		<div class="post-text">

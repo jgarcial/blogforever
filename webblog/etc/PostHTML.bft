@@ -16,7 +16,8 @@
 		<BFE_TITLE prefix='<h1 class="articleTitle">' suffix='</h1>'/>
 		<div class="post-extra-data">
 			<BFE_POST_POSTED_DATE />
-			<BFE_WEBJOURNAL_ARTICLE_AUTHOR prefix="<br/>By: " separator=", " display_email="no"/>
+			<br />
+			<BFE_POST_AUTHOR />
 		</div>
 
 		<div class="post-text">
