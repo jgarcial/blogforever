@@ -22,6 +22,10 @@
 		<BFE_CITATION_BOX>
 	</div>
 
+	<div class="bfe-citation-box">
+		<BFE_DISCLAIMER>
+	</div>
+
 	</div> <!-- end span9 -->
 
 	<div class="span3 pull-left">
@@ -36,6 +40,6 @@
 
 	</div>
 
-	
+
 
 </div> <!-- end row -->

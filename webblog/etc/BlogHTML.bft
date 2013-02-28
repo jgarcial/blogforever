@@ -6,7 +6,7 @@
 		<BFE_TITLE prefix='<h2 class="articleTitle"> <i class="icon-col-Blogs"></i>' suffix='</h2>' />
 	</div>
 	<div class="text span9">
-		
+
 			<div class="bfe-blog-url-link">
 				<BFE_BLOG_URL_LINK />
 			</div>
@@ -30,11 +30,13 @@
 		</div> <!-- end bfe-post-thumbnail -->
 
 		<div class="bfe-citation-box">
-				<BFE_CITATION_BOX>
+			<BFE_CITATION_BOX>
 		</div>
 
+		<div class="bfe-citation-box">
+			<BFE_DISCLAIMER>
+		</div>
 	</div>
-
 
 	<div id="bottom">  </div>
 
