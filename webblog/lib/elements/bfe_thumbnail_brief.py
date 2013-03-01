@@ -25,7 +25,7 @@ from invenio.config import CFG_SITE_URL
 
 def format_element(bfo):
     """
-    Displays the thumbnail
+    Displays the thumbnail on brief blof records
     """
 
     # get variables
@@ -36,10 +36,10 @@ def format_element(bfo):
 
     for f in files:
         if f['u'].find('Thumbnail') > -1:
-            thumbnail_url = f['u']
+            snapshot_url = f['u']
 
-    img = """<img src="%s"> """ % thumbnail_url
-    out = '<a href="%s">%s</a>' % (thumbnail_url, img)
+#    out = """<div><img src="%s" width="100" height="75"></img></div>""" % snapshot_url
+    out = """<div style="background:url(%s) no-repeat;background-size:100px 100px;height:100px;width:100px"></div>""" % snapshot_url
 
     return out
 

@@ -35,7 +35,7 @@ def format_element(bfo):
     snapshot_url = ''
 
     for f in files:
-        if f['u'].find('SnapShot') > -1:
+        if f['u'].find('SnapShot.') > -1:
             snapshot_url = f['u']
 
     img = """<img src="%s"> """ % snapshot_url
