@@ -35,8 +35,11 @@ def format_element(bfo):
 
     try:
         posted_date = bfo.fields('269__c')[0]
+        # hack
+        if posted_date.find("ERROR") > -1:
+            posted_date = "Date not available"
     except:
-        posted_date = ""
+        posted_date = "Date not available"
 
     out = '<span class="post-posted-date"> %s: %s </span>' % (_("Posted on"), posted_date)
     return out
