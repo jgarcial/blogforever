@@ -6,8 +6,6 @@
 <strong><BFE_TITLE_BRIEF highlight="no"/></strong>
 <br />
 
-<div class="post-text">
-<BFE_ABSTRACT limit="1" prefix="<br /><small>" suffix="</small>"
-highlight="no" contextual="no"/>
-</div>
-<br />
+<div class="bfe-snapshot">
+	<BFE_SNAPSHOT_BRIEF/>
+</div> <!-- end bfe-snapshot -->
