@@ -1,6 +1,9 @@
 <name>Blog HTML</name>
 <description>First draft to display blogs</description>
 
+<div class="to-be-translated" style="padding-left:10px;padding-right:10px">
+<div class="translate-link"></div>
+
 <div class="row blog-record-page">
 	<div class="span12">
 		<BFE_TITLE prefix='<h2 class="articleTitle"> <i class="icon-col-Blogs"></i>' suffix='</h2>' />

@@ -1,15 +1,14 @@
 <name>Post HTML</name>
 <description>First draft to display blog posts</description>
 
-
+<div class="to-be-translated" style="padding-left:10px;padding-right:10px">
+<div class="translate-link"></div>
 
 <div class="bfe-post-header">
 	<BFE_POST_HEADER />
 </div>
 
-
 <div class="row">
-
 
 	<div class="text span9 pull-right">
 		

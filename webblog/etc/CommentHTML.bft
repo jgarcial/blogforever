@@ -1,6 +1,9 @@
 <name>Comment HTML</name>
 <description>First draft to display blog comments</description>
 
+<div class="to-be-translated" style="padding-left:10px;padding-right:10px">
+<div class="translate-link"></div>
+
 <div class="bfe-comment-header">
 			<BFE_COMMENT_HEADER />
 </div>
