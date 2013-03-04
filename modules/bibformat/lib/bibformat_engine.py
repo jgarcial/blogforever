@@ -470,6 +470,26 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0,
 
     out += out_
 
+    # Insert translate script
+    show_translate = 0
+    if CFG_TRANSLATE_RECORD_PREVIEW:
+        from invenio.search_engine import get_record
+        show_translate = 1
+        record = get_record(recID)
+        record_lang = ""
+        if '041' in record.keys():
+            record_lang = record['041'][0][0][0][1]
+
+        if record_lang != "":
+            if record_lang == ln:
+                show_translate = 0
+            else:
+                site_lang = get_lang_name_from_code(ln)
+                if(is_in_lang_codes(site_lang, record_lang) != ""):
+                    show_translate = 0
+    if show_translate:
+        out += get_translate_script('to-be-translated', ln, True)
+
     return out
 
 def decide_format_template(bfo, of):
