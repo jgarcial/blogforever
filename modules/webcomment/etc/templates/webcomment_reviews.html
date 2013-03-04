@@ -20,6 +20,13 @@
   {% extends "record.html" %}
 {%- endif -%}
 
+{%- if display_translate -%}
+  {% block header %}
+    {{ super() }}
+    {% js "js/translate.js" %}
+  {% endblock header %}
+{%- endif -%}
+
 {% block record_content %}
   <div class="page-header">
     {{ format_record(recid, 'hs', ln=g.ln)|safe }}
@@ -41,10 +48,23 @@
       </small>
     </h4>
   </div>
+  
+{%- if display_translate -%}
+  {{ translate_script|safe }}
+  {{ translate_section|safe }}
+{%- endif -%}
 
   {%- if comments -%}
 
-  <ul class="unstyled">
+  <ul class="reviews unstyled">
+  {%- if display_translate -%}
+  <div class="translate-section">
+      <div class="translate-link"></div>
+      <div class="dummy-translate-link">
+          <span class="dummy-translate-link">{{ _("Translate reviews") }}</span>
+      </div>
+  </div>
+  {%- endif -%}
   {%- for c in comments -%}
   <li name="{{ c.id }}">
     <div>

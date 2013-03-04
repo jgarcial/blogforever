@@ -121,6 +121,7 @@ pylib_DATA = __init__.py \
              testutils_regression_tests.py \
              textutils.py \
              textutils_unit_tests.py \
+             translate_utils.py \
              upgrade_manager.py \
              urlutils.py \
              urlutils_unit_tests.py \
@@ -143,6 +144,11 @@ js_DATA = jquery.mathpreview.js
 noinst_DATA = testimport.py \
               kwalitee.py \
               pep8.py
+
+jsdir=$(localstatedir)/www/js
+
+js_DATA = jquery.mathpreview.js \
+          translate.js
 
 tmpdir = $(prefix)/var/tmp
 

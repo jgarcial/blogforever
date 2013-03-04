@@ -34,25 +34,29 @@ from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
 from invenio.webuser_flask import current_user
 from invenio.config import CFG_PREFIX, \
     CFG_SITE_LANG, \
-    CFG_WEBALERT_ALERT_ENGINE_EMAIL,\
-    CFG_SITE_SUPPORT_EMAIL,\
-    CFG_WEBCOMMENT_ALERT_ENGINE_EMAIL,\
-    CFG_SITE_URL,\
     CFG_SITE_NAME,\
     CFG_SITE_RECORD, \
+    CFG_SITE_SUPPORT_EMAIL,\
+    CFG_SITE_URL,\
+    CFG_TRANSLATE_RECORD_COMMENT, \
+    CFG_TRANSLATE_RECORD_REVIEW, \
+    CFG_WEBALERT_ALERT_ENGINE_EMAIL,\
+    CFG_WEBCOMMENT_ADMIN_NOTIFICATION_LEVEL,\
+    CFG_WEBCOMMENT_ALERT_ENGINE_EMAIL,\
+    CFG_WEBCOMMENT_ALLOW_COMMENTS,\
     CFG_WEBCOMMENT_ALLOW_REVIEWS,\
     CFG_WEBCOMMENT_ALLOW_SHORT_REVIEWS,\
-    CFG_WEBCOMMENT_ALLOW_COMMENTS,\
-    CFG_WEBCOMMENT_ADMIN_NOTIFICATION_LEVEL,\
-    CFG_WEBCOMMENT_NB_REPORTS_BEFORE_SEND_EMAIL_TO_ADMIN,\
-    CFG_WEBCOMMENT_TIMELIMIT_PROCESSING_COMMENTS_IN_SECONDS,\
     CFG_WEBCOMMENT_DEFAULT_MODERATOR, \
     CFG_WEBCOMMENT_EMAIL_REPLIES_TO, \
-    CFG_WEBCOMMENT_ROUND_DATAFIELD, \
+    CFG_WEBCOMMENT_MAX_COMMENT_THREAD_DEPTH, \
+    CFG_WEBCOMMENT_NB_REPORTS_BEFORE_SEND_EMAIL_TO_ADMIN,\
     CFG_WEBCOMMENT_RESTRICTION_DATAFIELD, \
-    CFG_WEBCOMMENT_MAX_COMMENT_THREAD_DEPTH
+    CFG_WEBCOMMENT_ROUND_DATAFIELD, \
+    CFG_WEBCOMMENT_TIMELIMIT_PROCESSING_COMMENTS_IN_SECONDS
 from invenio.webcomment_config import CFG_WEBCOMMENT_ACTION_CODE
 from invenio.access_control_engine import acc_authorize_action
+from invenio.translate_utils import construct_translate_section, \
+                                    get_translate_script
 
 blueprint = InvenioBlueprint('webcomment', __name__,
                              url_prefix="/" + CFG_SITE_RECORD,
@@ -213,8 +217,12 @@ def comments(recid):
         CmtRECORDCOMMENT.id_bibrec == recid,
         CmtRECORDCOMMENT.in_reply_to_id_cmtRECORDCOMMENT == 0,
         CmtRECORDCOMMENT.star_score == 0
-    )).all()
-    return render_template('webcomment_comments.html', comments=comments)
+        )).all()
+    display_translate = CFG_TRANSLATE_RECORD_COMMENT and len(comments)
+    return render_template('webcomment_comments.html', comments=comments,
+                           display_translate=display_translate,
+                           translate_section=construct_translate_section(''),
+                           translate_script=get_translate_script('comments'))
 
 
 @blueprint.route('/<int:recid>/reviews', methods=['GET', 'POST'])
@@ -239,8 +247,12 @@ def reviews(recid):
         CmtRECORDCOMMENT.id_bibrec == recid,
         CmtRECORDCOMMENT.in_reply_to_id_cmtRECORDCOMMENT == 0,
         CmtRECORDCOMMENT.star_score > 0
-    )).all()
-    return render_template('webcomment_reviews.html', comments=comments)
+        )).all()
+    display_translate = CFG_TRANSLATE_RECORD_REVIEW and len(comments)
+    return render_template('webcomment_reviews.html', comments=comments,
+                           display_translate=display_translate,
+                           translate_section=construct_translate_section(''),
+                           translate_script=get_translate_script('reviews'))
 
 
 @blueprint.route('/<int:recid>/report/<int:id>', methods=['GET', 'POST'])

@@ -28,7 +28,8 @@ import urllib
 from invenio.config import CFG_SITE_SECURE_URL, \
                            CFG_ACCESS_CONTROL_LEVEL_SITE, \
                            CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS, \
-                           CFG_SITE_SECURE_URL, CFG_PREFIX, CFG_SITE_LANG
+                           CFG_SITE_SECURE_URL, CFG_PREFIX, CFG_SITE_LANG, \
+                           CFG_TRANSLATE_BASKET_COMMENT
 from invenio.messages import gettext_set_language
 from invenio.webpage import page
 from invenio.webuser import getUid, page_not_authorized, isGuestUser
@@ -358,6 +359,13 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                       urllib.quote(argd['topic']),
                       argd['group'],
                       argd['bskid'])
+                      
+        metaheaderadd = ""
+        if CFG_TRANSLATE_BASKET_COMMENT:
+            metaheaderadd = """
+<link rel="stylesheet" href="%(cssurl)s/img/translate.css" type="text/css" />
+<script src="%(cssurl)s/js/translate.js"></script>
+     """ % {'cssurl': 1 and CFG_SITE_SECURE_URL or CFG_SITE_URL}
 
         return page(title       = _("Display baskets"),
                     body        = body,
@@ -370,7 +378,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     of          = argd['of'],
                     navtrail_append_title_p = 0,
                     secure_page_p=1,
-                    rssurl=rssurl)
+                    rssurl=rssurl,
+                    metaheaderadd = metaheaderadd)
 
     def search(self, req, form):
         """Search baskets interface."""
@@ -489,6 +498,13 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
             register_customevent("baskets", ["write_note", basket_str, user_str])
         except:
             register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
+        metaheaderadd = ""
+
+        if CFG_TRANSLATE_BASKET_COMMENT:
+            metaheaderadd = """
+<link rel="stylesheet" href="%(cssurl)s/img/translate.css" type="text/css" />
+<script src="%(cssurl)s/js/translate.js"></script>
+     """ % {'cssurl': 1 and CFG_SITE_SECURE_URL or CFG_SITE_URL}
 
         return page(title       = _("Add a note"),
                     body        = body,
@@ -499,7 +515,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     req         = req,
                     navmenuid   = 'yourbaskets',
                     of          = argd['of'],
-                    secure_page_p=1)
+                    secure_page_p=1,
+                    metaheaderadd = metaheaderadd)
 
     def save_note(self, req, form):
         """Save comment on record in basket"""
@@ -563,6 +580,13 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         except:
             register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
 
+        metaheaderadd = ""
+        if CFG_TRANSLATE_BASKET_COMMENT:
+            metaheaderadd = """
+<link rel="stylesheet" href="%(cssurl)s/img/translate.css" type="text/css" />
+<script src="%(cssurl)s/js/translate.js"></script>
+     """ % {'cssurl': 1 and CFG_SITE_SECURE_URL or CFG_SITE_URL}
+
         return page(title       = _("Display item and notes"),
                     body        = body,
                     navtrail    = navtrail,
@@ -572,8 +596,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     req         = req,
                     navmenuid   = 'yourbaskets',
                     of          = argd['of'],
-                    navtrail_append_title_p = 0,
-                    secure_page_p=1)
+                    secure_page_p=1,
+                    metaheaderadd = metaheaderadd)
 
     def delete_note(self, req, form):
         """Delete a comment
@@ -638,6 +662,13 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         except:
             register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
 
+        metaheaderadd = ""
+        if CFG_TRANSLATE_BASKET_COMMENT:
+            metaheaderadd = """
+<link rel="stylesheet" href="%(cssurl)s/img/translate.css" type="text/css" />
+<script src="%(cssurl)s/js/translate.js"></script>
+     """ % {'cssurl': 1 and CFG_SITE_SECURE_URL or CFG_SITE_URL}
+
         return page(title       = _("Display item and notes"),
                     body        = body,
                     navtrail    = navtrail,
@@ -648,7 +679,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     navmenuid   = 'yourbaskets',
                     of          = argd['of'],
                     navtrail_append_title_p = 0,
-                    secure_page_p=1)
+                    secure_page_p=1,
+                    metaheaderadd = metaheaderadd)
 
     def add(self, req, form):
         """Add records to baskets.
@@ -1348,6 +1380,13 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                      (CFG_SITE_SECURE_URL,
                       argd['bskid'])
 
+        metaheaderadd = ""
+        if CFG_TRANSLATE_BASKET_COMMENT:
+            metaheaderadd = """
+<link rel="stylesheet" href="%(cssurl)s/img/translate.css" type="text/css" />
+<script src="%(cssurl)s/js/translate.js"></script>
+     """ % {'cssurl': 1 and CFG_SITE_SECURE_URL or CFG_SITE_URL}
+
         return page(title       = title,
                     body        = body,
                     navtrail    = navtrail,
@@ -1359,7 +1398,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     of          = argd['of'],
                     navtrail_append_title_p = 0,
                     secure_page_p=1,
-                    rssurl=rssurl)
+                    rssurl=rssurl,
+                    metaheaderadd = metaheaderadd)
 
     def list_public_baskets(self, req, form):
         """List of public baskets interface."""
@@ -1448,6 +1488,13 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
             body = subscribe_warnings_html + body
             title = _('Public basket')
 
+        metaheaderadd = ""
+        if CFG_TRANSLATE_BASKET_COMMENT:
+            metaheaderadd = """
+<link rel="stylesheet" href="%(cssurl)s/img/translate.css" type="text/css" />
+<script src="%(cssurl)s/js/translate.js"></script>
+     """ % {'cssurl': 1 and CFG_SITE_SECURE_URL or CFG_SITE_URL}
+
         return page(title       = title,
                     body        = body,
                     navtrail    = navtrail,
@@ -1458,7 +1505,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     navmenuid   = 'yourbaskets',
                     of          = argd['of'],
                     navtrail_append_title_p = 0,
-                    secure_page_p=1)
+                    secure_page_p=1,
+                    metaheaderadd = metaheaderadd)
 
     def unsubscribe(self, req, form):
         """Unsubscribe from basket pseudo-interface."""
@@ -1508,6 +1556,13 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
             body = unsubscribe_warnings_html + body
             title = _('Public basket')
 
+        metaheaderadd = ""
+        if CFG_TRANSLATE_BASKET_COMMENT:
+            metaheaderadd = """
+<link rel="stylesheet" href="%(cssurl)s/img/translate.css" type="text/css" />
+<script src="%(cssurl)s/js/translate.js"></script>
+     """ % {'cssurl': 1 and CFG_SITE_SECURE_URL or CFG_SITE_URL}
+
         return page(title       = title,
                     body        = body,
                     navtrail    = navtrail,
@@ -1518,7 +1573,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     navmenuid   = 'yourbaskets',
                     of          = argd['of'],
                     navtrail_append_title_p = 0,
-                    secure_page_p=1)
+                    secure_page_p=1,
+                    metaheaderadd = metaheaderadd)
 
     def write_public_note(self, req, form):
         """Write a comment (just interface for writing)"""

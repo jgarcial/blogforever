@@ -3,6 +3,8 @@
 
 <link href="<BFE_SERVER_INFO var='CFG_SITE_URL' />img/AtlantisTimes.css" rel="stylesheet" type="text/css" />
 
+<div class="to-be-translated" style="padding-left:10px;padding-right:10px">
+<div class="translate-link"></div>
 <div style="width:800px;margin:auto">
 
 <BFE_WEBJOURNAL_ARTICLE_TITLE prefix='<h2 class="articleTitle">' suffix='</h2>' />
@@ -11,4 +13,5 @@
 
 <BFE_ADDTHIS />
 
+</div>
 </div>

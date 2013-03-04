@@ -43,13 +43,15 @@ from invenio.config import CFG_SITE_URL, \
                            CFG_CERN_SITE, \
                            CFG_SITE_RECORD, \
                            CFG_WEBCOMMENT_MAX_ATTACHED_FILES, \
-                           CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE
+                           CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE, \
+                           CFG_TRANSLATE_RECORD_COMMENT
 from invenio.htmlutils import get_html_text_editor, create_html_select
 from invenio.messages import gettext_set_language
 from invenio.bibformat import format_record
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import acc_get_user_roles_from_user_info, acc_get_role_id
 from invenio.search_engine_utils import get_fieldvalues
+from invenio.translate_utils import construct_translate_section
 
 class Template:
     """templating class, refer to webcomment.py for examples of call"""
@@ -90,7 +92,20 @@ class Template:
             last_comment_round_name = comment_round_names[-1]
 
         for comment_round_name, comments_list in comments:
-            comment_rows += '<div id="cmtRound%s" class="cmtRound">' % (comment_round_name)
+            if CFG_TRANSLATE_RECORD_COMMENT and nb_comments_total:
+                comment_rows += """
+            <div id="cmtRound%(comment_round_name)s" class="cmtround">
+            <div class="translate_section">
+                <div class="translate_link" id="comment"></div>
+                <div class="dummy_translate_link" id="comment">
+                    <span class="dummy_translate_link">%(Translate_your_message)s</span>
+                </div>
+            </div>""" % {   'comment_round_name':comment_round_name,
+                            'Translate_your_message': _("Translate comments")}
+            else:
+                comment_rows += """<div id="cmtRound%(comment_round_name)s"
+                class="cmtRound">""" % {'comment_round_name':comment_round_name}
+                
             if comment_round_name:
                 comment_rows += '<div class="webcomment_comment_round_header">' + \
                                 _('%(x_nb)i Comments for round "%(x_name)s"') % {'x_nb': len(comments_list), 'x_name': comment_round_name}  + "</div>"
@@ -243,7 +258,20 @@ class Template:
             last_comment_round_name = comment_round_names[-1]
 
         for comment_round_name, comments_list in comments:
-            comment_rows += '<div id="cmtRound%s" class="cmtRound">' % (comment_round_name)
+            if CFG_TRANSLATE_RECORD_COMMENT and nb_comments_total:
+                comment_rows += """
+            <div id="cmtRound%(comment_round_name)s" class="cmtround">
+            <div class="translate_section">
+                <div class="translate_link" id="comment"></div>
+                <div class="dummy_translate_link" id="comment">
+                    <span class="dummy_translate_link">%(Translate_your_message)s</span>
+                </div>
+            </div>""" % {   'comment_round_name':comment_round_name,
+                            'Translate_your_message': _("Translate comments")}
+            else:
+                comment_rows += """<div id="cmtRound%(comment_round_name)s"
+                class="cmtRound">""" % {'comment_round_name':comment_round_name}
+
             comment_rows += _('%(x_nb)i comments for round "%(x_name)s"') % {'x_nb': len(comments_list), 'x_name': comment_round_name} + "<br/>"
             for comment in comments_list:
                 if comment[c_nickname]:
@@ -719,7 +747,24 @@ class Template:
             if comment_round_name in display_comment_rounds:
                 comment_round_is_open = True
                 comment_round_style = ""
-            comments_rows += '<div id="cmtRound%s" class="cmtround">' % (comment_round_name)
+
+            if CFG_TRANSLATE_RECORD_COMMENT and \
+                            not (not reviews and not total_nb_comments) and \
+                            not (reviews and not total_nb_reviews):
+                comments_rows += """
+            <div id="cmtRound%(comment_round_name)s" class="cmtround">
+            <div class="translate_section">
+                <div class="translate_link" id="comment"></div>
+                <div class="dummy_translate_link" id="comment">
+                    <span class="dummy_translate_link">%(Translate_your_message)s</span>
+                </div>
+            </div>""" % {'comment_round_name':comment_round_name,
+                                'Translate_your_message': _("Translate comments")
+                                }
+            else:
+                comments_rows += """<div id="cmtRound%(comment_round_name)s"
+                class="cmtRound">""" % {'comment_round_name':comment_round_name}
+
             if not comment_round_is_open and \
                    (comment_round_name or len(comment_round_names) > 1):
                 new_cmtgrp = list(display_comment_rounds)
@@ -925,8 +970,34 @@ class Template:
             review_or_comment_first = _("Be the first to review this document.") + '<br />'
 
         # do NOT remove the HTML comments below. Used for parsing
+        translate_section = ""
+        translate_script = ""
+        translate_link_section = ""
+        if CFG_TRANSLATE_RECORD_COMMENT and \
+                            not (not reviews and not total_nb_comments) and \
+                            not (reviews and not total_nb_reviews):
+            translate_section = construct_translate_section("comment")
+            translate_script = """
+<!-- start translate script -->
+<div id="translate_script">
+        <script>
+        function googleSectionalElementInit() {
+          new google.translate.SectionalElement({
+            sectionalNodeClassName: 'cmtround',
+            controlNodeClassName: 'translate_link',
+            background: 'transparent'
+          }, 'google_sectional_element');
+        }
+        </script>
+</div>
+<!-- end translate script -->
+            
+            """
+
         body = '''
 %(comments_and_review_tabs)s
+    %(translate_script)s
+    %(translate_section)s
 <!-- start comments table -->
 <div class="webcomment_comment_table">
   %(comments_rows)s
@@ -934,7 +1005,10 @@ class Template:
 <!-- end comments table -->
 %(review_or_comment_first)s
 <br />''' % \
-        {   'record_label': _("Record"),
+        {
+            'translate_script': translate_script,
+            'translate_section': translate_section,
+            'record_label': _("Record"),
             'back_label': _("Back to search results"),
             'total_label': total_label,
             'write_button_form' : write_button_form,

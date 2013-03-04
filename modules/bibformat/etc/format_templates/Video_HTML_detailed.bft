@@ -7,6 +7,8 @@
 	<script type="text/javascript" src="/mediaelement/mediaelement-and-player.js"></script>
 	<script type="text/javascript" src="/js/video_platform_record.js"></script>
 
+<div class="to-be-translated" style="padding-left:10px;padding-right:10px">
+<div class="translate-link"></div>
 		<!-- VIDEO PLAYER -->
 		<div class="video_black_band">
 			<div class="video_player">
@@ -52,3 +54,4 @@
 
 		<!-- Elements that are only evaluated by JavaScript -->
 		<BFE_VIDEO_PLATFORM_DOWNLOADS/>
+</div>

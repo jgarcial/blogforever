@@ -1,4 +1,6 @@
 <name>Poetry HTML detailed</name>
+<div class="to-be-translated" style="padding-left:10px;padding-right:10px">
+<div class="translate-link"></div>
 <description>The detailed HTML format suitable for displaying poetry.</description>
 
 <BFE_TOPBANNER
@@ -39,3 +41,4 @@ suffix="<br />" />
 <BFE_ADDTHIS />
 
 <BFE_APPEARS_IN_COLLECTIONS prefix="<p style='margin-left: 10px;'><em>The record appears in these collections:</em><br />" suffix="</p>">
+</div>

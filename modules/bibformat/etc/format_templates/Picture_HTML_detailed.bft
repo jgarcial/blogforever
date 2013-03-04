@@ -5,6 +5,8 @@
 </div>
 <hr />
 <div style="padding-left:10px;padding-right:10px">
+<div class="to-be-translated" style="padding-left:10px;padding-right:10px">
+<div class="translate-link"></div>
 <BFE_TITLE prefix="<center><big><big><strong>"
 separator="<br/><br/>"
 suffix="</strong></big></big></center>" />
@@ -59,4 +61,5 @@ The words CERN Photo must be quoted for each use. </small>
 </tr>
 
 </table>
+</div>
 </div>

@@ -20,6 +20,17 @@
 {% set title = _("Read a message") %}
 {% block body %}
 
+{%- if display_translate -%}
+  {% block header %}
+    {{ super() }}
+    {% js "js/translate.js" %}
+  {% endblock header %}
+{%- endif -%}
+
+{%- if display_translate -%}
+  {{ translate_script|safe }}
+{%- endif -%}
+
 <div class="row">
 <dl class="dl-horizontal well offset1 span5">
   <dt>{{ _("From") }}</dt>
@@ -45,8 +56,21 @@
     {% endfor %}
   </dd>
 </dl>
+{%- if display_translate -%}
+<dl class="offset1 span5">
+ {{ translate_section|safe }}
+</dl>
+{%- endif -%}
 </div>
-<div class="row">
+<div class="message row">
+{%- if display_translate -%}
+<div class="offset1 span5 translate-section" style="margin-top:-25px">
+    <div class="translate-link"></div>
+    <div class="dummy-translate-link">
+      <span class="dummy-translate-link">{{ _("Translate this message") }}</span>
+    </div>
+  </div>
+{%- endif -%}
   <div style="min-height: 100px;" class="offset1 span10 thumbnail">
   {{ m.message.body }}
   </div>

@@ -32,6 +32,8 @@ from invenio.webmessage_forms import AddMsgMESSAGEForm, FilterMsgMESSAGEForm
 from invenio import webmessage_query as dbquery
 from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
 from invenio.webuser_flask import current_user
+from invenio.translate_utils import construct_translate_section, \
+                                    get_translate_script
 
 from sqlalchemy.sql import operators
 
@@ -206,7 +208,9 @@ def view(msgid):
             ## I wonder if the autocommit works ...
             # Commit changes before rendering for correct menu update.
             db.session.commit()
-            return dict(m=m)
+            return dict(m=m, display_translate=CFG_TRANSLATE_WEBMESSAGE,
+                        translate_section=construct_translate_section(''),
+                        translate_script=get_translate_script('message'))
         except db.sqlalchemy.orm.exc.NoResultFound:
             flash(_('This message does not exist.'), "error")
         except:

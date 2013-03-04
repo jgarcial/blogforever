@@ -85,7 +85,8 @@ from invenio.config import \
      CFG_WEBSEARCH_VIEWRESTRCOLL_POLICY, \
      CFG_BIBSORT_BUCKETS, \
      CFG_XAPIAN_ENABLED, \
-     CFG_BIBINDEX_CHARS_PUNCTUATION
+     CFG_BIBINDEX_CHARS_PUNCTUATION, \
+     CFG_TRANSLATE_RECORD_PREVIEW
 
 from invenio.search_engine_config import \
      InvenioWebSearchUnknownCollectionError, \
@@ -4576,6 +4577,43 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                         content += websearch_templates.tmpl_display_back_to_search(req,
                                                                                    recIDs[irec],
                                                                                    ln)
+                        #begin - constructs the script for translating record.
+                        show_translate = 0
+                        if CFG_TRANSLATE_RECORD_PREVIEW:
+                            from invenio.search_engine import get_record
+                            from invenio.translate_utils import get_lang_name_from_code, is_in_lang_codes
+                            
+                            show_translate = 1
+                            record = get_record(recid)
+                            record_lang = ""
+                            if record.has_key('041'):
+                                record_lang = record['041'][0][0][0][1]
+
+                            if record_lang != "":
+                                if record_lang == ln:
+                                    show_translate = 0
+                                else:
+                                    site_lang = get_lang_name_from_code(ln)
+                                    if(is_in_lang_codes(site_lang, record_lang) != ""):
+                                        show_translate = 0
+
+                        translate_section = ""
+                        if show_translate:
+                            translate_section = """
+                                        <script>
+                                function googleSectionalElementInit() {
+                                  new google.translate.SectionalElement({
+                                    sectionalNodeClassName: 'to-be-translated',
+                                    controlNodeClassName: 'translate-link',
+                                    background: '#ffffff'
+                                  }, 'google_sectional_element');
+                                }
+                            </script>
+                            <script src="//translate.google.com/translate_a/element.js?cb=googleSectionalElementInit&ug=section&hl=%(ln)s"></script>
+                            """ % {'ln':ln}
+                        #end - constructs the script for translating record.
+                        
+                        req.write(translate_section)
                         req.write(content)
                         req.write(webstyle_templates.detailed_record_container_bottom(recIDs[irec],
                                                                                       tabs,

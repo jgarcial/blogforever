@@ -16,7 +16,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-
 """
 Formats a single XML Marc record using specified format.
 There is no API for the engine. Instead use module L{bibformat}.
@@ -55,7 +54,8 @@ from werkzeug.utils import cached_property
 from invenio.config import \
      CFG_PATH_PHP, \
      CFG_BINDIR, \
-     CFG_SITE_LANG
+     CFG_SITE_LANG, \
+     CFG_TRANSLATE_RECORD_PREVIEW
 from invenio.errorlib import \
      register_exception
 from invenio.bibrecord import \
@@ -94,6 +94,9 @@ from invenio.importutils import autodiscover_modules
 from invenio.jinja2utils import render_template_to_string
 from HTMLParser import HTMLParseError
 from invenio.shellutils import escape_shell_arg
+from invenio.translate_utils import get_translate_script, \
+                                    get_lang_name_from_code, \
+                                    is_in_lang_codes
 
 if CFG_PATH_PHP: #Remove when call_old_bibformat is removed
     from xml.dom import minidom
@@ -466,6 +469,26 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0,
     out_ = format_with_format_template(template, bfo, verbose)
 
     out += out_
+
+    # Insert translate script
+    show_translate = 0
+    if CFG_TRANSLATE_RECORD_PREVIEW:
+        from invenio.search_engine import get_record
+        show_translate = 1
+        record = get_record(recID)
+        record_lang = ""
+        if '041' in record.keys():
+            record_lang = record['041'][0][0][0][1]
+
+        if record_lang != "":
+            if record_lang == ln:
+                show_translate = 0
+            else:
+                site_lang = get_lang_name_from_code(ln)
+                if(is_in_lang_codes(site_lang, record_lang) != ""):
+                    show_translate = 0
+    if show_translate:
+        out += get_translate_script('to-be-translated', ln, True)
 
     return out
 

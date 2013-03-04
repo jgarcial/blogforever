@@ -38,12 +38,14 @@ from invenio.config import \
      CFG_SITE_LANG, \
      CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS, \
      CFG_WEBBASKET_USE_RICH_TEXT_EDITOR, \
-     CFG_SITE_RECORD
+     CFG_SITE_RECORD, \
+     CFG_TRANSLATE_BASKET_COMMENT
 from invenio.webuser import get_user_info
 from invenio.dateutils import convert_datetext_to_dategui
 from invenio.webbasket_dblayer import get_basket_item_title_and_URL, \
                                       get_basket_ids_and_names
 from invenio.bibformat import format_record
+from invenio.translate_utils import construct_translate_section
 
 class Template:
     """Templating class for webbasket module"""
@@ -3237,11 +3239,56 @@ class Template:
                             'notes_icon': notes_icon,
                             'add_note': (notes and user_can_add_notes and not add_note_p) and add_note or "&nbsp;",
                             'nb_notes': len(notes)}
+        
+        translate_section = ""
+        translate_script = ""
+        translate_link_section = ""
+        if CFG_TRANSLATE_BASKET_COMMENT and notes:
+            translate_section = construct_translate_section("basket_note")
+            translate_script = """
+              <!-- start translate script -->
+                <div id="translate_script">
+                    <script>
+                        function googleSectionalElementInit() {
+                          new google.translate.SectionalElement({
+                            sectionalNodeClassName: 'bsknotescontent',
+                            controlNodeClassName: 'translate_link',
+                            background: '#ffffff'
+                          }, 'google_sectional_element');
+                        }
+                    </script>
+                </div>
+              <!-- end translate script -->
+            """
+            translate_link_section = """
+            <div class="translate_section">
+                <div class="translate_link" id="basket_note">
+                </div>
+                <div class="dummy_translate_link" id="basket_note">
+                    <span class="dummy_translate_link">%(Translate_your_message)s</span>
+                </div>
+            </div>
+            """ % {'Translate_your_message': _('Translate notes')}
 
         if notes or add_note or add_note_p:
             notes_html += """
                 <tr>
-                  <td colspan="2" class="bsknotescontent">"""
+                    <td colspan="2">
+                        <div class="language_dropdown">
+                        %(translate_section)s
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                  <td colspan="2" class="bsknotescontent">
+                        %(translate_script)s
+                        %(translate_link_section)s
+                        """ % {'ln':ln,
+                                'translate_section': translate_section,
+                                'translate_script': translate_script,
+                                'translate_link_section': translate_link_section
+                                }
+                                
             thread_history = [0]
             for (cmt_uid, cmt_nickname, cmt_title, cmt_body, cmt_date, dummy, cmtid, reply_to) in notes:
                 if reply_to not in thread_history:
@@ -4040,11 +4087,56 @@ class Template:
                             'notes_icon': notes_icon,
                             'add_note': (notes and user_can_add_notes and not add_note_p) and add_note or "&nbsp;",
                             'nb_notes': len(notes)}
-
+        
+        translate_section = ""
+        translate_script = ""
+        translate_link_section = ""
+        if CFG_TRANSLATE_BASKET_COMMENT and notes:
+            translate_section = construct_translate_section("basket_note")
+            translate_script = """
+              <!-- start translate script -->
+                <div id="translate_script">
+                    <script>
+                        function googleSectionalElementInit() {
+                          new google.translate.SectionalElement({
+                            sectionalNodeClassName: 'bsknotescontent',
+                            controlNodeClassName: 'translate_link',
+                            background: '#ffffff'
+                          }, 'google_sectional_element');
+                        }
+                    </script>
+                </div>
+              <!-- end translate script -->
+            """
+            translate_link_section = """
+            <div class="translate_section">
+                <div class="translate_link" id="basket_note">
+                </div>
+                <div class="dummy_translate_link" id="basket_note">
+                    <span class="dummy_translate_link">%(Translate_your_message)s</span>
+                </div>
+            </div>
+            """ % {'Translate_your_message': _('Translate notes')}
+            
         if notes or add_note or add_note_p:
             notes_html += """
                 <tr>
-                  <td colspan="2" class="bsknotescontent">"""
+                    <td colspan="2">
+                        <div class="language_dropdown">
+                        %(translate_section)s
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                  <td colspan="2" class="bsknotescontent">
+                    %(translate_script)s
+                    %(translate_link_section)s
+                    """     % { 'ln' : ln,
+                                'translate_section': translate_section,
+                                'translate_script': translate_script,
+                                'translate_link_section': translate_link_section
+                                }
+                                
             thread_history = [0]
             for (cmt_uid, cmt_nickname, cmt_title, cmt_body, cmt_date, dummy, cmtid, reply_to) in notes:
                 if reply_to not in thread_history:

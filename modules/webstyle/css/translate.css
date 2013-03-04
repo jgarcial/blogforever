@@ -1,0 +1,77 @@
+.translate_section
+{
+    height: 40px;
+    margin-top: 5px;
+}
+
+#message.languages
+{
+    position: relative;
+    left: 26px;
+    top: 15px;
+}
+
+#basket_note.languages
+{
+    position: relative;
+    left: 17px;
+    top: 15px;
+}
+
+#comment.languages
+{
+    position: relative;
+    left: 22px;
+    top: 15px;
+}
+
+
+#message.translate_link
+{
+    position: relative;
+    left: 175px;
+    top: -17px;
+}
+
+#message.dummy_translate_link
+{
+    position: relative;
+    left: 175px;
+    top: -17px;
+}
+
+
+#basket_note.translate_link
+{
+    position: relative;
+    left: 175px;
+    top: -32px;
+}
+
+#basket_note.dummy_translate_link
+{
+    position: relative;
+    left: 175px;
+    top: -32px;
+}
+
+#comment.translate_link
+{
+    position: relative;
+    left: 185px;
+    top: -15px;
+}
+
+#comment.dummy_translate_link
+{
+    position: relative;
+    left: 185px;
+    top: -15px;
+}
+
+
+.translate_section
+{
+    position: static;
+    height: 15px;
+}
