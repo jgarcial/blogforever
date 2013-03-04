@@ -22,7 +22,9 @@
 from datetime import datetime
 from flask import render_template, request, flash, redirect, url_for
 from invenio import webmessage_dblayer as dbplayer
-from invenio.config import CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES
+from invenio.config import CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES, \
+                        CFG_WEBMESSAGE_MAX_SIZE_OF_MESSAGE, \
+                        CFG_TRANSLATE_WEBMESSAGE
 from invenio.sqlalchemyutils import db
 from invenio.webmessage import is_no_quota_user
 from invenio.webmessage_config import CFG_WEBMESSAGE_STATUS_CODE
