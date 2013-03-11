@@ -59,14 +59,16 @@
     <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
   <![endif]-->
 
-  <!-- Le fav and touch icons -->
-{#
-  <link rel="shortcut icon" href="../assets/ico/favicon.ico">
-  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="../assets/ico/apple-touch-icon-144-precomposed.png">
-  <link rel="apple-touch-icon-precomposed" sizes="114x114" href="../assets/ico/apple-touch-icon-114-precomposed.png">
-  <link rel="apple-touch-icon-precomposed" sizes="72x72" href="../assets/ico/apple-touch-icon-72-precomposed.png">
-  <link rel="apple-touch-icon-precomposed" href="../assets/ico/apple-touch-icon-57-precomposed.png">
-#}
+    <!-- Le fav and touch icons -->
+
+  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
+  {% for size in [144, 114, 72, 57] %}
+    {% set icon_name = 'apple-touch-icon-%d-precomposed.png'|format(size) %}
+  <link rel="apple-touch-icon-precomposed" sizes="{{ size }}x{{ size }}"
+        href="{{ url_for('static', filename=icon_name) }}">
+  {% endfor %}
+
 {#
   {% js 'js/jquery/jquery.min.js' %}
 #}
@@ -81,7 +83,15 @@
   {% endassets %}
   {% block javascript %}{% endblock javascript %}
   {% block css %}{% endblock css %}
-
+  <style>
+    footer a, footer a:hover {
+      color: #666;
+    }
+    footer, footer p {
+      font-size: 11px;
+      color: #333;
+    }
+  </style>
 </head>
 <body {{ body_css_classes|safe }} lang="{{ g.ln|safe }}">
 <div class="wrapper">
@@ -125,7 +135,7 @@
     {% for category, msg in get_flashed_messages(with_categories=true) %}
       <div class="alert alert-{{ category }}">
         <a class="close" data-dismiss="alert" href="#">×</a>
-        {{ msg }}
+        {{ msg|safe }}
       </div>
     {% endfor %}
     {% endblock messages %}
