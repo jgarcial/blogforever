@@ -606,6 +606,21 @@ class WebSearchTestBrowse(unittest.TestCase):
                                                username='admin',
                                                password='',
                                                expected_text= ['Hits', '>CERN-THESIS-99-074</a>'])
+
+    def test_browse_exact_author_help_link(self):
+        error_messages = test_web_page_content(CFG_SITE_URL + '/search?ln=en&p=Dasse%2C+Michel&f=author&action_browse=Browse',
+                                               username = 'guest',
+                                               expected_text = ['Did you mean to browse in', 'index?'])
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+        error_messages = test_web_page_content(CFG_SITE_URL + '/search?ln=en&p=Dasse%2C+Michel&f=firstauthor&action_browse=Browse',
+                                               username = 'guest',
+                                               expected_text = ['Did you mean to browse in', 'index?'])
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+        error_messages = test_web_page_content(CFG_SITE_URL + '/search?ln=en&as=1&m1=a&p1=Dasse%2C+Michel&f1=author&op1=a&m2=a&p2=&f2=firstauthor&op2=a&m3=a&p3=&f3=&action_browse=Browse',
+                                               username = 'guest',
+                                               expected_text = ['Did you mean to browse in', 'index?'])
         if error_messages:
             self.fail(merge_error_messages(error_messages))
 
