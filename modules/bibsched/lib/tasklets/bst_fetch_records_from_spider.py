@@ -1,15 +1,32 @@
-#!/usr/bin/python
+# -*- coding: utf-8 -*-
+##
+## This file is part of Invenio.
+## Copyright (C) 2012, 2013 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
 from invenio.flaskshell import db
 from suds.client import Client
 from base64 import decodestring
 from hashlib import md5
 import os
 import time
+import tempfile
 import sys
-from invenio.config import CFG_BATCHUPLOADER_DAEMON_DIR, \
-                           CFG_PREFIX
-from invenio.bibtask import task_low_level_submission, write_message, task_update_progress
-
+from invenio.bibtask import task_low_level_submission, task_update_progress
+from invenio.bibupload_preprocess import bp_pre_ingestion
 
 # Parameters CS 1, 2
 # url = 'http://bf.cyberwatcher.com/System3/SpiderService.svc?wsdl'
@@ -34,10 +51,10 @@ from invenio.bibtask import task_low_level_submission, write_message, task_updat
 # url='http://bf4.itc.auth.gr/Spider/SpiderService.svc?wsdl'
 # api_key='nXkTqQdj/o2d2BL2r+ZEAg7vgtXhRZqB4UhpkiXWxiE='
 
-batchupload_dir = CFG_BATCHUPLOADER_DAEMON_DIR[0] == '/' and CFG_BATCHUPLOADER_DAEMON_DIR \
-                          or CFG_PREFIX + '/' + CFG_BATCHUPLOADER_DAEMON_DIR
-path_mets_attachedfiles = batchupload_dir + "/mets/"
-path_metadata = batchupload_dir + "/metadata/replace/"
+
+batchupload_dir = bp_pre_ingestion.batchupload_dir
+path_mets_attachedfiles = bp_pre_ingestion.path_mets_attachedfiles
+path_metadata = bp_pre_ingestion.path_metadata
 
 
 def validate_content(content, md5_hash):
@@ -58,13 +75,16 @@ def process_record(client, api_key, match):
 
     # Let's store the METS of the corresponding match
     metadata = client.service.GetDocumentAsMets(api_key, match.Object.Id)
-    metadata_file_name = match.Object.Type + "_" + time.strftime("%Y-%m-%d_%H:%M:%S")
     if validate_content(content=metadata.MetsXml.encode('utf-8'), md5_hash=metadata.MD5):
-        task_update_progress("Uploading blog record %s" % metadata_file_name)
-        path_metadata_file = path_metadata + metadata_file_name + '.xml'
-        f = open(path_metadata_file, "w")
-        f.write(metadata.MetsXml.encode('utf-8'))
-        f.close()
+        fd, path_metadata_file = tempfile.mkstemp(suffix=".xml", \
+                                                  prefix= match.Object.Type + "_" + \
+                                                  time.strftime("%Y-%m-%d_%H:%M:%S"), \
+                                                  dir=path_metadata)
+        metadata_file = os.path.basename(path_metadata_file)
+        metadata_file_name, extension = os.path.splitext(metadata_file)
+        task_update_progress("Preparing record %s to upload" % metadata_file_name)
+        os.write(fd, metadata.MetsXml.encode('utf-8'))
+        os.close(fd)
         # Let's create a subdirectory for each document fetched
         # to store in it all the files, images... within the METS
         # document
@@ -73,54 +93,60 @@ def process_record(client, api_key, match):
             os.mkdir(path_mets_attachedfiles_doc)
 
         # Let's store the files/attachments of the corresponding match
-        docstorage = client.service.GetDocumentStorage(api_key, match.Object.DocumentId)
         try:
-            for file in docstorage.FileInfos.StorageFileInfo:
-                attach = client.service.GetDocument(api_key, match.Object.DocumentId, file.Filename)
-                if validate_content(content=decodestring(attach), md5_hash=file.MD5):
-                    f = open(path_mets_attachedfiles_doc + \
-                                time.strftime("%Y-%m-%d_%H:%M:%S") + "_" + file.Type, 'w')
-                    f.write(decodestring(attach))
-                    f.close()
-                else:
-                    error_file = open("/tmp/error_file", "a")
-                    error_file.write("Attached file %s validation failed in %s \n" % (file.Filename, metadata_file_name))
-                    error_file.close()
-        except Exception, e:
+            docstorage = client.service.GetDocumentStorage(api_key, match.Object.DocumentId)
+        except Exception:
             error_file = open("/tmp/error_file", "a")
-            error_file.write("SubmissionID: " + \
-                                str(match.Object.Id) + "\tFailed to retrieve attached files\n")
+            error_file.write("There are not attached files for %s, %s \n" % \
+                             (metadata_file_name, match.Object.WatchPointId))
             error_file.close()
 
-#        sys.stdout.write("\r"+str(match.Object.Id))
-#        time.sleep(0.01)
-#        sys.stdout.flush()
+        if docstorage:
+            for file in docstorage.FileInfos.StorageFileInfo:
+                try:
+                    attach = client.service.GetDocument(api_key, match.Object.DocumentId, file.Filename)
+                    if validate_content(content=decodestring(attach), md5_hash=file.MD5):
+                        f = open(path_mets_attachedfiles_doc + \
+                                    time.strftime("%Y-%m-%d_%H:%M:%S") + "_" + file.Type, 'w')
+                        f.write(decodestring(attach))
+                        f.close()
+                    else:
+                        error_file = open("/tmp/error_file", "a")
+                        error_file.write("Attached file %s validation failed in %s \n" % \
+                                         (file.Filename, metadata_file_name))
+                        error_file.close()
+                except Exception:
+                    error_file = open("/tmp/error_file", "a")
+                    error_file.write("Fail retrieving attached files for %s, %s \n" % \
+                                     (metadata_file_name, match.Object.WatchPointId))
+                    error_file.close()
 
         # Let's save the last record id it was retrieved
         last_id_file = open("/tmp/last_id", "w")
         last_id_file.write(repr(match.Object.Id))
         last_id_file.close()
 
+        # Double check if the file exists
         if os.path.exists(path_metadata_file):
             task_low_level_submission('bibupload', 'batchupload', '-r', \
-                                        path_metadata_file, '--pre-plugin=bp_pre_ingestion', '--post-plugin=bp_post_ingestion')
-            write_message("Uploaded blog record %s " % metadata_file_name)
+                                      path_metadata_file, \
+                                      '--pre-plugin=bp_pre_ingestion', \
+                                      '--post-plugin=bp_post_ingestion')
         else:
             error_file = open("/tmp/error_file", "a")
-            error_file.write("No file %s \n" % metadata_file_name)
+            error_file.write("No such as file %s \n" % metadata_file_name)
             error_file.close()
     else:
+        # TODO: write down this url to fetch this record again
         error_file = open("/tmp/error_file", "a")
-        error_file.write("METS validation failed in %s \n" % metadata_file_name)
+        error_file.write("METS validation failed in %s, %s \n" % metadata_file_name, match.Object.WatchPointId)
         error_file.close()
-        # write down this url to fetch this record again
 
 
-def connect_to_webservice(url, api_key):
+def connect_to_webservice(url):
     """
     Creates client to connect to the CW webservice
     @param url: WSDL url
-    @param api_key: 
     """
 
     try:
@@ -140,21 +166,24 @@ def create_error_file():
     error_file.close()
 
 
-def create_metadata_dirs(path_mets_attachedfiles, path_metadata):
+def create_metadata_dirs():
     """
     Create the two directories used to store all the METS files and 
-    the attached files
+    the attached files, as well as the batchupload subdirectory
     """
 
+    # Let's create batchupload subdirectory (/opt/invenio/var/batchupload)
+    if not os.path.isdir(batchupload_dir):
+        os.mkdir(batchupload_dir)
     # In this directory will be created a subdirectory for each document
     # fetched storing in it all the files, images... within the METS
-    # document
+    # document (/opt/invenio/var/batchupload/mets)
     if not os.path.isdir(path_mets_attachedfiles):
         os.mkdir(path_mets_attachedfiles)
     # In this directory will be stored all the METS documents as
     # .xml files. Once the pre-ingestion is done, in this directory
     # will be stored the MARC extracted from those mets files during
-    # the pre-ingestion process
+    # the pre-ingestion process (/opt/invenio/var/batchupload/metadata/replace)
     if not os.path.isdir(path_metadata):
         os.makedirs(path_metadata)
 
@@ -173,7 +202,7 @@ def create_sort_order(client):
     so.Field = "Id"
     so.SortType = st.Field
     so.OrderBy = sot.Ascending
-    
+
     return so
 
 
@@ -208,38 +237,53 @@ def get_last_id():
             last_id = 0
     else: # It is the first iteration
         last_id = 0
-    
+
     return last_id
 
 
-def bst_fetch_records_from_spider(api_key, url):
+def get_total_nb_records(client, api_key, sr):
+    """
+    Get the total number of records to fetch
+    """
+
+    try:
+        result = client.service.SearchEntities(api_key, sr)
+    except Exception: # no more results were found
+        raise Exception ("Server raised fault: 'The server was unable to process the request due to an internal error")
+
+    return result.HitTotal
+
+
+def bst_fetch_records_from_spider(api_key, url, constant_set=100, id_max=2147483647):
     """
     Bibtasklet responsible of the communication spider-repository: 
     the goal is to fetch all records crawled
     by the spider and to store them into the repository
+    @param api_key: unique api key to access to the web service
+    @param url: web service url
+    @param constant_set: records are fetched in groups
+    of "constant_set" records
+    @param id_max: maximum int value
     """
 
-    client = connect_to_webservice(url, api_key)
+    client = connect_to_webservice(url)
     create_error_file()
-    create_metadata_dirs(path_mets_attachedfiles, path_metadata)
+    create_metadata_dirs()
     last_id = get_last_id()
-    # Set limits to get the total of results to retrieved
+    # Set limits to get the total of results to retrieve
     id_start = last_id
-#    id_max = sys.maxint
-    id_max = 2147483647
     sr = create_search_request(client, page_size = 1, page_number = 0, \
                                 query = "Type:(Post OR Comment OR Blog) AND Id:["+str(id_start)\
                                 +" TO "+str(id_max)+"]")
-    # Let's get the total number of records to fetch
-    result = client.service.SearchEntities(api_key, sr)
-    total_records = result.HitTotal
-    constant_set = 10
-    if total_records <= constant_set:
+
+    total_records = get_total_nb_records(client, api_key, sr)
+
+    if total_records <= int(constant_set):
         id_max = last_id + total_records
         constant_set = total_records
     else:
-        id_max = last_id + constant_set
-    
+        id_max = last_id + int(constant_set)
+
     # Let's fetch all records/documents from the spider in
     # small groups of constant_set records
     while total_records > 0:
@@ -249,63 +293,55 @@ def bst_fetch_records_from_spider(api_key, url):
         comments = []
         final_matches = []
         sr.Query = "Type:(Post OR Comment OR Blog) AND Id:["+str(id_start)+" TO "+str(id_max)+"]"
-        for i in range(constant_set):
+        for i in range(int(constant_set)+1):
             try:
-#                sys.stdout.write("\r"+str(sr.PageNumber))
-#                time.sleep(0.01)
-#                sys.stdout.flush()
                 result = client.service.SearchEntities(api_key, sr)
                 matches = result.Matches.BlogSearchMatch
-            except Exception, e: # no more results found on page sr.PageNumber
+            except Exception: # no more results were found
                 error_file = open("/tmp/error_file", "a")
-                error_file.write("Page Number %s" % sr.PageNumber + ": " + str(e)+"\n")
+                error_file.write("No more results were found \n")
                 error_file.close()
+                break
             # Let's go to the next page
             sr.PageNumber = sr.PageNumber + 1
             final_matches.extend([match for match in matches])
-    
+
         task_update_progress("Start processing blog records from %s to %s" % (id_start, id_max))
-        for match in final_matches:
-            if match.Object.Type == 'Blog':
-                blogs.append(match)
-            elif match.Object.Type == 'Post':
-                posts.append(match)
-            elif match.Object.Type == 'Comment':
-                comments.append(match)
-            else:
-                raise Exception("Invalid record type")
-    
+
+        if final_matches:
+            for match in final_matches:
+                if match.Object.Type == 'Blog':
+                    blogs.append(match)
+                elif match.Object.Type == 'Post':
+                    posts.append(match)
+                elif match.Object.Type == 'Comment':
+                    comments.append(match)
+                else:
+                    raise Exception("Invalid record type")
+
         if blogs:
             for blog in blogs:
-                process_record(client, api_key, blog)
                 total_records -= 1
-            task_update_progress("Running bibindex and webcoll for BLOGS")
-            task_low_level_submission('bibindex', 'admin')
-            task_low_level_submission('webcoll', 'admin')
-        task_update_progress("BLOGS done")
-    
+                process_record(client, api_key, blog)
+
         if posts:
             for post in posts:
-                process_record(client, api_key, post)
                 total_records -= 1
-            task_update_progress("Running bibindex and webcoll for POSTS")
-            task_low_level_submission('bibindex', 'admin')
-            task_low_level_submission('webcoll', 'admin')
-        task_update_progress("POSTS done")
+                process_record(client, api_key, post)
 
         if comments:
             for comment in comments:
-                process_record(client, api_key, comment)
                 total_records -= 1
-            task_update_progress("Running bibindex and webcoll for COMMENTS")
-            task_low_level_submission('bibindex', 'admin')
-            task_low_level_submission('webcoll', 'admin')
-        task_update_progress("COMMENTS done")
-    
+                process_record(client, api_key, comment)
+
         # Set new limits to get the next group of records
         id_start = id_max + 1
-        id_max = id_start + constant_set
-        sr.PageNumber = 0 
+        id_max = id_start + int(constant_set)
+        sr.PageNumber = 0
+        task_low_level_submission('bibindex', 'admin')
+        task_low_level_submission('webcoll', 'admin')
 
     task_update_progress("Finish fetching blog records")
-
+    error_file = open("/tmp/error_file", "a")
+    error_file.write("Finished fetching blog records\n")
+    error_file.close()

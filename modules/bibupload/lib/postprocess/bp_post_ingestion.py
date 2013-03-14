@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -26,25 +26,26 @@ import os
 from invenio.search_engine import search_pattern
 from invenio import bibingest as b
 import datetime
-from invenio.config import CFG_BATCHUPLOADER_DAEMON_DIR, \
-                           CFG_PREFIX
-from invenio.bibtask import  write_message, task_update_progress
+from invenio.bibtask import task_update_progress
 from lxml import etree
+from invenio.bibupload_preprocess import bp_pre_ingestion
+
+
+path_mets_attachedfiles = bp_pre_ingestion.path_mets_attachedfiles
+path_metadata = bp_pre_ingestion.path_metadata
+
 
 def bp_post_ingestion(file_path):
     """
     Plugin to insert the given document/s in mongoDB
-    @param file_path: file path
+    @param file_path: absolute path of the METS file to post-process
     @type file_path: string
     """
 
     file_name = os.path.basename(file_path)
-    task_update_progress("Post-processing blog record %s" % file_name)
+    task_update_progress("Started post-processing record %s" % file_name)
     submission_id = file_name[:file_name.find(".xml")]
     # Let's build the path where the corresponding METS is stored
-    batchupload_dir = CFG_BATCHUPLOADER_DAEMON_DIR[0] == '/' and CFG_BATCHUPLOADER_DAEMON_DIR \
-                          or CFG_PREFIX + '/' + CFG_BATCHUPLOADER_DAEMON_DIR
-    path_mets_attachedfiles = batchupload_dir + "/mets/"
     file_path = path_mets_attachedfiles + submission_id + "/" + file_name + "_mets"
     # let's search for the corresponding record_id
     try:
@@ -79,5 +80,6 @@ def bp_post_ingestion(file_path):
         # once we have all we need let's store the document
         # in its corresponding storage instance
         ingestion_pack.store_one(subid=submission_id, recid=record_id, content=final_xml, date=date)
+        task_update_progress("Finished post-processing record %s" % file_name)
 
     return 1

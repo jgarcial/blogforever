@@ -31,16 +31,18 @@ def format_element(bfo):
 
     l = lambda x : [i for i in x]
     final_formatted_record = ""
-    subid = bfo.control_field('002')
+#    subid = bfo.control_field('002')
+    recid = bfo.control_field('001')
     record_collection = bfo.fields('980__a')[0]
     ingestion_pack = b.select(record_collection)
-    document = l(ingestion_pack.get_many(subid = subid))
+    document = l(ingestion_pack.get_many(recid = recid))
     if document:
         formatted_record = document[0]['content']
         xml_tree = etree.XML(formatted_record)
         final_formatted_record = etree.tostring(xml_tree, pretty_print=True)
 
     return final_formatted_record
+
 
 def escape_values(bfo):
     """
