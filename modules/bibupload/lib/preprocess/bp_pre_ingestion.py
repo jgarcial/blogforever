@@ -27,7 +27,6 @@ from xml.dom.minidom import parseString
 from invenio.search_engine import search_pattern
 from invenio.config import CFG_BATCHUPLOADER_DAEMON_DIR, \
                            CFG_PREFIX
-from HTMLParser import HTMLParser, HTMLParseError
 from invenio.bibtask import  task_update_progress
 from bs4 import BeautifulSoup
 import bleach
@@ -37,58 +36,20 @@ batchupload_dir = CFG_BATCHUPLOADER_DAEMON_DIR[0] == '/' and CFG_BATCHUPLOADER_D
 path_mets_attachedfiles = batchupload_dir + "/files/"
 path_metadata = batchupload_dir + "/metadata/replace/"
 
-
-class HTMLStyleWasher(HTMLParser):
-
-    def __init__(self):
-        HTMLParser.__init__(self)
-#        super(HTMLStyleWasher, self).__init__()
-        self.tag_black_list = ('style',
-                               'iframe',
-                               'script',)
-        self.attribute_black_list = ('color',
-                                     'style',
-                                     'class',
-                                     'id',)
-        self.output = ''
-        self.black_listed_tag_count = 0
-
-    def handle_starttag(self, tag, attrs):
-        if tag in self.tag_black_list:
-            self.black_listed_tag_count += 1
-        else:
-            self.output += '<' + tag
-            for (attr, value) in attrs:
-                if attr not in self.attribute_black_list:
-                    self.output += ' %s="%s"' % (attr, value)
-            self.output += '>'
-
-    def handle_endtag(self, tag):
-        if tag in self.tag_black_list:
-            if self.black_listed_tag_count:
-                self.black_listed_tag_count -= 1
-        else:
-            self.output += '</' + tag + '>'
-
-    def handle_startendtag(self, tag, attrs):
-        self.handle_starttag(tag, attrs)
-
-    def handle_data(self, data):
-        if self.black_listed_tag_count == 0:
-            self.output += data
-
-    def handle_charref(self, name):
-        self.output += '&#' + name + ';'
-
-    def handle_entityref(self, name):
-        self.output += '&' + name + ';'
-
-    def clean(self, html):
-        self.reset()
-        self.output = ''
-        self.black_listed_tag_count = 0
-        self.feed(html)
-        self.close()
+tag_black_list = ['iframe', 'script', 'style', 'select', 'form', 'option']
+tag_white_list = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+                  'span', 'div', 'p', 'object', 'param', 'embed', 'blockquote',
+                  'ul','li','ol', 'dl', 'dt', 'dd', 'br', 'a', 'pre',
+                  'table', 'tbody', 'thead', 'tr', 'td', 'img']
+attr_white_list = {'*': ['title'],
+                   'a': ['href'],
+                   'img': ['src', 'alt'],
+                   'ul' : ['type', 'start'],
+                   'li' : ['type'],
+                   'object' : ['name', 'type', 'value', 'codebase', 'data', 'wmode', 'allowfullscreen', 'allowscriptaccess', 'src', 'rel', 'width', 'height'],
+                   'param' : ['name', 'type', 'value', 'allowfullscreen', 'allowscriptaccess', 'src', 'rel', 'width', 'height'],
+                   'embed' : ['name', 'type', 'value', 'allowfullscreen', 'allowscriptaccess', 'src', 'rel', 'width', 'height']
+                   }
 
 
 class MetsIngestion:
@@ -119,7 +80,7 @@ class MetsIngestion:
         if self.marc_record is not None:
             marc_output += self.marc_record.toxml()
         marc_output += '</collection>\n'
-        return marc_output.encode('utf-8')
+        return marc_output.encode("utf-8")
 
 
     def create_fft_tag_node(self, file_name):
@@ -171,7 +132,15 @@ class MetsIngestion:
     def insert_parent_blog_recid(self):
         """ Inserts the recid of the parent blog of a post. """
 
-        parent_blog_url = self.get_fieldvalue(tag='760', code='o')
+        try:
+            parent_blog_url = self.get_fieldvalue(tag='760', code='o')
+        except Exception, e: # post coming without parent blog url
+            wp = self.get_fieldvalue(tag='99999', code='watchpointid')
+            error_file = open("/tmp/error_file", "a")
+            error_file.write("Not parent blog url present in file %s, wp: %s. Error: %s\n" %
+                            (self.file_name, wp, str(e)))
+            error_file.close()
+            raise Exception(str(e))
         if parent_blog_url:
             parent_blog_recid = search_pattern(p='520__u:' + parent_blog_url)
             if parent_blog_recid:
@@ -184,7 +153,15 @@ class MetsIngestion:
     def insert_parent_post_recid(self):
         """ Inserts the recid of the parent post of a comment. """
 
-        parent_post_url = self.get_fieldvalue(tag='773', code='o')
+        try:
+            parent_post_url = self.get_fieldvalue(tag='773', code='o')
+        except Exception, e: # comment coming without parent post url
+            wp = self.get_fieldvalue(tag='99999', code='watchpointid')
+            error_file = open("/tmp/error_file", "a")
+            error_file.write("Not parent post url present in file %s, wp: %s. Error: %s\n" %
+                            (self.file_name, wp, str(e)))
+            error_file.close()
+            raise Exception(str(e))
         if parent_post_url:
             parent_post_recid = search_pattern(p='520__u:' + parent_post_url)
             if parent_post_recid:
@@ -217,61 +194,38 @@ class MetsIngestion:
             return recid
 
 
-    def clean_html(self):
-        """ This function cleans the HTML coming in tag 520__a.
+    def clean_html(self, content):
+        """ This function cleans the HTML content
         """
 
-        for tag in self.marc_record.getElementsByTagName('datafield'):
-            if tag.getAttribute('tag')=='520':
-                for subfield in tag.getElementsByTagName('subfield'):
-                    if subfield.getAttribute('code')=='a':
-                        sw = HTMLStyleWasher()
-                        try:
-#                        tag_black_list = ['iframe', 'script', 'style', 'select', 'form', 'option']
-#                        tag_white_list = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-#                                          'span', 'div', 'p', 'object', 'param', 'embed', 'blockquote',
-#                                          'ul','li','ol', 'dl', 'dt', 'dd', 'br', 'a', 'pre',
-#                                          'table', 'tbody', 'thead', 'tr', 'td', 'img']
-#                        attr_white_list = {'*': ['title'],
-#                                           'a': ['href'],
-#                                           'img': ['src', 'alt'],
-#                                           'ul' : ['type', 'start'],
-#                                           'li' : ['type'],
-#                                           'object' : ['name', 'type', 'value', 'allowfullscreen', 'allowscriptaccess', 'src', 'rel', 'width', 'height'],
-#                                           'param' : ['name', 'type', 'value', 'allowfullscreen', 'allowscriptaccess', 'src', 'rel', 'width', 'height'],
-#                                           'embed' : ['name', 'type', 'value', 'allowfullscreen', 'allowscriptaccess', 'src', 'rel', 'width', 'height']
-#                                           }
-#
-#                        # Open file as BeautifulSoup object with utf-8 encoding.
-#                        text = BeautifulSoup(subfield.firstChild.data)
-#                        text.encode("utf-8")
-#                        # With BeautifulSoup: Remove tags in tag_black_list, destroy contents.
-#                        for s in text(tag_black_list): s.decompose()
-#                        # Prettify- a BeautifulSoup operation to correctly indent the mark-up
-#                        # With Bleach: Remove tags and attributes not in whitelists, leave tag contents.
-#                        cleaned = bleach.clean(text.prettify(), strip="TRUE", \
-#                                               attributes=attr_white_list, tags=tag_white_list)
-#                        subfield.firstChild.data = cleaned
-                            sw.clean(subfield.firstChild.data)
-                        except HTMLParseError, e:
-                            # TODO: write down this url to fetch this record again
-                            wrong_html_file = open("/tmp/wrong_html_file_%s" % self.file_name, "w")
-                            wrong_html_file.write(subfield.firstChild.data.encode('utf8'))
-                            wrong_html_file.close()
-                            wp = ""
-                            for tag in self.marc_record.getElementsByTagName('datafield'):
-                                if tag.getAttribute('tag')=='99999':
-                                    for subfield in tag.getElementsByTagName('subfield'):
-                                        if subfield.getAttribute('code')=='watchpointid':
-                                            wp = subfield.firstChild.data
-                            error_file = open("/tmp/error_file", "a")
-                            error_file.write("HTMLParseError in file %s, wp: %s. Error: %s\n" %
-                                             (self.file_name, wp, str(e)))
-                            error_file.close()
-                            # something is wrong with the HTML of the record, so let's stop this bibupload task
-                            # and notified this to the spider
-                            raise HTMLParseError(str(e))
-                        subfield.firstChild.data = sw.output
+        # read content as BeautifulSoup object with utf-8 encoding
+        text = BeautifulSoup(content)
+        text.encode("utf-8")
+        # with BeautifulSoup: Remove tags in tag_black_list, destroy contents
+        try:
+            for tag in tag_black_list:
+                l = text.findAll(tag)
+                for item in l:
+                    item.decompose()
+            # prettify- a BeautifulSoup operation to correctly indent the mark-up
+            # with Bleach: remove tags and attributes not in whitelists, leave tag contents
+            cleaned = bleach.clean(text.prettify(), strip="TRUE", \
+                                   attributes=attr_white_list, tags=tag_white_list)
+        except AttributeError, e:
+            # TODO: write down this url to fetch this record again
+            wrong_html_file = open("/tmp/wrong_html_file_%s" % self.file_name, "w")
+            wrong_html_file.write(content.encode('utf8'))
+            wrong_html_file.close()
+            wp = self.get_fieldvalue(tag='99999', code='watchpointid')
+            error_file = open("/tmp/error_file", "a")
+            error_file.write("AttributeError in file %s, wp: %s. Error: %s\n" %
+                            (self.file_name, wp, str(e)))
+            error_file.close()
+            # something is wrong with the HTML of the record, so let's stop this bibupload task
+            # and notified this to the spider
+            raise Exception(str(e))
+
+        return cleaned
 
 
     def find_marc_node(self):
@@ -317,7 +271,11 @@ class MetsIngestion:
         # transforms MARC to MARC record compatible with Invenio
         self.marc_record = self.transform_marc(self.find_marc_node())
         # let's clean the HTML content of the record
-        self.clean_html()
+        for tag in self.marc_record.getElementsByTagName('datafield'):
+            if tag.getAttribute('tag')=='520':
+                for subfield in tag.getElementsByTagName('subfield'):
+                    if subfield.getAttribute('code')=='a':
+                        subfield.firstChild.data = self.clean_html(subfield.firstChild.data)
         # before adding the recid, check if the coming
         # record is already in the repository
         recid = self.get_recid()
