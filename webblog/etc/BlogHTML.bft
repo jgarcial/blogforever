@@ -31,9 +31,6 @@
 				<BFE_SNAPSHOT/>
 		</div> <!-- end bfe-snapshot -->
 
-		<div class="bfe-bulletin-header">
-			<BFE_BULLETIN_HEADER />
-		</div>
 		<div class="bfe-citation-box">
 			<BFE_CITATION_BOX>
 		</div>

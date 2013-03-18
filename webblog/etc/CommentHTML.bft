@@ -6,7 +6,7 @@
 <div class="translate-link"></div>
 
 <div class="bfe-comment-header">
-			<BFE_COMMENT_HEADER />
+	<BFE_COMMENT_HEADER />
 </div>
 
 <div class="row comment-record">
