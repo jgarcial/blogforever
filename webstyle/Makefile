@@ -4,8 +4,6 @@ include ../config.mk
 
 SUBDIRS = etc img css font
 
-LIBFILES = webstyle_templates.py
-
 all:
 	$(foreach SUBDIR, $(SUBDIRS), cd $(SUBDIR) && make all && cd .. ;)
 	@echo "Done.  Please run make test now."
@@ -16,6 +14,5 @@ test:
 	@echo "Done.  Please run make install now."
 
 install:
-	$(INSTALL) $(LIBFILES) $(LIBDIR)/python/invenio
 	$(foreach SUBDIR, $(SUBDIRS), cd $(SUBDIR) && make install && cd .. ;)
 	@echo "Done.  You may want to restart Apache now."
