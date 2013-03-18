@@ -14,5 +14,6 @@ test:
 	@echo "Not implemented."
 
 install:
+	mkdir -p ${PREFIX}/var/www/font
 	$(INSTALL) $(FONTFILES) $(FONTDIR)
 	$(foreach SUBDIR, $(SUBDIRS), cd $(SUBDIR) && make install && cd .. ;)
