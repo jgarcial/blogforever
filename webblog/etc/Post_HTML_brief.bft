@@ -1,15 +1,22 @@
 <name>Post HTML brief</name>
-
 <description>Post HTML brief format.</description>
 
-<i class="icon-col-Posts"></i>
-<strong><BFE_TITLE_BRIEF highlight="no"/></strong>
-<br />
-<BFE_AUTHORS />
-<br />
-<BFE_POST_POSTED_DATE />
-<div class="post-text">
-<BFE_POST_CONTENT_BRIEF limit="1" prefix="<br /><small>" suffix="</small>"
-highlight="no" contextual="no" escape="4"/>
+<div class="row">
+	<div class="span8">
+		<p>
+		<i class="icon-col-Posts"></i>
+		<strong style="font-size:17.5px"><BFE_TITLE_BRIEF/></strong>
+		</p>
+		<p>
+		<BFE_POST_CONTENT_BRIEF limit="1" escape="4"/>
+		</p>
+		<p>
+		<i class="icon-user"></i> <BFE_AUTHORS />
+		| <i class="icon-col-Comments"></i> <BFE_POST_COMMENTS_BRIEF />
+		</p>
+		<span class="badge badge-success">
+			<BFE_POST_POSTED_DATE />
+		</span>
+	</div>
 </div>
-
+<hr>

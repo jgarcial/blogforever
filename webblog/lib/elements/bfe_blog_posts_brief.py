@@ -16,34 +16,33 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
 """
-BibFormat Element - thumbnail
+BibFormat Element - displays the number of posts
+for the corresponding blog
 """
-from invenio.bibformat_engine import BibFormatObject
+
 from invenio.config import CFG_SITE_SECURE_URL
+from invenio.webblog_utils import get_posts
 
 
 def format_element(bfo):
     """
-    Displays the thumbnail on brief blog records
+    Displays the number of posts for the corresponding blog
     """
 
-    # get variables
     this_recid = bfo.control_field('001')
     current_language = bfo.lang
-    files = bfo.fields('8564_')
+    blog_posts_recids = get_posts(this_recid)
+    blog_url = bfo.fields('520__u')[0]
 
-    thumbnail_url = ''
-
-    for f in files:
-        if f['u'].find('Thumbnail') > -1:
-            snapshot_url = f['u']
-
-    record_url = "%s/record/%s?ln=%s" % (CFG_SITE_SECURE_URL, this_recid, current_language)
-    out = """<a href='%s'>
-                <div style="background-image:url(%s);display:inline-block;height:100px;width:100px"></div>
-            </a>""" % (record_url, snapshot_url)
-
+    message = "%i Posts" % len(blog_posts_recids)
+    out = ""
+    if blog_posts_recids:
+        out = """<span><a href="%s/search?p=760__o:%s&cc=Posts">%s</a></span>""" % \
+                (CFG_SITE_SECURE_URL, blog_url, message)
+    else:
+        out = """<span>No posts yet</span>"""
     return out
 
 

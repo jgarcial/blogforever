@@ -28,6 +28,12 @@ from cgi import escape
 from invenio.config import CFG_SITE_URL
 from invenio.messages import gettext_set_language
 
+
+cfg_messages = {}
+cfg_messages["in_issue"] = {"en": "by",
+                            "es": "por",
+                            "fr": "par"}
+
 def format_element(bfo):
     """
     Prints the authors of posts and comments
@@ -42,7 +48,8 @@ def format_element(bfo):
         # Process authors to add link, highlight and format affiliation
         for author in authors:
             if author:
-                out += '<a href="' + CFG_SITE_URL + \
+                out = cfg_messages["in_issue"][bfo.lang]
+                out += ' <a href="' + CFG_SITE_URL + \
                         '/search?f=author&amp;p=' + quote(author) + \
                         '&amp;ln=' + bfo.lang + \
                         '">' + escape(author) + '</a>'

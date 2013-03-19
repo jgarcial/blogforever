@@ -821,7 +821,7 @@ margin-left: 3px;
 
 /* external link style */
 
-a[href ^= "http"]:not([href*="newhope"]):after {
+/*a[href ^= "http"]:not([href*="newhope"]):after {
 font-family: FontAwesome;
 font-weight: normal;
 font-style: normal;
@@ -830,7 +830,7 @@ text-decoration: inherit;
 content: "\f08e";
 font-size: 85%;
 padding-left: 0.3em;
-}
+}*/
 
 .marketing .pull-right {
 padding-bottom: 40px;

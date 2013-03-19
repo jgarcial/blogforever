@@ -1,13 +1,19 @@
 <name>Comment HTML brief</name>
 <description>Brief HTML format.</description>
 
-<i class="icon-col-Comments"></i>
-<strong><BFE_TITLE_BRIEF highlight="no"/></strong>
-<br />
-<BFE_AUTHORS limit="4" extension=" ;<em> et al</em> " highlight="no"/>
-
-<div class="post-text">
-<BFE_ABSTRACT limit="3" prefix="<br /><small>" suffix="</small>"
-highlight="no" contextual="no"/>
+<div class="row">
+	<div class="span8">
+		<p>
+		<i class="icon-col-Comments"></i>
+		<strong style="font-size:17.5px"><BFE_TITLE_BRIEF></strong>
+		</p>
+		<p>
+		<BFE_POST_CONTENT_BRIEF limit="2" escape="4"/>
+		</p>
+		<p>
+		<i class="icon-user"></i>
+		<BFE_AUTHORS/>
+		</p>
+	</div>
 </div>
-<br />
+<hr>
