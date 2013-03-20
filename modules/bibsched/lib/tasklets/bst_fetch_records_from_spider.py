@@ -106,8 +106,7 @@ def process_record(client, api_key, match):
                 try:
                     attach = client.service.GetDocument(api_key, match.Object.DocumentId, file.Filename)
                     if validate_content(content=decodestring(attach), md5_hash=file.MD5):
-                        f = open(path_mets_attachedfiles_doc + \
-                                    time.strftime("%Y-%m-%d_%H:%M:%S") + "_" + file.Type, 'w')
+                        f = open(path_mets_attachedfiles_doc + file.Type, 'w')
                         f.write(decodestring(attach))
                         f.close()
                     else:
