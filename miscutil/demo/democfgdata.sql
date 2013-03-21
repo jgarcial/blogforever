@@ -7,6 +7,8 @@ INSERT INTO collection VALUES (4,'Comments','collection:COMMENT',NULL,NULL);
 INSERT INTO collection VALUES (5,'Pages','collection:PAGE',NULL,NULL);
 INSERT INTO collection VALUES (6,'Provisional Blogs','collection:PROVBLOG',NULL,NULL);
 INSERT INTO collection VALUES (7,'Rejected Blogs','collection:REJBLOG',NULL,NULL);
+INSERT INTO collection VALUES (8,'Restricted','542__f:Restricted',NULL,NULL);
+INSERT INTO collection VALUES (9,'Private','542__f:Private',NULL,NULL);
 
 INSERT INTO collectionname VALUES (2,'en','ln','Blogs');
 INSERT INTO collectionname VALUES (3,'en','ln','Posts');
@@ -14,6 +16,8 @@ INSERT INTO collectionname VALUES (4,'en','ln','Comments');
 INSERT INTO collectionname VALUES (5,'en','ln','Pages');
 INSERT INTO collectionname VALUES (6,'en','ln','Provisional Blogs');
 INSERT INTO collectionname VALUES (7,'en','ln','Rejected Blogs');
+INSERT INTO collectionname VALUES (8,'en','ln','Restricted');
+INSERT INTO collectionname VALUES (9,'en','ln','Private');
 
 INSERT INTO collection_collection VALUES (1,2,'r',20);
 INSERT INTO collection_collection VALUES (1,3,'r',30);
@@ -106,7 +110,7 @@ INSERT INTO sbmFIELD VALUES ('SBIBSIREF',1,5,'BSI_END','<br /><br /></td></tr></
 INSERT INTO sbmFIELDDESC VALUES ('BSI_COMENT',NULL,'','T',NULL,6,60,NULL,NULL,NULL,'2012-09-03','2012-09-03',NULL,NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('BSI_DEC',NULL,'','S',NULL,NULL,NULL,NULL,NULL,'<select name=\"BSI_DEC\">\r\n<option value=\"- select -\">- select -</option>\r\n<option value=\"approve\">Approve</option>\r\n<option value=\"reject\">Reject</option>\r\n</select>','2012-09-03','2012-10-16',NULL,NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('BSI_END',NULL,'','D',NULL,NULL,NULL,NULL,NULL,'<div align=\"center\">\r\n<INPUT TYPE=\"button\" class=\"adminbutton\" name=\"endS\" width=\"400\" height=\"50\" value=\"Submit blog\" onclick=\"finish();\">\r\n</div>','2012-05-23','2012-10-15',NULL,NULL,0);
-INSERT INTO sbmFIELDDESC VALUES ('BSI_LICENSE',NULL,'542__f','R',NULL,NULL,NULL,NULL,NULL,'text = \'<select name=\"BSI_LICENSE\">\'\r\n# FIXME: retrieve from the database\r\n# from invenio.dbquery import run_sql\r\n# license_names = run_sql(\"select name from license\")\r\nlicense_names = [\'License1\', \'License2\', \'License3\']\r\n\r\nfor license_name in license_names:\r\n    text += \'<option value=\"%s\"> %s </option>\' % (license_name, license_name)\r\n    \r\ntext += \"</select>\"\r\n','2012-05-23','2012-10-24','Enter new license:',NULL,0);
+INSERT INTO sbmFIELDDESC VALUES ('BSI_LICENSE',NULL,'542__f','R',NULL,NULL,NULL,NULL,NULL,'text = \'<select id=\"select-license\" name=\"BSI_LICENSE\">\'\r\n# FIXME: retrieve from the database\r\n# from invenio.dbquery import run_sql\r\n# license_names = run_sql(\"select name from license\")\r\nlicense_names = [\'Public\', \'Restricted\', \'Private\']\r\nlicense_descriptions = [\'Public - Everybody will have access to the content\',\r\n                        \'Restricted - Only registered users will have access to the content\',\r\n                        \'Private - Only you will have access to the content\']\r\n\r\nfor (license_name, license_description) in zip(license_names, license_descriptions):\r\n    text += \'<option value=\"%s\"> %s </option>\' % (license_name, license_description)\r\n\r\ntext += \"</select>\"\r\n','2012-05-23','2012-12-11','Enter new license:',NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('BSI_REGDEC',NULL,'','D',NULL,NULL,NULL,NULL,NULL,'<div align=\"center\">\r\n<INPUT TYPE=\"button\" class=\"adminbutton\" name=\"endS\" width=\"400\" height=\"50\" value=\"Register decision\" onclick=\"finish();\">\r\n</div>','2012-09-03','2012-10-15',NULL,NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('BSI_RN',NULL,'037__a','I',20,NULL,NULL,NULL,NULL,NULL,'2012-10-22','2012-10-23',NULL,NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('BSI_TITLE',NULL,'245__a','I',40,NULL,NULL,NULL,NULL,'Blog Title','2012-05-23','2012-10-24','Enter new title:',NULL,0);

@@ -77,7 +77,7 @@ else:
 if CFG_CERN_SITE:
     CFG_ACC_GRANT_VIEWER_RIGHTS_TO_EMAILS_IN_TAGS = ['506__m']
 else:
-    CFG_ACC_GRANT_VIEWER_RIGHTS_TO_EMAILS_IN_TAGS = []
+    CFG_ACC_GRANT_VIEWER_RIGHTS_TO_EMAILS_IN_TAGS = ['506__m']
 
 # Use external source for access control?
 
@@ -141,6 +141,7 @@ CFG_EXTERNAL_AUTH_SSO_REFRESH = 600
 DEF_ROLES = ((SUPERADMINROLE, 'superuser with all rights', 'deny any'),
              (WEBACCESSADMINROLE, 'WebAccess administrator', 'deny any'),
              ('anyuser', 'Any user', 'allow any'),
+	     ('anyregistereduser', 'Any registered user', "allow any\ndeny guest '1'"),
              ('basketusers', 'Users who can use baskets', 'allow any'),
              ('loanusers', 'Users who can use loans', 'allow any'),
              ('groupusers', 'Users who can use groups', 'allow any'),
@@ -271,6 +272,8 @@ DEF_DEMO_AUTHS = (
              ('swordcurator', 'runbibswordclient', {}),
              ('internalviewer', VIEWRESTRCOLL, {'collection': 'Provisional Blogs'}),
              ('internalviewer', VIEWRESTRCOLL, {'collection': 'Rejected Blogs'}),
+             ('internalviewer', VIEWRESTRCOLL, {'collection': 'Private'}),
+             ('anyregistereduser', VIEWRESTRCOLL, {'collection': 'Restricted'}),
              ('submit_BSI_*', 'submit', {'doctype': 'BSI', 'act': 'SBI', 'categ': '*'}),
              ('submit_BSI_*', 'submit', {'doctype': 'BSI', 'act': 'MBI', 'categ': '*'}),
              ('submit_BSI_*', 'submit', {'doctype': 'BSI', 'act': 'DPI', 'categ': '*'}),

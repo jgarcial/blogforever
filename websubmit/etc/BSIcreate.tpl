@@ -6,4 +6,5 @@ START::DEFP()---<record>
 542a::REPL(EOL,)::MINLW(82)---<datafield tag="542" ind1=" " ind2=" "><subfield code="f"><:BSI_LICENSE::BSI_LICENSE:></subfield></datafield>
 65014::REPL(EOL,)::MINLW(82)---<datafield tag="654" ind1=" " ind2=" "><subfield code="a"><:BSI_TOPIC::BSI_TOPIC:></subfield></datafield>
 980::DEFP()---<datafield tag="980" ind1=" " ind2=" "><subfield code="a">PROVBLOG</subfield></datafield>
+506::REPL(EOL,)---<datafield tag="506" ind1=" " ind2=" "><subfield code="m"><:SuE::SuE:></subfield></datafield>
 END::DEFP()---</record>
