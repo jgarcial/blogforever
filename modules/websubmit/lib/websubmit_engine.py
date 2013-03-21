@@ -1834,6 +1834,7 @@ def Propose_Next_Action (doctype, action_score, access, currentlevel, indir, ln=
     return t
 
 def specialchars(text):
+    text = text.encode('utf-8')
     text = string.replace(text, "&#147;", "\042");
     text = string.replace(text, "&#148;", "\042");
     text = string.replace(text, "&#146;", "\047");
