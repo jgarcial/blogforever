@@ -34,8 +34,8 @@ def websearch_instantbrowse_cms_pas(reclist, recIDs_to_remove=""):
     (E.g.: "1281585")
     (E.g.: "56,89,22")
     @type recIDs_to_remove: string
-    @return: list of recIDs and output format
-    @rtype: tuple(list, string)
+    @return: list of recIDs
+    @rtype: list
     """
 
     recIDs = list(reclist)
@@ -45,4 +45,4 @@ def websearch_instantbrowse_cms_pas(reclist, recIDs_to_remove=""):
             if int(recID_to_remove) in recIDs:
                 recIDs.remove(int(recID_to_remove))
 
-    return (recIDs, 'hb')
+    return recIDs

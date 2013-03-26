@@ -34,8 +34,8 @@ def websearch_instantbrowse_by_number_of_years(reclist, \
     @type reclist: HitSet
     @param num_years: number of years ago (E.g.: "5")
     @type num_years: string
-    @return: list of recIDs and output format
-    @rtype: tuple(list, string)
+    @return: list of recIDs
+    @rtype: list
     """
 
     this_year = time.strftime("%Y", time.localtime())
@@ -52,5 +52,5 @@ def websearch_instantbrowse_by_number_of_years(reclist, \
                                 search_pattern_parenthesised(p='year:%s' % year))
         recIDs = list(final_reclist)
 
-    return (recIDs, 'hb')
+    return recIDs
 

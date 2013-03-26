@@ -35,8 +35,8 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm.collections import attribute_mapped_collection
 from sqlalchemy.orm.collections import collection
 from sqlalchemy.ext.orderinglist import ordering_list
-from invenio.websearch_external_collections_searcher import \
-    external_collections_dictionary
+#from invenio.websearch_external_collections_searcher import \
+#    external_collections_dictionary
 from invenio.websearch_instantbrowse import instantbrowse_manager
 from invenio.pluginutils import PluginContainer
 from invenio.config import CFG_PYLIBDIR
@@ -399,17 +399,18 @@ class Collection(db.Model):
         by the selected plugin
         """
 
-        instantbrowse_plugin = instantbrowse_manager.get_instantbrowse_plugin(self.id)
-        if instantbrowse_plugin:
-            plugin = instantbrowse_plugins_container.get_plugin(instantbrowse_plugin[0])
-            params = instantbrowse_plugin[1]
-            # run the corresponding plugin
-            if params:
-                latest_additions_recids = plugin(reclist=self.reclist, **json.loads(params))
-            else:
-                latest_additions_recids = plugin(reclist=self.reclist)
-        else: # by default
-            latest_additions_recids = self.reclist
+        if self.reclist:
+            instantbrowse_plugin = instantbrowse_manager.get_instantbrowse_plugin(self.id)
+            if instantbrowse_plugin:
+                plugin = instantbrowse_plugins_container.get_plugin(instantbrowse_plugin[0])
+                params = instantbrowse_plugin[1]
+                # run the corresponding plugin
+                if params:
+                    latest_additions_recids = plugin(reclist=self.reclist, **json.loads(params))
+                else:
+                    latest_additions_recids = plugin(reclist=self.reclist)
+            else: # by default
+                latest_additions_recids = self.reclist
 
         return latest_additions_recids
 
