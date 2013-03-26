@@ -27,4 +27,4 @@ def websearch_instantbrowse_return_empty(reclist):
     for given collection.
     """
 
-    return ([], None)
+    return []

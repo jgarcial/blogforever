@@ -35,8 +35,17 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm.collections import attribute_mapped_collection
 from sqlalchemy.orm.collections import collection
 from sqlalchemy.ext.orderinglist import ordering_list
-#from invenio.websearch_external_collections_searcher import \
-#    external_collections_dictionary
+from invenio.websearch_external_collections_searcher import \
+    external_collections_dictionary
+from invenio.websearch_instantbrowse import instantbrowse_manager
+from invenio.pluginutils import PluginContainer
+from invenio.config import CFG_PYLIBDIR
+import os
+import json
+
+# Container of latest additions plugins
+instantbrowse_plugins_container = PluginContainer\
+            (os.path.join(CFG_PYLIBDIR, 'invenio', 'websearch_instantbrowse_plugins', 'websearch_*.py'))
 
 # Create your models here.
 
@@ -382,6 +391,28 @@ class Collection(db.Model):
                 Collection.id == CollectionPortalbox.id_collection,
             foreign_keys=lambda: CollectionPortalbox.id_collection,
             order_by=lambda: db.asc(CollectionPortalbox.score))
+
+    @property
+    def latest_additions(self):
+        """
+        Get list of the latest additions recids sorted
+        by the selected plugin
+        """
+
+        if self.reclist:
+            instantbrowse_plugin = instantbrowse_manager.get_instantbrowse_plugin(self.id)
+            if instantbrowse_plugin:
+                plugin = instantbrowse_plugins_container.get_plugin(instantbrowse_plugin[0])
+                params = instantbrowse_plugin[1]
+                # run the corresponding plugin
+                if params:
+                    latest_additions_recids = plugin(reclist=self.reclist, **json.loads(params))
+                else:
+                    latest_additions_recids = plugin(reclist=self.reclist)
+            else: # by default
+                latest_additions_recids = self.reclist
+
+        return latest_additions_recids
 
     #@db.hybrid_property
     #def externalcollections(self):

@@ -20,7 +20,7 @@
 __revision__ = "$Id$"
 
 from invenio.search_engine import search_pattern_parenthesised
-from intbitset import intbitset
+from invenio.intbitset import intbitset
 
 def websearch_instantbrowse_videos(reclist):
     """
@@ -28,10 +28,10 @@ def websearch_instantbrowse_videos(reclist):
     only videos that contain movies.
     @param reclist: HitSet of recIDs
     @type reclist: HitSet
-    @return: list of recIDs and output format
-    @rtype: tuple(list, string)
+    @return: list of recIDs
+    @rtype: list
     """
 
     recIDs = list(intbitset(list(reclist)) & \
                     search_pattern_parenthesised(p='collection:"PUBLVIDEOMOVIE"'))
-    return (recIDs, 'hvp')
+    return recIDs

@@ -48,10 +48,10 @@ def websearch_instantbrowse_by_field(reclist, \
     @type of: string
     @param ln: language (E.g.: "en")
     @type ln: string
-    @return: sorted list of recIDs and output format
-    @rtype: tuple(list, string)
+    @return: sorted list of recIDs
+    @rtype: list
     """
 
-    recIDs = sort_records(None, list(reclist), field, order, \
-                          pattern, verbose, of, ln)
-    return (recIDs, 'hb')
+    recIDs = sort_records(None, reclist, sort_field=field, sort_order=order, \
+                          sort_pattern=pattern, verbose=verbose, of=of, ln=ln)
+    return recIDs
