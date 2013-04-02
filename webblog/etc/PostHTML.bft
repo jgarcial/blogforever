@@ -14,12 +14,16 @@
 </div>
 
 <div class="row">
-
 	<div class="text span9 pull-right">
 		<BFE_TITLE prefix='<h1 class="articleTitle">' suffix='</h1>'/>
 
 		<div class="post-text">
-			<BFE_ABSTRACT escape="0" />
+			<BFE_ABSTRACT escape="0" 
+				prefix_en="<div class='highlightable' style='margin-right:20px;'><span>"
+				prefix_fr="<div class='highlightable' style='margin-right:20px;'><span>"
+				suffix_en="</span></div><br />"
+				suffix_fr="</span></div><br />"
+			/>
 		</div>
 
 		<div class="bfe-citation-box">	
@@ -69,9 +73,11 @@
 			<BFE_LINKS_MENU>
 		</div>
 
- 	</div>
-
+	</div> <!-- end bfe-blog-navigation -->
 </div> <!-- end row -->
 
-<div id="bottom">  </div> <! -- end bottom -->
+
+
+
+	<div id="bottom">  </div> <! -- end bottom -->
 
