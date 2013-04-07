@@ -78,10 +78,9 @@
 
 {% macro collection_tree(collections, limit=None) %}
 {%- set idxs = [0] -%}
-<ul {{ kwargs|xmlattr }} >
+<ul {{ kwargs|xmlattr }}>
 {% for collection in collections recursive %}
   <li class="span4">
-
     {# Do not show checkboxes in new UI
     {% if idxs|length == 1 %}
     <input type="checkbox" name="c" value="{{ collection.name }}" checked/>
@@ -225,7 +224,7 @@
 {% macro search_box(collection) %}
   <div style="padding: 0px;" class="dropdown-menu donothide">
     <div class="row">
-      <div class="span6">
+      <div class="span6" style="min-width: 400px;">
 
         <div class="modal-header">
           <button type="button" style="z-index:9999; position: relative;" class="close" onclick="$('.dropdown').removeClass('open open-permanent')">×</button>
@@ -311,33 +310,35 @@
 
 {% macro search_form(collection) %}
 
+ 
 
-      <form action="{{ url_for('.search') }}"
+
+        <!-- start Search form -->
+        <form action="{{ url_for('.search') }}"
               name="search"
               method="get"
               class="searchbox-title visible-desktop">
-        
+
           
-            <label for="p">
+            <label for="p" class="searchbox-title">
               {%- set nbrecs = collection.nbrecs -%}
               {%- if not collection.nbrecs -%}
               {%- set nbrecs = 0 -%}
               {%- endif -%}
-              {{ _("Search %d records for:")|format(nbrecs) }}
+              {{ _("Search %s records for")|format(nbrecs) }}
             </label>
-
         </form>
 
-      <div class="row search-wrap">
-        <div class="search-forms">
+      <div id="search-box-main" class="row search-wrap">
 
-      
+      <div class="search-forms">   
+
         <form action="{{ url_for('.search') }}"
               name="search"
               method="get"
               class="form-horizontal search-input">
           
-          <div>
+
             <div id="searchdropdown"
                  class="dropdown">
             {#
@@ -354,7 +355,7 @@
                      data-delay="100"
                      data-toggle="dropdown" role="button"
                      href="#"><i class="icon-question-sign"></i></a>
-                  <ul class="searchexamples dropdown-menu" role="menu" aria-labelledby="dLabel">
+                  <ul class="searchexamples dropdown-menu" role="menu" aria-labelledby="dLabel" style="text-align: left;">
                     <li>
                       <a href="/help/search-tips">
                         <i class="pull-right icon-info-sign"></i>
@@ -390,7 +391,7 @@
                   name="p"
                   class="span6"
                   type="text"
-                 
+                  style="min-width:200px;"
                   {# placeholder="{{ _('Example') }}: {{ search_placeholder }}" #}
                   tabindex="1"
                   value="{{ request.args.get('p', '') }}"
@@ -421,30 +422,32 @@
 
               <button name="action_search" type="submit" class="btn btn-primary search-btn">
                 <i class="icon-search icon-white"></i>
-                <span>{{ _("Search") }}</span>
+                <span class="hidden-phone">{{ _("Search") }}</span>
               </button>
               {#
               <span class="help-inline">
                 <a href="/help/search-tips">{{ _("Search Tips") }}</a>
               </span>
               #}
-            </div>
+            
           </div><!-- end controls -->
         
         </form>
+        <!-- end Search form -->
 
-        <!-- Settings dropdown -->
+                 <!-- Settings dropdown -->
         <form action="{{ url_for('.search') }}" name="settings" method="get"
               class="form-inline search-settings">
           <input name="p" value="{{ request.args.get('p','') }}" type="hidden" />
 
 
-        <div id="settingsdropdown" class="btn-group dropdown">
+        <div id="settingsdropdown" class="pull-right btn-group dropdown">
           <button class="btn dropdown-toggle add-open-permanent search-btn" data-target="#settingsdropdown" data-toggle="dropdown">
             <i class="icon-cog"></i>
             <span class="caret"></span>
           </button>
-          <ul class="dropdown-menu donothide clearfix">
+          <ul class="dropdown-menu donothide clearfix"
+              style="min-width: 300px; padding-bottom: 0px;">
             <li class="nav-header">{{ _('Search settings') }}</li>
 
             <li class="divider"></li>
@@ -455,6 +458,7 @@
             <div class="controls pull-right">
               <select
                       name="rg"
+                      style="height: inherit; line-height: inherit;"
                       class="btn-small span2">
               {%- for i in [10, 25, 50, 100, 250, 500] -%}
               {%- if i <= config.CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS -%}
@@ -471,6 +475,7 @@
             <div class="controls pull-right">
               <select
                       name="of"
+                      style="height: inherit; line-height: inherit;"
                       class="btn-small span2">
               {%- for i in collection.formatoptions if i.content_type == 'text/html' and i.visibility == 1 -%}
                 <option value="{{ i.code }}"{{ ' selected' if request.args.get('of','hb')==i.code }}>{{ i.name }}</option>
@@ -541,11 +546,16 @@
           </ul>
         </div>
         </form>
+        <!-- END settings dropdown form -->
+        
 
-      </div> <!-- end search forms -->
-  </div><!-- end row -->
+
+</div>
+</div>
+{% endmacro %}
 
 
+{% macro search_form_javascript(collection) %}
 
   <script>
   $(function () {
@@ -777,6 +787,4 @@
   });
 
  </script>
-
-
 {% endmacro %}
