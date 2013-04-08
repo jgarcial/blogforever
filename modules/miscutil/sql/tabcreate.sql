@@ -4325,6 +4325,15 @@ CREATE TABLE IF NOT EXISTS upgrade (
   PRIMARY KEY (upgrade)
 ) ENGINE=MyISAM;
 
+-- table for instant browsing
+CREATE TABLE IF NOT EXISTS `collection_instantbrowse` (
+  `collection_id` mediumint(9) unsigned NOT NULL,
+  `instantbrowse_plugin` text NOT NULL default '',
+  `instantbrowse_optional_params` text NOT NULL default '',
+  PRIMARY KEY (`collection_id`)
+) ENGINE=MyISAM;
+
+-- maint-1.1 upgrade recipes:
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_release_1_1_0',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_10_31_tablesorter_location',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_11_01_lower_user_email',NOW());
@@ -4342,12 +4351,5 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_11_15_bibdocfile_mo
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_02_01_oaiREPOSITORY_last_updated',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_03_07_crcILLREQUEST_overdue_letter',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_01_12_bibrec_master_format',NOW());
-
-CREATE TABLE IF NOT EXISTS `collection_instantbrowse` (
-  `collection_id` mediumint(9) unsigned NOT NULL,
-  `instantbrowse_plugin` text NOT NULL default '',
-  `instantbrowse_optional_params` text NOT NULL default '',
-  PRIMARY KEY (`collection_id`)
-) ENGINE=MyISAM;
 
 -- end of file
