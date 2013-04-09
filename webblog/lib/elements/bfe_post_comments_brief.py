@@ -25,7 +25,6 @@ for the corresponding post
 from invenio.config import CFG_SITE_SECURE_URL
 from invenio.webblog_utils import get_comments
 
-
 def format_element(bfo):
     """
     Displays the number of comments for the corresponding post
@@ -34,15 +33,14 @@ def format_element(bfo):
     this_recid = bfo.control_field('001')
     current_language = bfo.lang
     post_comments_recids = get_comments(this_recid)
-    post_url = bfo.fields('520__u')[0]
-
+    # post_url = bfo.fields('520__u')[0]
     message = "%i Comments" % len(post_comments_recids)
     out = ""
     if post_comments_recids:
-        out = """<span><a href="%s/search?p=773__o:%s&cc=Comments">%s</a></span>""" % \
-                (CFG_SITE_SECURE_URL, post_url, message)
-    else:
-        out = """<span>No comments yet</span>"""
+        out = """| <i class="icon-col-Comments"></i> <span><a href="%s/search?p=773__w:%s">%s</a></span>""" % \
+                (CFG_SITE_SECURE_URL, this_recid, message)
+    # else:
+        # out = """<span>No comments yet</span>"""
     return out
 
 

@@ -310,15 +310,11 @@
 
 {% macro search_form(collection) %}
 
- 
-
-
         <!-- start Search form -->
         <form action="{{ url_for('.search') }}"
               name="search"
               method="get"
               class="searchbox-title visible-desktop">
-
           
             <label for="p" class="searchbox-title">
               {%- set nbrecs = collection.nbrecs -%}
@@ -337,7 +333,6 @@
               name="search"
               method="get"
               class="form-horizontal search-input">
-          
 
             <div id="searchdropdown"
                  class="dropdown">
@@ -439,7 +434,6 @@
         <form action="{{ url_for('.search') }}" name="settings" method="get"
               class="form-inline search-settings">
           <input name="p" value="{{ request.args.get('p','') }}" type="hidden" />
-
 
         <div id="settingsdropdown" class="pull-right btn-group dropdown">
           <button class="btn dropdown-toggle add-open-permanent search-btn" data-target="#settingsdropdown" data-toggle="dropdown">
@@ -547,9 +541,6 @@
         </div>
         </form>
         <!-- END settings dropdown form -->
-        
-
-
 </div>
 </div>
 {% endmacro %}

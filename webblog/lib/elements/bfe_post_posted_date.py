@@ -23,6 +23,7 @@ BibFormat Element - creates the posted date of a blog post
 from invenio.bibformat_engine import BibFormatObject
 from invenio.config import CFG_SITE_URL
 from invenio.messages import gettext_set_language
+import datetime
 
 def format_element(bfo):
     """
@@ -38,10 +39,13 @@ def format_element(bfo):
         # hack
         if posted_date.find("ERROR") > -1:
             posted_date = "Date not available"
+	else:
+	   date = datetime.datetime.strptime(posted_date, "%m/%d/%Y %I:%M:%S %p")
+	   posted_date = date.strftime("%Y/%m/%d %H:%M:%S")
     except:
         posted_date = "Date not available"
 
-    out = '<span class="post-posted-date"> %s: %s </span>' % (_("Posted on"), posted_date)
+    out = '<i class="icon-calendar"></i> <span class="post-posted-date"> %s </span>' % posted_date
     return out
 
 

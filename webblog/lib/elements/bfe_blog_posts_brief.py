@@ -34,15 +34,15 @@ def format_element(bfo):
     this_recid = bfo.control_field('001')
     current_language = bfo.lang
     blog_posts_recids = get_posts(this_recid)
-    blog_url = bfo.fields('520__u')[0]
+    # blog_url = bfo.fields('520__u')[0]
 
     message = "%i Posts" % len(blog_posts_recids)
     out = ""
     if blog_posts_recids:
-        out = """<span><a href="%s/search?p=760__o:%s&cc=Posts">%s</a></span>""" % \
-                (CFG_SITE_SECURE_URL, blog_url, message)
-    else:
-        out = """<span>No posts yet</span>"""
+        out = """<span><a href="%s/search?p=760__w:%s">%s</a></span>""" % \
+                (CFG_SITE_SECURE_URL, this_recid, message)
+    # else:
+        # out = """<span>No posts yet</span>"""
     return out
 
 

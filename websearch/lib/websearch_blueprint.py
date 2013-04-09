@@ -112,7 +112,7 @@ def get_collection_breadcrumbs(collection, breadcrumbs=None, builder=None):
 
 
 @blueprint.route('/collection/<name>', methods=['GET', 'POST'])
-@blueprint.invenio_templated('websearch_col.html')
+@blueprint.invenio_templated('websearch_collection.html')
 def collection(name):
     collection = Collection.query.filter(Collection.name==name).first_or_404()
     #FIXME cache per language

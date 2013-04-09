@@ -17,7 +17,7 @@
 		<div class="post-extra-data">
 			<BFE_POST_POSTED_DATE />
 			<br />
-			<BFE_POST_AUTHOR />
+			<BFE_AUTHORS />
 		</div>
 
 		<div class="post-text">
