@@ -46,7 +46,7 @@ def format_element(bfo, style):
                 linkattrd['style'] = style
         
             try:
-                recid = bfo.control_field('001')[0]
+                recid = bfo.control_field('001')
             except:
                 raise Exception("Record not found")
     
