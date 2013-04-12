@@ -734,7 +734,7 @@ def perform_instantbrowseoptions(colID, ln=CFG_SITE_LANG, select_plugin="", para
 
         text += """</select></td></tr></table></td>"""
 
-        text += """ <td rowspan="5"><div align="center" style="width:600px; height:250px; \
+        text += """ <td rowspan="5"><div align="center" style="width:610px; height:250px; \
                       border: solid thin black; overflow-y: auto; overflow-x: auto;"><pre id="documentation"></pre></div></td></tr>
                     <tr>
                       <td style="padding-left:10px;padding-top:5px;"><span class="adminlabel">\

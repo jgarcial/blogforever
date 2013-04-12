@@ -91,6 +91,20 @@ class BibSortWasher(object):
             return ''
         return str(val).lower()
 
+    def _sort_transform_format_date(self, val):
+	"""
+	Convert:
+	'1/28/2013 10:04:55 AM' =>  '2013/1/28 10:04:55'
+	'5/12/2013 03:10:23 PM' =>  '2013/5/12 15:10:23'
+	"""
+	import datetime
+	try:
+	    date = datetime.datetime.strptime(val, "%m/%d/%Y %I:%M:%S %p")
+	    posted_date = date.strftime("%Y/%m/%d %H:%M:%S")
+	except:
+	    return val
+	return posted_date
+
     def _sort_dates(self, val):
         """
         Convert:
