@@ -28,3 +28,8 @@ def customize_app(app):
     submit = Menu('main.submit', 'Submit a Blog', 'submit', 2)
     app.config['menubuilder_map']['main'].children['submit'] = submit
 
+    @app.context_processor
+    def record_context():
+    	from invenio.bibedit_utils import get_bibrecord
+    	from invenio.bibrecord import record_get_field_value
+        return dict(get_bibrecord=get_bibrecord, record_get_field_value=record_get_field_value)   

@@ -28,6 +28,10 @@
 			<BFE_CITATION_BOX>
 		</div>
 
+		<div class="bfe-blog-timeline">
+			<BFE_BLOG_TIMELINE>
+		</div>
+
 		<div>
 			<BFE_DOI prefix="<small><strong>DOI: </strong>" suffix=" </small><br />" />
 		</div>
@@ -71,3 +75,4 @@
 	<div id="bottom">  </div>
 
 </div> <!-- end blog-record-page -->
+
