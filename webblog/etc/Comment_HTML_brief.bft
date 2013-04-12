@@ -1,13 +1,13 @@
 <name>Comment HTML brief</name>
 <description>Brief HTML format.</description>
 
-<div class="span10">
+<div class="span9">
 	<div class="row">
-		<div class="span10">
+		<div class="span9">
 			<p><span style="font-size:17.5px"><i class="icon-col-Comments"></i>
 			<strong><BFE_TITLE_BRIEF></strong></span></p>
 			<p>
-			<BFE_POST_CONTENT_BRIEF limit="2" escape="4"/>
+			<BFE_POST_CONTENT_BRIEF limit="1" escape="4"/>
 			<BFE_AUTHORS/>
 			</p>
 		</div>

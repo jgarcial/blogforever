@@ -18,7 +18,7 @@
 		</div>
 	
 		<div class="post-text">
-			<BFE_ABSTRACT escape="0" />
+		    <i class="icon-col-Comments"></i> <BFE_ABSTRACT escape='4'/>
 		</div>
 
 

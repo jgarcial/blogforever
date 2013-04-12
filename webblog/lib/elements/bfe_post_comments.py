@@ -43,7 +43,10 @@ def format_element(bfo):
     if post_comments_recids:
         # let's print just the 3 latest posts
         latest_post_comments_recids = post_comments_recids[:2]
-        out += "<h4>%s</h4>" % cfg_messages["in_issue"][current_language]
+        try:
+            out += "<h4>%s</h4>" % cfg_messages["in_issue"][current_language]
+        except:
+            out += "<h4>%s</h4>" % cfg_messages["in_issue"]["en"]
 
         for comment_recid in latest_post_comments_recids:
             out += call_bibformat(comment_recid, format='hb')

@@ -26,8 +26,7 @@ from invenio.search_engine import perform_request_search
 
 cfg_messages = {}
 cfg_messages["in_issue"] = {"en": "Reference links on this post",
-                            "es": "Links de referencia en este post",
-                            "fr": ""}
+                            "es": "Links de referencia en este post"}
 
 def format_element(bfo):
     """
@@ -39,24 +38,29 @@ def format_element(bfo):
     menu_out = ""
 
     if links:
-        menu_out = '<h4>%s:</h4>' % cfg_messages["in_issue"][current_language]
-        for link in links:
-            link_url   = link.get('u')
-            link_data  = link.get('y', link_url)
-            link_title = link.get('z', '')
+        try:
+            menu_out += '<h4>%s:</h4>' % cfg_messages["in_issue"][current_language]
+        except: # in english by default
+            menu_out += '<h4>%s:</h4>' % cfg_messages["in_issue"]["en"]
 
-            menu_out += """<div class="litem"><a href="%s"%s>%s</a></div>""" % (link_url, link_title and ' title="%s"' % link_title or '' , link_data)
-
+    for link in links:
+        link_url   = link.get('u')
+        link_data  = link.get('y', link_url)
+        link_title = link.get('z', '')
+        if link_data:
+            menu_out += '<div class="litem"><a href="%s"%s>%s</a></div>' % \
+                (link_url, link_title and ' title="%s"' % link_title or '' , link_data)
             recid_in_archive = perform_request_search(p = link_url, f = '520__u')
             # differentiate between links to sources inside
             # the archive and sources outside
             if recid_in_archive:
-                menu_out += """<div style="padding-left:20px;"><h4>This content is also available in the archive: </h4>"""
+                menu_out += '<div style="padding-left:20px;"><h4>This content is also available in the archive: </h4>'
                 try:
                     title = get_fieldvalues(recid_in_archive[0], "245__a")[0]
                 except:
                     title = "Untitled"
-                menu_out += """<span class="moreinfo"><a href="%s/record/%s">%s</a></span></div></br>""" % (CFG_SITE_URL, recid_in_archive[0], title)
+                menu_out += '<span class="moreinfo"><a href="%s/record/%s">%s</a></span></div></br>' % \
+                            (CFG_SITE_URL, recid_in_archive[0], title)
 
     return menu_out
 

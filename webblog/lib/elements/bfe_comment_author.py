@@ -25,18 +25,25 @@ import cgi
 
 cfg_messages = {}
 cfg_messages["in_issue"] = {"en": "wrote",
-                            "fr": "a écrit"}
+                            "fr": "a écrit",
+			    "es": "escribió"}
 
 def format_element(bfo):
     """
     Displays the author of a comment record
     """
 
+    out = ""
     author = bfo.field('100__a')
-    current_language = bfo.lang
-    out = """<a href = "%s/search?ln=%s&p=%s&f=author"> <i class="icon-col-Comments"></i> %s</a> %s:""" % \
-                (CFG_SITE_URL, current_language, author, author, \
-                 cfg_messages["in_issue"][current_language])
+    if author:
+        current_language = bfo.lang
+        try:
+            message = cfg_messages["in_issue"][current_language]
+        except: # in english by default
+            message = cfg_messages["in_issue"]['en']
+        out += """<i class="icon-user"></i> <a href = "%s/search?ln=%s&p=%s&f=author"> %s</a> %s:""" % \
+                  (CFG_SITE_URL, current_language, author, author, \
+                   message)
 
     return out
     

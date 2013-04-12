@@ -39,51 +39,45 @@ def format_element(bfo):
 
     # get variables
     this_recid = bfo.control_field('001')
-    try:
-        this_content = bfo.fields('520__a')[0]
-    except:
-        return ""
+    this_content = bfo.fields('520__a')[0]
     try:
         this_author = bfo.fields('100__a')[0]
     except:
-        return ""
+        this_author = ""
 
     this_limit_content = get_contextual_content(this_content,
                                                 [],
-                                                max_lines=2)[0]
+                                                max_lines=1)[0]
     menu_recids = []
     current_language = bfo.lang
-
+    menu_out = ""
     post_recid = get_parent_post(this_recid)
-
-    menu_recids = get_comments(post_recid, newest_first=True)
-
-    try:
-        menu_out = '<h4>%s</h4>' % cfg_messages["in_issue"][current_language]
-    except:
-        menu_out = '<h4>%s</h4>' % cfg_messages["in_issue"]['en']
-
-    for recid in menu_recids:
-        if str(this_recid) == str(recid):
-            menu_out += '<div class="active"><div class="litem"><b>%s</b>: %s [...]</div></div>' % (this_author, this_limit_content)
-        else:
-            temp_rec = BibFormatObject(recid)
-            content = temp_rec.fields('520__a')[0]
-            limit_content = get_contextual_content(content,
-                                                   [],
-                                                   max_lines=1)[0]
-
+    if post_recid:
+        menu_recids = get_comments(post_recid, newest_first=True)
+        if menu_recids:
             try:
-                author = temp_rec.fields('100__a')[0]
+                menu_out = '<h4>%s</h4>' % cfg_messages["in_issue"][current_language]
             except:
-                author = 'Anonymous'
-            menu_out += '<div class="litem"><a href="%s/record/%s%s"><b>%s</b>: %s [...]</a></div>' % (CFG_SITE_URL,
-                                                                                                recid,
-                                                                                                (bfo.lang=="fr") and "?ln=fr" or "?ln=en",
-                                                                                                author, limit_content)
-            
+                menu_out = '<h4>%s</h4>' % cfg_messages["in_issue"]['en']
 
-        
+            for recid in menu_recids:
+                if str(this_recid) == str(recid):
+                    menu_out += '<div class="active"><div class="litem"><b><i class="icon-user"></i> %s</b>: %s [...]</div></div>' % \
+                                (this_author, this_limit_content)
+                else:
+                    temp_rec = BibFormatObject(recid)
+                    content = temp_rec.fields('520__a')[0]
+                    limit_content = get_contextual_content(content,
+                                                           [],
+                                                           max_lines=1)[0]
+                    try:
+                        author = temp_rec.fields('100__a')[0]
+                    except:
+                        this_author = ""
+                    menu_out += '<div class="litem"><a href="%s/record/%s?%s"><b><i class="icon-user"></i> %s</b>: %s [...]</a></div>' % (CFG_SITE_URL,
+                                                                                                               recid,
+                                                                                                               bfo.lang,
+                                                                                                               author, limit_content)        
     return menu_out
 
 def escape_values(bfo):
