@@ -24,7 +24,7 @@ for the corresponding blog
 
 from invenio.config import CFG_SITE_SECURE_URL
 from invenio.webblog_utils import get_posts
-
+from invenio.urlutils import create_html_link
 
 def format_element(bfo):
     """
@@ -34,14 +34,18 @@ def format_element(bfo):
     this_recid = bfo.control_field('001')
     current_language = bfo.lang
     blog_posts_recids = get_posts(this_recid)
-    # blog_url = bfo.fields('520__u')[0]
 
-    message = "%i Posts" % len(blog_posts_recids)
+    message = "<span> %i Posts </span>" % len(blog_posts_recids)
+    out = ""
     if blog_posts_recids:
-        out = '<span><a href="%s/search?p=760__w:%s">%s</a></span>' % \
-                (CFG_SITE_SECURE_URL, this_recid, message)
+        out = '<span>'
+        out += create_html_link(CFG_SITE_SECURE_URL + "/search", \
+                                {'cc': 'Posts', 'p': '760__w:%s' % this_recid, \
+                                 'ln': current_language}, \
+                                message)
+        out += '</span>'
     else:
-        out = '<span>No posts yet</span>'
+        out = """<span>No posts yet</span>"""
     return out
 
 

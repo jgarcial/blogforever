@@ -55,6 +55,11 @@ from invenio.search_engine import search_pattern_parenthesised,\
                                   get_most_popular_field_values, \
                                   create_nearest_terms_box
 from invenio.bibformat import format_records
+from invenio.websearch_instantbrowse import instantbrowse_manager
+from invenio.pluginutils import PluginContainer
+from invenio.config import CFG_PYLIBDIR, CFG_WEBSEARCH_INSTANT_BROWSE_AND_SEARCH_SAME_SORTING
+import os
+import json
 
 #FIXME use caches for internationalization of collection names (get_coll_i18nname)
 
@@ -287,6 +292,20 @@ def search():
     f = request.args.get('f')
     colls_to_search = request.args.get('cc')
     wl = request.args.get('wl')
+
+    if CFG_WEBSEARCH_INSTANT_BROWSE_AND_SEARCH_SAME_SORTING:
+        # Container of latest additions plugins
+        instantbrowse_plugins_container = PluginContainer\
+            (os.path.join(CFG_PYLIBDIR, 'invenio', 'websearch_instantbrowse_plugins', 'websearch_*.py'))
+        # check which plugins have been set for each collection
+        instantbrowse_plugin = instantbrowse_manager.get_instantbrowse_plugin(collection.id)
+        if instantbrowse_plugin:
+            plugin = instantbrowse_plugins_container.get_plugin(instantbrowse_plugin[0])
+            params = instantbrowse_plugin[1]
+            # run the corresponding plugin
+            if params:
+                plugin_argd = json.loads(params)
+                argd.update(plugin_argd)
 
     recids = perform_request_search(req=request, **argd)
     qid = md5(repr((p,f,colls_to_search, wl))).hexdigest()

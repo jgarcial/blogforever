@@ -77,7 +77,7 @@ def get_posts(blog_recid, newest_first=True):
     """
 
     from invenio.search_engine import perform_request_search
-    return perform_request_search(p='760__w:"%s"' % blog_recid, sf='date', so='d')
+    return perform_request_search(p='760__w:"%s"' % blog_recid, sf='posted date', so='a')
 
 def get_parent_post(comment_recid):
     """ This function returns the parent post of any 

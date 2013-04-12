@@ -28,8 +28,7 @@ INSERT INTO collection_collection VALUES (1,5,'r',50);
 -- set the 'websearch_instantbrowse_by_field' plugin up to
 -- the blog posts collection to display them by publication date
 
--- INSERT INTO collection_instantbrowse VALUES (3, 'websearch_instantbrowse_by_field', '{"field": "269__c", "order": "d"}');
-
+INSERT INTO collection_instantbrowse VALUES (3, 'websearch_instantbrowse_by_field', '{"sf": "posted date", "so": "a"}');
 
 -- blogs submission form
 
