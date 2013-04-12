@@ -5,7 +5,7 @@ include ../../config.mk
 BFTFILES = *.bft
 #XSLFILES = *.xsl
 BFTDIR = $(ETCDIR)/bibformat/format_templates
-SUBDIRS = output_formats
+SUBDIRS = output_formats templates
 all:
 	@echo "Done."
 

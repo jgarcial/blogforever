@@ -15,8 +15,8 @@
 
 			<div class="bfe-blog-timeline">
 				<div id="tl"
-				    data-source="{{bfe_xtl_url(bfo)}}" 
-				    data-initial-date="{{ bfe_last_post_date(bfo) }}"
+				    data-source="{{ bfe_xtl_url(bfo) }}" 
+				    data-initial-date="{{ bfe_last_post_date(bfo) }}" 
 				    class="timeline-default dark-theme" 
 				    style="height: 350px; margin: 2em;">
 				</div>

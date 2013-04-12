@@ -21,9 +21,9 @@
 BibFormat element - TimeLine
 """
 
-from webblog_utils import get_blog_descendants
-from htmlutils import escape_html
-from bibformat_engine import BibFormatObject
+from invenio.webblog_utils import get_blog_descendants
+from invenio.htmlutils import escape_html
+from invenio.bibformat_engine import BibFormatObject
 from invenio.search_engine import call_bibformat
 from lxml import etree
 
