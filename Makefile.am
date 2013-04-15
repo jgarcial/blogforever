@@ -119,6 +119,28 @@ uninstall-mathjax-plugin:
 	@echo "** The MathJax plugin was successfully uninstalled.      **"
 	@echo "***********************************************************"
 
+install-jstimeline-plugin:
+	@echo "***********************************************************"
+	@echo "** Installing jsTimeline plugin, please wait...          **"
+	@echo "***********************************************************"
+	rm -rf /tmp/invenio-jstimeline-plugin
+	mkdir /tmp/invenio-jstimeline-plugin
+	(cd /tmp/invenio-jstimeline-plugin && \
+        wget 'https://launchpad.net/ubuntu/+archive/primary/+files/simile-timeline_2.3.0%2Bdfsg.orig.tar.gz' && \
+	tar -xvf simile-timeline_2.3.0+dfsg.orig.tar.gz && \
+        mkdir -p ${prefix}/var/www/js/simile-timeline_2.3.0/ && \
+        cp -r simile-timeline-2.3.0/* ${prefix}/var/www/js/simile-timeline_2.3.0) 
+	rm -fr /tmp/invenio-jstimeline-plugin
+	@echo "***********************************************************"
+	@echo "** The jsTimeline plugin was successfully installed.     **"
+	@echo "***********************************************************"
+
+uninstall-jstimeline-plugin:
+	@rm -rvf ${prefix}/var/www/js/simile-timeline_2.3.0
+	@echo "***********************************************************"
+	@echo "** The jsTimeline plugin was successfully uninstalled.   **"
+	@echo "***********************************************************"
+
 install-jscalendar-plugin:
 	@echo "***********************************************************"
 	@echo "** Installing jsCalendar plugin, please wait...          **"
