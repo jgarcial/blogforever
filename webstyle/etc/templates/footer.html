@@ -26,21 +26,30 @@
 
 <div class="container">
   <div class="row">
-  <div class="span6">
-  {{ config["CFG_SITE_NAME_INTL"][g.ln] }} &nbsp;::&nbsp;<a href="{{ url_for('') }}">{{ _("Search") }}</a>&nbsp;::&nbsp;<a href="{{ url_for('submit') }}">{{ _("Submit") }}</a>&nbsp;::&nbsp;<a href="{{ url_for('youraccount.display') }}">{{ _("Personalize") }}</a>&nbsp;::&nbsp;<a href="{{ url_for('help') }}">{{ _("Help") }}</a>
-  <br />
-  {{ _("Powered by") }} <a href="http://invenio-software.org/">Invenio</a> v{{ config.CFG_VERSION }}
+  <div class="span4">
+ ::&nbsp;<a href="{{ url_for('') }}">{{ _("Search") }}</a>&nbsp;::&nbsp;<a href="{{ url_for('submit') }}">{{ _("Submit") }}</a>&nbsp;::&nbsp;<a href="{{ url_for('youraccount.display') }}">{{ _("Personalize") }}</a>&nbsp;::&nbsp;<a href="{{ url_for('help') }}">{{ _("Help") }}</a>
+
   <br />
   {{ _("Maintained by") }} <a href="mailto:{{ config.CFG_SITE_SUPPORT_EMAIL }}">{{ config.CFG_SITE_SUPPORT_EMAIL }}</a>
   <br />
   {% if lastupdated %}
       {{ _("Last updated") }}: {{ lastupdated|invenio_format_date }}
   {% endif %}
+</div>
+<div class="span4">
+  <p class="centered">
+     
+  <img src="/img/blogforever-logo.png" alt=" {{ _("A Blogforever installation") }} class="footer-logo"><br/>
+    {{ config["CFG_SITE_NAME_INTL"][g.ln] }} &nbsp; <br />
+  {{ _("Powered by") }} <a href="http://invenio-software.org/">Invenio</a> v{{ config.CFG_VERSION }}
+ 
+</p>
   </div>
-  <div class="span6">
+  <div class="span4">
     <p style="text-align: right">
       {% if config.CFG_LANGUAGE_LIST_LONG %}
           {{ _("This site is also available in the following languages:") }} <br />
+
           {% for (lang, lang_namelong) in config.CFG_LANGUAGE_LIST_LONG %}
               &nbsp; <a href="?ln={{ lang }}" class="langinfo">{{ lang_namelong|safe }}</a>
           {% endfor %}
@@ -48,5 +57,6 @@
     </p>
   </div>
   </div>
+
   <!-- replaced page footer -->
 </div> <!-- containter -->

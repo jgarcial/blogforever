@@ -576,6 +576,63 @@ padding-top: 15px;
 
 }
 
+/* Nav */
+
+.navbar .nav > li > a.btn-log-in, .navbar .nav > li > a.btn-sign-up {
+   display:inline-block;
+   color:#000;
+    text-shadow:none;
+    padding: 5px 10px;
+}
+
+.navbar .nav {
+margin: 20px 10px 0 0;
+}
+
+.navbar-inner {
+min-height: 60px;
+}
+
+.navbar .btn, .navbar .btn-group {
+margin-top: 1px;
+}
+
+.navbar .brand {
+margin-top: 19px;
+color: #ddd;
+text-shadow: 1px 1px 1px #1c5016;
+font-weight: 400;
+-webkit-transition: all .2s linear;
+-moz-transition: all .2s linear;
+transition: all .2s linear;
+}
+
+.navbar .brand:hover {
+text-decoration: none;
+color: #fff;
+text-shadow: 4px 4px 4px #222;
+}
+
+.navbar .nav > li > a.btn-log-in:hover, .navbar .nav > li > a.btn-sign-up:hover, .navbar .nav > li > a.btn-log-in:focus, .navbar .nav > li > a.btn-sign-up:focus {
+background-color: #e6e6e6;
+color: #333333;
+text-decoration: none;
+background-position: 0 -15px;
+-webkit-transition: background-position 0.1s linear;
+-moz-transition: background-position 0.1s linear;
+-o-transition: background-position 0.1s linear;
+transition: background-position 0.1s linear;
+}
+
+.btn.btn-sign-up {
+border-radius: 0 4px 4px 0;
+margin-left: -5px;
+}
+.btn.btn-log-in {
+   border-radius:4px 0 0 4px;
+
+}
+
 /* Hero styles */
 
 .centered {
@@ -819,18 +876,7 @@ margin-left: 3px;
    content: "\f016";
 }
 
-/* external link style */
 
-/*a[href ^= "http"]:not([href*="newhope"]):after {
-font-family: FontAwesome;
-font-weight: normal;
-font-style: normal;
-display: inline-block;
-text-decoration: inherit;
-content: "\f08e";
-font-size: 85%;
-padding-left: 0.3em;
-}*/
 
 .marketing .pull-right {
 padding-bottom: 40px;
