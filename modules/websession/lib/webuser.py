@@ -227,8 +227,8 @@ def getUid(req):
             return -1
 
 
-from invenio.webuser_flask import current_user, login_user, logout_user
-getUid = lambda req: current_user.get_id()
+#from invenio.webuser_flask import current_user, login_user, logout_user
+#getUid = lambda req: current_user.get_id()
 
 
 def setUid(req, uid, remember_me=False):
