@@ -2,7 +2,7 @@
 
 include ../../../config.mk
 
-templatesdir = $(ETCDIR)/templates
+templatesdir = $(ETCLOCALDIR)/templates
 templates_DATA = page.html header.html footer.html
 EXTRA_DIST = $(templates_DATA)
 CLEANFILES = *~ *.tmp

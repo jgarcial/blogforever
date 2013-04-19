@@ -13,6 +13,7 @@ test:
 	@echo "Done.  Please run make install now."
 
 install:
+	mkdir -p $(ETCLOCALDIR)/templates
 	$(foreach SUBDIR, $(SUBDIRS), cd $(SUBDIR) && make install && cd .. ;)
 	@echo "Done.  You may want to restart Apache now."
 

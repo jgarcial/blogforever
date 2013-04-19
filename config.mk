@@ -5,6 +5,7 @@ PREFIX = /opt/invenio
 
 BINDIR = $(PREFIX)/bin
 ETCDIR = $(PREFIX)/etc
+ETCLOCALDIR = $(PREFIX)/etc-local
 TMPDIR = $(PREFIX)/tmp
 LIBDIR = $(PREFIX)/lib
 SQLDIR = $(PREFIX)/lib/sql/invenio
