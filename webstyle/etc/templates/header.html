@@ -35,16 +35,15 @@
             <span class="icon-bar"></span>
         </a>
         <a class="brand" href="{{ url_for('search.index') }}">
-          {{ config.CFG_SITE_NAME_INTL[g.ln] }}
+          <img src="/img/blogforever_logo.png" alt="{{ config.CFG_SITE_NAME_INTL[g.ln] }}" />
         </a>
         <ul class="nav pull-right">
           {% if current_user.is_guest %}
           <li>
-          
             <a href="{{ url_for('youraccount.login', referer=request.url) }}" class="btn btn-log-in">
-            {{ _("Log-in") }}
+            {{ _("Log in") }}
             </a>
-            <a href="{{ url_for('youraccount.register', referer=request.url) }}" class="btn btn-sign-up">{{ _("Sign-up") }}
+            <a href="{{ url_for('youraccount.register', referer=request.url) }}" class="btn btn-sign-up">{{ _("Sign up") }}
             </a>
           </li>
           {% else %}
@@ -52,18 +51,14 @@
             <a href="{{ url_for('youraccount.display') }}">
               <i class="icon icon-white icon-user"></i> {{ current_user.nickname|default(current_user.email) }}
             </a>
-          
           </li>
-  
           <li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span>&nbsp;</a>
           <ul class="dropdown-menu">
-            <li><a href="{{ url_for('youraccount.display') }}">{{ _("Personalize") }}</a></li>
-            
+            <li><a href="{{ url_for('youraccount.display') }}">{{ _("Your Account") }}</a></li>
             <li><a href="{{ url_for('youraccount.logout') }}">
               <i class="icon icon-off"></i> {{ _("Logout") }}
             </a></li>
-    
           </ul>
           </li>
 

@@ -485,12 +485,12 @@ th.youraccountheader a:hover {
 /***************************/
 
 .brand img {
-   height: 24px;
+   height: 40px;
    width: auto;
    max-width: 130px;
-   opacity: 0.6;
+   opacity: 0.7;
    position: relative;
-   margin: -6px -10px 0 0;
+   margin: -1px -7px 0 0;
    -webkit-transition: all .2s linear;
    -moz-transition: all .2s linear;
    transition: all .2s linear;
@@ -520,7 +520,7 @@ margin: 0 auto -150px;
 }
 
 .wrapper > .container {
-padding: 20px 0;
+padding: 24px 0;
 }
 
 .footerwrapper {
@@ -586,7 +586,7 @@ padding-top: 15px;
 }
 
 .navbar .nav {
-margin: 20px 10px 0 0;
+margin: 13px 10px 0 0;
 }
 
 .navbar-inner {
@@ -598,10 +598,10 @@ margin-top: 1px;
 }
 
 .navbar .brand {
-margin-top: 19px;
+margin-top: 1px;
 color: #ddd;
 text-shadow: 1px 1px 1px #1c5016;
-font-weight: 400;
+font-weight: 600;
 -webkit-transition: all .2s linear;
 -moz-transition: all .2s linear;
 transition: all .2s linear;
@@ -625,14 +625,21 @@ transition: background-position 0.1s linear;
 }
 
 .btn.btn-sign-up {
-border-radius: 0 4px 4px 0;
-margin-left: -5px;
+   border-radius: 0 4px 4px 0;
+   font-size: 1em;
+   font-weight: bold;
+   margin-left: -5px;
 }
 .btn.btn-log-in {
+   font-size: 1em;
+   font-weight: bold;
    border-radius:4px 0 0 4px;
 
 }
 
+.input-prepend {
+margin-bottom: 10px;
+}
 /* Hero styles */
 
 .centered {
