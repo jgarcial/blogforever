@@ -11,4 +11,4 @@ SQLDIR = $(PREFIX)/lib/sql/invenio
 IMGDIR = $(PREFIX)/var/www/img
 BINDIR = $(PREFIX)/bin
 
-INSTALL = install -g www-data -m 775
+INSTALL = install -g www-data -m 664

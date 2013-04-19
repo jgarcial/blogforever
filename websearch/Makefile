@@ -2,7 +2,7 @@
 
 include ../config.mk
 
-SUBDIRS = etc lib
+SUBDIRS = etc
 
 all:
 	$(foreach SUBDIR, $(SUBDIRS), cd $(SUBDIR) && make all && cd .. ;)
