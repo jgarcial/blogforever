@@ -1,0 +1,69 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2013 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+
+{% extends "page.html" %}
+{% block title %}{% endblock %}
+{% block body %}
+
+<div class="container">
+  <div class="row">
+    <div class="span4 offset4 well">
+    <legend>{{ _('New to BlogForever?')}} {{ _('Sign up')}}</legend>
+    <form method="POST" action="{{ url_for('.register',) }}">
+    {{ form.referer }}
+    <div class="div_text">
+      <div class="input-prepend">
+         <span class="add-on">
+             <i class="icon-user"></i>
+         </span>
+         {{ form.nickname(placeholder=_('Username'), class_="span3") }}
+      </div>
+    </div>
+    <div class="div_text">
+      <div class="input-prepend">
+        <span class="add-on">
+            <i class="icon-envelope"></i>
+        </span>
+        {{ form.email(placeholder=_('E-mail'), class_="span3") }}
+      </div>
+    </div>
+    <div class="div_text">
+     <div class="input-prepend">
+        <span class="add-on">
+            <i class="icon-lock"></i>
+        </span>
+        {{ form.password(placeholder=_('New password'), class_="span3") }}
+     </div>
+    </div>
+    <div class="div_text">
+     <div class="input-prepend">
+        <span class="add-on">
+            <i class="icon-lock"></i>
+        </span>
+        {{ form.password2(placeholder=_('Repeat password'), class_="span3") }}
+     </div>
+    </div>
+    <br/>
+    {{form.submit(class="btn btn-info pull-right")}}
+    </form>
+    </div>
+  </div>
+</div>
+</form>
+{% endblock %}
