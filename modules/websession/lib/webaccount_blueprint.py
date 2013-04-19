@@ -42,6 +42,7 @@ from invenio.access_control_mailcookie import \
     InvenioWebAccessMailCookieError, \
     mail_cookie_check_authorize_action
 from invenio.pluginutils import PluginContainer
+
 from invenio.webaccount_forms import LoginForm, RegisterForm
 from invenio.webuser_flask import login_user, logout_user, current_user
 from invenio.websession_webinterface import wash_login_method
