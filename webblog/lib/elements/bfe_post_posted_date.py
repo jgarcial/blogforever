@@ -38,12 +38,12 @@ def format_element(bfo):
         posted_date = bfo.fields('269__c')[0]
         # hack
         if posted_date.find("ERROR") > -1:
-            posted_date = "Date not available"
-	else:
-	   date = datetime.datetime.strptime(posted_date, "%m/%d/%Y %I:%M:%S %p")
-	   posted_date = date.strftime("%Y/%m/%d %H:%M:%S")
+            posted_date = "Unknown date"
+        else:
+            date = datetime.datetime.strptime(posted_date, "%m/%d/%Y %I:%M:%S %p")
+            posted_date = date.strftime("%Y/%m/%d %H:%M:%S")
     except:
-        posted_date = "Date not available"
+        posted_date = "Unknown date"
 
     out = '<i class="icon-calendar"></i> <span class="post-posted-date"> %s </span>' % posted_date
     return out
