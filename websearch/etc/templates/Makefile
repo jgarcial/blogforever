@@ -3,7 +3,7 @@
 include ../../../config.mk
 
 templatesdir = $(ETCLOCALDIR)/templates
-templates_DATA = websearch_collection.html websearch_index.html websearch_helpers.html websearch_search.html
+templates_DATA = websearch_collection.html websearch_index.html websearch_helpers.html websearch_search.html websearch_results.html
 EXTRA_DIST = $(templates_DATA)
 CLEANFILES = *~ *.tmp
 
