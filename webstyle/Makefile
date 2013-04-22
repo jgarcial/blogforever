@@ -2,7 +2,7 @@
 
 include ../config.mk
 
-SUBDIRS = etc img css font
+SUBDIRS = etc img css font lib
 
 all:
 	$(foreach SUBDIR, $(SUBDIRS), cd $(SUBDIR) && make all && cd .. ;)
