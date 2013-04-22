@@ -9,6 +9,8 @@
 			<p>
 			<BFE_POST_CONTENT_BRIEF limit="1" escape="4"/>
 			<BFE_AUTHORS/>
+			<BFE_DISCUSSION />
+			<BFE_REVIEWS/>
 			</p>
 		</div>
 	</div>

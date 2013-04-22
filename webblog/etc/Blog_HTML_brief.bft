@@ -8,7 +8,10 @@
 	<div class="span10">
 		<p><span style="font-size:17.5px"><i class="icon-col-Blogs"></i>
 		<strong><BFE_TITLE_BRIEF/></strong></span></p>
-		<p><i class="icon-col-Posts"></i>  <BFE_BLOG_POSTS_BRIEF/></p>
+		<p><i class="icon-col-Posts"></i>  <BFE_BLOG_POSTS_BRIEF/>
+		<BFE_DISCUSSION />
+		<BFE_REVIEWS/>
+		</p>
 	</div>
 </div>
 <hr>

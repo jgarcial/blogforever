@@ -42,7 +42,7 @@
     {%- endif -%}
   {%- endif -%}
 
-  {# Comments link #}
+  <!--{# Comments link #}
   {%- if config.CFG_WEBCOMMENT_ALLOW_COMMENTS and config.CFG_WEBSEARCH_SHOW_COMMENT_COUNT -%}
     {%- set num_comments = rinfo.get_nb_comments() -%}
     {%- if num_comments -%}
@@ -66,7 +66,7 @@
       {{ _("%i reviews") % num_reviews if num_reviews > 1 else _("1 review") }}
     </a>
     {%- endif -%}
-  {%- endif -%}
+  {%- endif -%} -->
 
 
   </p>
