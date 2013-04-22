@@ -25,6 +25,6 @@ from flask import current_app
 def customize_app(app):
 
     Menu = type(app.config['menubuilder_map']['main'])
-    submit = Menu('main.submit', 'Submit', 'submit', 2)
+    submit = Menu('main.submit', 'Submit a Blog', 'submit', 2)
     app.config['menubuilder_map']['main'].children['submit'] = submit
 
