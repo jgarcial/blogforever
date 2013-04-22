@@ -48,15 +48,23 @@ def format_element(bfo):
     # let's get the fields we want to show
     if coll in ["BLOGPOST", "COMMENT"]:
         author = bfo.fields('100__a')[0]
+        if not author:
+            author = "Unknown author"
         try:
             posted_date = bfo.fields('269__c')[0]
+            # hack
+            if posted_date.find("ERROR") > -1:
+                posted_date = "Unknown date"
+            else:
+                date = datetime.datetime.strptime(posted_date, "%m/%d/%Y %I:%M:%S %p")
+                posted_date = date.strftime("%Y/%m/%d %H:%M:%S")
         except:
-            posted_date = ""
+            posted_date = "Unknown date"
 
     try:
         title = bfo.fields('245__a')[0]
     except:
-        title = "Untitled"
+        title = "Unknown title"
 
     try:
         original_url = bfo.fields('520__u')[0]
@@ -76,7 +84,7 @@ def format_element(bfo):
         try:
             blog_title = blog_bfo.fields('245__a')[0]
         except:
-            blog_title = 'Untitled'
+            blog_title = 'Unknown title'
 
         out = """<h4>Citation:</h4> 
         <div class="well well-large">
@@ -93,7 +101,7 @@ def format_element(bfo):
         try:
             post_title = post_bfo.fields('245__a')[0]
         except:
-            post_title = 'Untitled'
+            post_title = 'Unknown title'
 
         out = """<h4>Citation:</h4>
         <div class="well well-large">\
