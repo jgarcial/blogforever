@@ -59,22 +59,8 @@
         {% if collection.latest_additions %}
         {% for recid in collection.latest_additions[-10:]|reverse %}
           <div class="row-fluid span1 offset1">
-            <!--<div class="span1">
-              <small style="font-size:70%;">
-                {{ get_creation_date(recid, fmt="%Y-%m-%d<br />%H:%i")|safe }}
-              </small>
-            </div> -->
             <div class="span12">
-		{{ format_record(recid, 'hb', ln=g.ln)|safe }}
-                <!--<p>
-                  <a href="{{ url_for('record.metadata', recid=recid, ln=g.ln) }}">
-                    {{ _("Detailed record") }}
-                  </a>
-                   -
-                  <a href="{{ url_for('.search', p="recid:%d" % recid, rm='wrd', ln=ln) }}">
-                    {{ _("Similar records") }}
-                  </a>
-                </p>-->
+               {{ format_record(recid, 'hb', ln=g.ln)|safe }}
              </div>
           </div>
         {% endfor %}
@@ -105,10 +91,9 @@
     {{ portalbox_sidebar(portalboxes.rt, class="offset2 span2") }}
   {% endif %}
 
-  </div> <!-- /span9 offset3 -->
+</div> <!-- /row -->
 </div> <!-- /search-index -->
 </div> <!-- /container -->
-</div> <!-- /row -->
 
 {% endmacro %}
 
@@ -117,7 +102,7 @@
 <div class="search-index">
 <header class="jumbotron masthead centered">
     <h1>Atlantis Blogs</h1>
-    <p>A Blogforever project preserving and disseminating blogs <br>from the citizens of Atlantis.</p>
+    <p>Preserving and disseminating blogs using <br> the BlogForever Platform</p>
 </header>
 
 <div class="row hero centered">
@@ -132,8 +117,9 @@
   {% endcache %}
 {% endif %}
 
+
 <div class="green-bg">
-    <div class="container">
+<div class="container">
 <div class="marketing">
   <h1>More Blogforever repositories:</h1>
   <p class="marketing-byline">See what other institutions are doing with Blogforever blog repositories</p>
@@ -189,9 +175,10 @@
   </div><!--/row-->
 
 <p class="pull-right"><a href="#">Back to top</a></p>
-</div><!-- /.marketing -->
-    </div><!-- /container -->
-  </div>
+
+</div><!-- /marketing -->
+</div><!-- /container -->
+</div>
 
 {% endblock %}
 

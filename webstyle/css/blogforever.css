@@ -520,7 +520,7 @@ margin: 0 auto -150px;
 }
 
 .wrapper > .container {
-padding: 24px 0;
+padding: 40px 0;
 }
 
 .footerwrapper {
@@ -653,6 +653,7 @@ position: relative;
 .green-bg {
 background-color: #E9F3E7;
 padding-bottom: 40px;
+margin-bottom: -150px;
 }
 
 .masthead {
@@ -742,6 +743,11 @@ background-image: -moz-linear-gradient(left, transparent, rgba(0, 0, 0, .1), tra
 background-image: -ms-linear-gradient(left, transparent, rgba(0, 0, 0, .1), transparent);
 background-image: -o-linear-gradient(left, transparent, rgba(0, 0, 0, .1), transparent);
 border: 0;
+}
+
+/* Login form */
+.size4 {
+width: 296px;
 }
 
 /* Narrow by collection  */
@@ -882,8 +888,6 @@ margin-left: 3px;
 .icon-col-Posts:before {
    content: "\f016";
 }
-
-
 
 .marketing .pull-right {
 padding-bottom: 40px;
