@@ -54,8 +54,7 @@ from werkzeug.utils import cached_property
 from invenio.config import \
      CFG_PATH_PHP, \
      CFG_BINDIR, \
-     CFG_SITE_LANG, \
-     CFG_TRANSLATE_RECORD_PREVIEW
+     CFG_SITE_LANG
 from invenio.errorlib import \
      register_exception
 from invenio.bibrecord import \
@@ -469,26 +468,6 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0,
     out_ = format_with_format_template(template, bfo, verbose)
 
     out += out_
-
-    # Insert translate script
-    show_translate = 0
-    if CFG_TRANSLATE_RECORD_PREVIEW:
-        from invenio.search_engine import get_record
-        show_translate = 1
-        record = get_record(recID)
-        record_lang = ""
-        if '041' in record.keys():
-            record_lang = record['041'][0][0][0][1]
-
-        if record_lang != "":
-            if record_lang == ln:
-                show_translate = 0
-            else:
-                site_lang = get_lang_name_from_code(ln)
-                if(is_in_lang_codes(site_lang, record_lang) != ""):
-                    show_translate = 0
-    if show_translate:
-        out += get_translate_script('to-be-translated', ln, True)
 
     return out
 
