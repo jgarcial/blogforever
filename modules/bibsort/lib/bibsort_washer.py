@@ -102,7 +102,7 @@ class BibSortWasher(object):
 	    date = datetime.datetime.strptime(val, "%m/%d/%Y %I:%M:%S %p")
 	    posted_date = date.strftime("%Y/%m/%d %H:%M:%S")
 	except:
-	    return val
+	    return ("0000/00/00 00:00:00")
 	return posted_date
 
     def _sort_dates(self, val):

@@ -42,8 +42,17 @@ from invenio.websearch_facet_builders import \
     get_current_user_records_that_can_be_displayed, faceted_results_filter, \
     FacetLoader
 from invenio.search_engine import get_creation_date, perform_request_search,\
+<<<<<<< HEAD
     print_record, create_nearest_terms_box, browse_pattern_phrases
 from invenio.paginationutils import Pagination
+=======
+    search_pattern, print_record, create_nearest_terms_box
+from invenio.websearch_instantbrowse import instantbrowse_manager
+from invenio.pluginutils import PluginContainer
+from invenio.config import CFG_PYLIBDIR, CFG_WEBSEARCH_INSTANT_BROWSE_AND_SEARCH_SAME_SORTING
+import os
+
+>>>>>>> 3eb4751... BibSort: fix sorting by posted date
 
 blueprint = InvenioBlueprint('search', __name__, url_prefix="",
                              config='invenio.search_engine_config',
@@ -292,9 +301,26 @@ def search(collection, p, of, so, rm):
         argd['rg'] = current_user.get('rg')
     rg = int(argd['rg'])
 
+    #FIXME add current_user.get('c') as list
+
     collection_breadcrumbs(collection)
 
     qid = get_search_query_id(**argd)
+
+    if CFG_WEBSEARCH_INSTANT_BROWSE_AND_SEARCH_SAME_SORTING:
+        # Container of latest additions plugins
+        instantbrowse_plugins_container = PluginContainer\
+            (os.path.join(CFG_PYLIBDIR, 'invenio', 'websearch_instantbrowse_plugins', 'websearch_*.py'))
+        # check which plugins have been set for each collection
+        instantbrowse_plugin = instantbrowse_manager.get_instantbrowse_plugin(collection.id)
+        if instantbrowse_plugin:
+            plugin = instantbrowse_plugins_container.get_plugin(instantbrowse_plugin[0])
+            params = instantbrowse_plugin[1]
+            # run the corresponding plugin
+            if params:
+                plugin_argd = json.loads(params)
+                argd.update(plugin_argd)
+
     recids = perform_request_search(req=request.get_legacy_request(), **argd)
 
     if so or rm:
