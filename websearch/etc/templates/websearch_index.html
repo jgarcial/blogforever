@@ -57,7 +57,7 @@
         <strong>{{ _('This collection is restricted. If you are authorized to access it, please click on the Search button.') }}</strong>
       {% else %}
         {% if collection.latest_additions %}
-        {% for recid in collection.latest_additions[:10] %}
+        {% for recid in collection.latest_additions[-10:]|reverse %}
           <div class="row-fluid span1 offset1">
             <!--<div class="span1">
               <small style="font-size:70%;">
