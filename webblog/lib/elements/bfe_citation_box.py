@@ -32,14 +32,14 @@ def format_element(bfo):
     Displays the description of how users should cite
     any content of the archive. The citation includes:
     For blogs: "title".
-    Date created: creation_date. record_url
+    Date archived: creation_date. Archived at "record_url"
     Retrieved from the original "original_url"
     For blog posts: author. "title". Blog: "blog_title".
-    Date created: creation_date. record_url
-    Date posted: posted_date. Retrieved from the original "original_url"
+    Date posted: posted_date. Retrieved from the original "original_url
+    Date archived: creation_date. Archived at "record_url"
     For comments: author. Blog post: "post_title".
-    Date created: creation_date. record_url
-    Retrieved from the original "original_url"
+    Retrieved from the original "original_url
+    Date archived: creation_date. Archived at "record_url"
     """
 
     coll = bfo.fields('980__a')[0]
@@ -88,10 +88,10 @@ def format_element(bfo):
 
         out = """<h4>Citation:</h4> 
         <div class="well well-large">
-        <span><b>%s </b>: '%s'. Blog: '%s'. </br> \
-        Date created: %s. <i>'%s'</i> </br>\
-        Date posted: %s. Retrieved from the original post <i>'%s'</i>. </span> </div>""" \
-        % (author, title, blog_title, record_creation_date, record_url, posted_date, original_url)
+        <span><b>%s</b>. '%s'. Blog: '%s' </br> \
+        Date posted: %s. Retrieved from the original post <i>'%s'</i> </br>\
+        Date archived: %s. Archived at <i>'%s'</i> </span> </div>""" \
+        % (author, title, blog_title, posted_date, original_url, record_creation_date, record_url)
 
     elif coll == "COMMENT":
         # we will also show the post's title of
@@ -105,18 +105,18 @@ def format_element(bfo):
 
         out = """<h4>Citation:</h4>
         <div class="well well-large">\
-        <span><b>%s. </b>Blog post: '%s'.</br> \
-        Date created: %s. <i>'%s'</i> </br> \
-        Retrieved from the original comment <i>'%s'</i></span> </div>""" \
-        % (author, post_title, record_creation_date, record_url, original_url)
+        <span><b>%s. </b>Blog post: '%s'</br> \
+         Retrieved from the original comment <i>'%s'</i></br> \
+         Date archived: %s. Archived at <i>'%s'</i> </span> </div>""" \
+        % (author, post_title, original_url, record_creation_date, record_url)
 
     else: # coll == "BLOG"
         out = """<h4>Citation:</h4>
         <div class="well well-large">\
         <span>'%s' </br> \
-        Date created: %s. <i>'%s'</i> </br> \
-        Retrieved from the original blog <i>'%s'</i></span> </div>""" \
-        % (title, record_creation_date, record_url, original_url)
+        Retrieved from the original blog <i>'%s'</i></br> \
+        Date archived: %s. Archived at <i>'%s'</i> </span> </div>""" \
+        % (title, original_url, record_creation_date, record_url)
 
     return out
 
