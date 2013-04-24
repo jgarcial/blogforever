@@ -41,6 +41,7 @@ def format_element(bfo):
     this_recid = bfo.control_field('001')
     current_language = bfo.lang
     blog_posts_recids = get_posts(this_recid)
+    blog_posts_recids.reverse()
     out = ""
     if blog_posts_recids:
         # let's print just the 3 latest posts

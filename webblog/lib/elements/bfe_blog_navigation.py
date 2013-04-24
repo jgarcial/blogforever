@@ -51,7 +51,7 @@ def format_element(bfo):
     except:
         blog_title = 'Untitled'
 
-    menu_recids = get_posts(blog_recid, newest_first=True)
+    menu_recids = get_posts(blog_recid)
 
     try:
         menu_out = '<h4>%s</h4>' % cfg_messages["in_issue"][current_language]

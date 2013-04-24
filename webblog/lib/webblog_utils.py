@@ -22,6 +22,18 @@ Various utilities for WebBlog, e.g. config parser, etc.
 """
 
 from invenio.search_engine_utils import get_fieldvalues
+from invenio.websearch_instantbrowse import instantbrowse_manager
+from invenio.pluginutils import PluginContainer
+import os
+import json
+from invenio.config import CFG_PYLIBDIR
+from invenio.search_engine import perform_request_search
+from invenio.websearch_external_collections_utils import get_collection_id
+
+# Container of latest additions plugins
+instantbrowse_plugins_container = PluginContainer\
+    (os.path.join(CFG_PYLIBDIR, 'invenio', 'websearch_instantbrowse_plugins', 'websearch_*.py'))
+
 
 #####  BLOGS #####
 
@@ -64,20 +76,27 @@ def get_blog_descendants(recid):
 
 ##### POSTS #####
 
-def get_posts(blog_recid, newest_first=True):
+def get_posts(blog_recid):
     """ This function returns the list of posts 
     written on the given blog
     @param blog_recid: blog recid
     @type blog_recid: int
-    @param newest_first: order in wich the posts will be displayed. If
-    it is True the newest published posts will be displayed first
-    @type newest_first: boolean
     @return: list of posts recids
     @rtype: list
     """
 
-    from invenio.search_engine import perform_request_search
-    return perform_request_search(p='760__w:"%s"' % blog_recid, sf='posted date', so='a')
+    collection_id = get_collection_id('Posts')
+    argd = {}
+    # check which plugins have been set for each collection
+    instantbrowse_plugin = instantbrowse_manager.get_instantbrowse_plugin(collection_id)
+    if instantbrowse_plugin:
+        plugin = instantbrowse_plugins_container.get_plugin(instantbrowse_plugin[0])
+        params = instantbrowse_plugin[1]
+        # run the corresponding plugin
+        if params:
+            argd.update(json.loads(params))
+    argd['p'] = '760__w:"%s"' % blog_recid
+    return perform_request_search(None, **argd)
 
 def get_parent_post(comment_recid):
     """ This function returns the parent post of any 
@@ -113,7 +132,7 @@ def get_sibling_posts(post_recid, newest_first=True, exclude_this_post=True):
     """
 
     main_blog_recid = get_parent_blog(post_recid)
-    siblings_list = get_posts(main_blog_recid, newest_first)
+    siblings_list = get_posts(main_blog_recid)
     if exclude_this_post:
         siblings_list.remove(post_recid)
 
@@ -168,19 +187,28 @@ def get_previous_post(post_recid):
 
 ##### COMMENTS #####
 
-def get_comments(post_recid, newest_first=True):
+def get_comments(post_recid):
     """ This function returns the list of comments 
     written on the given post
     @param post_recid: post recid
     @type post_recid: int
-    @param newest_first: order in wich the comments will be displayed. If
-    it is True the newest comments will be displayed first
-    @type newest_first: boolean
     @return: list of sibling comments recids
     @rtype: list
     """
-    from invenio.search_engine import perform_request_search
-    return perform_request_search(p='773__w:"%s"' % post_recid, sf='date', so='d')
+
+    collection_id = get_collection_id('Comments')
+    argd = {}
+    # check which plugins have been set for each collection
+    instantbrowse_plugin = instantbrowse_manager.get_instantbrowse_plugin(collection_id)
+    if instantbrowse_plugin:
+        plugin = instantbrowse_plugins_container.get_plugin(instantbrowse_plugin[0])
+        params = instantbrowse_plugin[1]
+        # run the corresponding plugin
+        if params:
+            argd.update(json.loads(params))
+    argd['p'] = '773__w:"%s"' % post_recid
+    print argd
+    return perform_request_search(None, **argd)
 
 def get_sibling_comments(comment_recid, newest_first=True, exclude_this_comment=True):
     """ This function returns the list of the sibling comments of any 
@@ -198,7 +226,7 @@ def get_sibling_comments(comment_recid, newest_first=True, exclude_this_comment=
     """
 
     post_recid = get_parent_post(comment_recid)
-    siblings_list = get_comments(post_recid, newest_first)
+    siblings_list = get_comments(post_recid)
     if exclude_this_comment:
         siblings_list.remove(comment_recid)
 

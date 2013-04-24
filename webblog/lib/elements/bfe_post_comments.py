@@ -38,7 +38,7 @@ def format_element(bfo):
 
     this_recid = bfo.control_field('001')
     current_language = bfo.lang
-    post_comments_recids = get_comments(this_recid, newest_first=True)
+    post_comments_recids = get_comments(this_recid)
     out = ""
     if post_comments_recids:
         # let's print just the 3 latest posts

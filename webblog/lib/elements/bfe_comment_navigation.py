@@ -53,7 +53,7 @@ def format_element(bfo):
     menu_out = ""
     post_recid = get_parent_post(this_recid)
     if post_recid:
-        menu_recids = get_comments(post_recid, newest_first=True)
+        menu_recids = get_comments(post_recid)
         if menu_recids:
             try:
                 menu_out = '<h4>%s</h4>' % cfg_messages["in_issue"][current_language]
