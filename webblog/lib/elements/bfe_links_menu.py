@@ -20,7 +20,8 @@
 BibFormat Element - creates a menu containing all the links in a post
 """
 
-from invenio.config import CFG_SITE_URL
+
+from invenio.config import CFG_SITE_SECURE_URL
 from invenio.search_engine_utils import get_fieldvalues
 from invenio.search_engine import perform_request_search
 
@@ -30,12 +31,13 @@ cfg_messages["in_issue"] = {"en": "Reference links on this post",
 
 def format_element(bfo):
     """
-    Returns all the links used as references in a post
-    """
+Returns all the links used as references in a post
+"""
 
     current_language = bfo.lang
     links = bfo.fields('856_0')
     menu_out = ""
+    pop_id = 0
 
     if links:
         try:
@@ -44,30 +46,36 @@ def format_element(bfo):
             menu_out += '<h4>%s:</h4>' % cfg_messages["in_issue"]["en"]
 
     for link in links:
-        link_url   = link.get('u')
-        link_data  = link.get('y', link_url)
+        link_url = link.get('u')
+        link_data = link.get('y', link_url)
         link_title = link.get('z', '')
+        pop_id = (pop_id+1)
         if link_data:
-            menu_out += '<div class="litem"><a href="%s"%s>%s</a></div>' % \
-                (link_url, link_title and ' title="%s"' % link_title or '' , link_data)
+            menu_out += '<div class="litem"><a href="%s"%s data-toggle="popover" id="pop_%s" >%s</a>' % \
+                (link_url, link_title and ' title="%s"' % link_title or '' , pop_id, link_data)
             recid_in_archive = perform_request_search(p = link_url, f = '520__u')
             # differentiate between links to sources inside
             # the archive and sources outside
             if recid_in_archive:
-                menu_out += '<div style="padding-left:20px;"><h4>This content is also available in the archive: </h4>'
+                menu_out += ' <i class="icon-asterisk"></i>'
+                menu_out += \
+                '<script type="text/javascript"> $(function(){$("#pop_%s").popover({ trigger:"hover", title:"This content is also available in the archive: ", html:true, delay: { show: 100, hide: 5000 }, ' % (pop_id)
                 try:
                     title = get_fieldvalues(recid_in_archive[0], "245__a")[0]
                 except:
                     title = "Untitled"
-                menu_out += '<span class="moreinfo"><a href="%s/record/%s">%s</a></span></div></br>' % \
-                            (CFG_SITE_URL, recid_in_archive[0], title)
-
+                archive_link = '<a href=%s/record/%s><i class=icon-arrow-right></i> %s</a>' % \
+                            (CFG_SITE_SECURE_URL, recid_in_archive[0], title)
+                menu_out += 'content: "%s" });}); </script>' % \
+                    (archive_link)
+            menu_out += '</div>'
     return menu_out
+
 
 
 def escape_values(bfo):
     """
-    Called by BibFormat in order to check if output of this element
-    should be escaped.
-    """
+Called by BibFormat in order to check if output of this element
+should be escaped.
+"""
     return 0

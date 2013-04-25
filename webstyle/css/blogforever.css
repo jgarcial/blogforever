@@ -1018,6 +1018,44 @@ color: #000;
 text-decoration:none;
 }
 
+/* Modified Popovers on Detailed Record */
+
+.popover {
+  width: auto;
+  background-color: #ffffff;
+  border: 1px solid #000;
+}
+
+.popover-title {
+  margin: 0;
+  padding: 8px 14px;
+  font-size: 16px;
+  font-weight: bold;
+  line-height: 20px;
+  background-color: #f7f7f7;
+  border-bottom: 1px solid #ebebeb;
+  -webkit-border-radius: 5px 5px 0 0;
+  -moz-border-radius: 5px 5px 0 0;
+  border-radius: 5px 5px 0 0;
+}
+
+.popover.right .arrow {
+  top: 50%;
+  left: -11px;
+  margin-top: -11px;
+  border-left-width: 0;
+  border-right-color: #000;
+}
+
+.delete-btn a {
+color: #333333;
+text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
+}
+
+.delete-btn a:hover {
+text-decoration: none;
+}
+
 @media (max-width: 767px) {
 .browse > li {
 width: 100%;
