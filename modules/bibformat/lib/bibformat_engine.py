@@ -97,6 +97,7 @@ from invenio.shellutils import escape_shell_arg
 from invenio.translate_utils import get_translate_script, \
                                     get_lang_name_from_code, \
                                     is_in_lang_codes
+from flask import current_app, has_app_context
 
 if CFG_PATH_PHP: #Remove when call_old_bibformat is removed
     from xml.dom import minidom
