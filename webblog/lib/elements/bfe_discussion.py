@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-BibFormat Element - 
+BibFormat Element - displays a link to the discussion on the record
 """
 
 from invenio.config import CFG_SITE_SECURE_URL, \
@@ -29,10 +29,10 @@ from invenio.urlutils import create_html_link
 
 def format_element(bfo):
     """
-    Returns
+     Displays a link to the discussion on the record
     """
 
-    current_language = bfo.lang
+    out = ""
     this_recid = bfo.control_field('001')
     if CFG_WEBCOMMENT_ALLOW_COMMENTS and CFG_WEBSEARCH_SHOW_COMMENT_COUNT:
         num_comments = get_nb_comments(this_recid)
