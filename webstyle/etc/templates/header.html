@@ -26,8 +26,8 @@
 
   <div class="navbar navbar-fixed-top">
 
-    <div class="navbar-inner">
-      <div class="navbar-inner-wrap">
+   <div class="navbar-inner">
+     <div class="navbar-inner-wrap">
       <div class="container">
         <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
             <span class="icon-bar"></span>
@@ -37,56 +37,58 @@
         <a class="brand" href="{{ url_for('search.index') }}">
           <img src="/img/blogforever_logo_header.png" alt="{{ config.CFG_SITE_NAME_INTL[g.ln] }}" />
         </a>
-        <ul class="nav pull-right">
-          {% if current_user.is_guest %}
-          <li>
-            <a href="{{ url_for('youraccount.login', referer=request.url) }}" class="btn btn-log-in">
-            {{ _("Log in") }}
-            </a>
-            <a href="{{ url_for('youraccount.register', referer=request.url) }}" class="btn btn-sign-up">{{ _("Sign up") }}
-            </a>
-          </li>
-          {% else %}
-          <li>
-            <a href="{{ url_for('youraccount.display') }}">
-              <i class="icon icon-white icon-user"></i> {{ current_user.nickname|default(current_user.email) }}
-            </a>
-          </li>
-          <li class="dropdown">
-            <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span>&nbsp;</a>
-          <ul class="dropdown-menu">
-            <li><a href="{{ url_for('youraccount.display') }}">{{ _("Your Account") }}</a></li>
-            <li><a href="{{ url_for('youraccount.logout') }}">
-              <i class="icon icon-off"></i> {{ _("Logout") }}
-            </a></li>
-          </ul>
-          </li>
-
-          {% endif %}
-
-        </ul>
         <div class="nav-collapse collapse">
-        <ul class="nav">
-        {%- for item in menu|sort(attribute='order') recursive %}
-          {%- if item.children -%}
-          <li class="dropdown">
-            <a class="dropdown-toggle" data-toggle="dropdown" href="{{ url_for(item.url) }}">
-              {{ item.title|safe }}
-              <b class="caret"></b>
-            </a>
-            <ul class="dropdown-menu">
-              {{ loop(item.children.itervalues()) }}
+          <ul class="nav">
+          {%- for item in config.menubuilder_map.main.children.itervalues()|sort(attribute='order') if item.display() recursive %}
+            {%- if item.children -%}
+            <li class="dropdown">
+              <a href="{{ url_for(item.url) }}" style="display: inline-block; padding-right: 5px;">{{ item.title|safe }}</a>
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="display: inline-block; padding-left: 5px;">
+                <b class="caret"></b>
+              </a>
+              <ul class="dropdown-menu pull-right">
+                {{ loop(item.children.itervalues()) }}
+              </ul>
+            </li>
+            {%- else -%}
+            <li><a href="{{ url_for(item.url) }}">{{ item.title|safe }}</a></li>
+            {%- endif %}
+          {%- endfor %}
+          </ul>
+          <div class="pull-right">
+            <ul class="nav pull-right">
+              {% if current_user.is_guest %}
+              <li>
+                <a href="{{ url_for('youraccount.login', referer=request.url) }}" class="btn btn-log-in">
+                {{ _("Log in") }}
+                </a>
+                <a href="{{ url_for('youraccount.register', referer=request.url) }}" class="btn btn-sign-up">{{ _("Sign up") }}
+                </a>
+              </li>
+              {% else %}
+               <li>
+               <a href="{{ url_for('youraccount.display') }}">
+               <i class="icon icon-white icon-user"></i> {{ current_user.nickname|default(current_user.email) }}</a>
+              </li>
+              <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="display: inline-block; padding-left: 5px;">
+                <span class="caret"></span>&nbsp;</a>
+                <ul class="dropdown-menu pull-right">
+                  {%- for item in config.menubuilder_map.personalize.children.itervalues()|sort(attribute='order') if item.display() %}
+                  <li><a href="{{ url_for(item.url) }}">{{ item.title|safe }}</a></li>
+                  {% endfor %}
+                  <li class="divider"></li>
+                  <li><a href="{{ url_for('youraccount.logout') }}">
+                    <i class="icon icon-off"></i> {{ _("Logout") }}
+                  </a></li>
+               </ul>
+            {% endif %}
             </ul>
-          </li>
-          {%- else -%}
-          <li><a href="{{ url_for(item.url) }}">{{ item.title|safe }}</a></li>
-          {%- endif %}
-        {%- endfor %}
-        </ul>
+          </div>
         </div>
-      </div>
+     </div>
     </div>
-    </div>
+  </div>
   </div>
 
   <div class="visible-desktop" style="clear:both; height: 80px;"></div>
