@@ -22,7 +22,7 @@ BibFormat Element - creates the blog navigation menu
 from invenio.bibformat_engine import BibFormatObject
 from invenio.config import CFG_SITE_SECURE_URL
 from invenio.webblog_utils import get_parent_blog, get_posts
-
+import datetime
 
 cfg_messages = {}
 cfg_messages["in_issue"] = {"en": "More posts in this blog ",
@@ -46,6 +46,7 @@ def format_element(bfo):
 
     blog_recid = get_parent_blog(this_recid)
     menu_recids = get_posts(blog_recid)
+    menu_recids.reverse()
 
     try:
         menu_title = '<h4>%s</h4>' % cfg_messages["in_issue"][current_language]
@@ -58,19 +59,30 @@ def format_element(bfo):
                     <li class="nav-header">%s</li>""" % menu_title
 
     for recid in menu_recids:
+        temp_rec = BibFormatObject(recid)
+        try:
+            posted_date = temp_rec.fields('269__c')[0]
+            # hack
+            if posted_date.find("ERROR") > -1:
+                posted_date = ""
+            else:
+                date = datetime.datetime.strptime(posted_date, "%m/%d/%Y %I:%M:%S %p")
+                posted_date = date.strftime("%Y/%m/%d %H:%M:%S")
+        except:
+            posted_date = ""
+
         menu_out += """<li class="divider"></li>"""
         if str(this_recid) == str(recid):
-            menu_out += '<li class="active"><li>%s</li></li>' % this_title
+            menu_out += '<li class="active">%s<br/><span><small>%s</small></span></li>' % (this_title, posted_date)
         else:
-            temp_rec = BibFormatObject(recid)
             try:
                 title = temp_rec.fields('245__a')[0]
             except:
                 title = 'Unknown title'
-            menu_out += '<li><a href="%s/record/%s?ln=%s">%s</a></li>' % (CFG_SITE_SECURE_URL,
+            menu_out += '<li><a href="%s/record/%s?ln=%s">%s</a><span><small>%s</small></span></li>' % (CFG_SITE_SECURE_URL,
                                                                       recid,
                                                                       bfo.lang,
-                                                                      title)
+                                                                      title, posted_date)
     menu_out += """<li class="divider"></li></ul></div></div>"""
     return menu_out
 
