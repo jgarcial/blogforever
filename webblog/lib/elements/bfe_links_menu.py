@@ -44,10 +44,16 @@ Returns all the links used as references in a post
             menu_title = '<h4>%s</h4>' % cfg_messages["in_issue"][current_language]
         except: # in english by default
             menu_title = '<h4>%s</h4>' % cfg_messages["in_issue"]["en"]
-        menu_out += """<div class="sidebar-nav">
-                        <div class="well" style="width:250px; padding: 5px 0;">
-                        <ul class="nav nav-list">
-                        <li class="nav-header">%s</li>""" % menu_title
+        
+        '<a id="see_all_link" \
+                href="javascript:void(0)" onclick="displayAllLinks()""></a>'
+        out = """<div class="sidebar-nav">
+                    <div class="well" style="width:250px; padding: 5px 0;">
+                    <ul class="nav nav-list">
+                    <li class="nav-header">%s</li>
+                      <a class="moreinfo" id="see_all_link" href="javascript:void(0)" onclick="displayAllLinks()"></a>
+                    """ % menu_title
+
         for link in links:
             link_url = link.get('u')
             link_data = link.get('y', link_url)
@@ -77,7 +83,28 @@ Returns all the links used as references in a post
                 menu_out += """</li>"""
         menu_out += """<li class="divider"></li></ul></div></div>"""
 
-    return menu_out
+        out += """
+                <script type="text/javascript">
+                function displayAllLinks(){
+                    var reference_links = document.getElementById('reference_links');
+                    var see_all_link = document.getElementById('see_all_link');
+                    if (reference_links.style.display == 'none'){
+                        reference_links.style.display = '';
+                        see_all_link.innerHTML = "Hide links"
+                    } else {
+                        reference_links.style.display = 'none';
+                        see_all_link.innerHTML = 'Click here to see all links <i class="icon-double-angle-down"></i>'
+                    }
+                }
+                </script>
+                """
+
+        out += '<span id="reference_links" style="">' + menu_out + '</span>'
+#        out += '<a id="see_all_link" \
+#                href="javascript:void(0)" onclick="displayAllLinks()""></a>'
+        out += '<script type="text/javascript">displayAllLinks()</script>'
+
+    return out
 
 
 def escape_values(bfo):
