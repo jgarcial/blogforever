@@ -44,7 +44,7 @@
 	<div class="span3 associated-content">
 
 		<div class="bfe-blog-navigation">
-		<BFE_BLOG_NAVIGATION />
+		<BFE_BLOG_NAVIGATION_MENU />
 		</div> <!-- end bfe-blog-navigation -->
 
 		<div class="bfe-links-menu">

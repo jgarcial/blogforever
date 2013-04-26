@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 ## This file is part of CDS Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## Copyright (C) 2012, 2013 CERN.
 ##
 ## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -19,59 +19,59 @@
 """
 BibFormat Element - creates the blog navigation menu
 """
-from invenio.search_engine import search_pattern, record_exists
 from invenio.bibformat_engine import BibFormatObject
-from invenio.config import CFG_SITE_URL
+from invenio.config import CFG_SITE_SECURE_URL
 from invenio.webblog_utils import get_parent_blog, get_posts
 
 
 cfg_messages = {}
-cfg_messages["in_issue"] = {"en": "Other posts in this blog: ",
-                            "fr": "Aussi dans ce blog: "}
+cfg_messages["in_issue"] = {"en": "Other posts in this blog ",
+                            "fr": "Aussi dans ce blog "}
 
 
 def format_element(bfo):
     """
-    Creates a navigation for articles in the same issue and category.
+    Creates a navigation menu in a post record with the links
+    of the other posts in the same blog
     """
     # get variables
     this_recid = bfo.control_field('001')
     menu_recids = []
+    menu_out = ""
     current_language = bfo.lang
-    this_title = ""
     try:
         this_title = bfo.fields('245__a')[0]
     except:
-        return ""
+        return "Unknown title"
 
     blog_recid = get_parent_blog(this_recid)
-    blog_rec = BibFormatObject(blog_recid)
-    try:
-        blog_title = blog_rec.fields('245__a')[0]
-    except:
-        blog_title = 'Untitled'
-
     menu_recids = get_posts(blog_recid)
 
     try:
-        menu_out = '<h4>%s</h4>' % cfg_messages["in_issue"][current_language]
+        menu_title = '<h4>%s</h4>' % cfg_messages["in_issue"][current_language]
     except: # in english by default
-        menu_out = '<h4>%s</h4>' % cfg_messages["in_issue"]['en']
+        menu_title = '<h4>%s</h4>' % cfg_messages["in_issue"]['en']
+
+    menu_out += """<div class="sidebar-nav">
+                    <div class="well" style="width:250px; padding: 5px 0;">
+                    <ul class="nav nav-list">
+                    <li class="nav-header">%s</li>""" % menu_title
 
     for recid in menu_recids:
+        menu_out += """<li class="divider"></li>"""
         if str(this_recid) == str(recid):
-            menu_out += '<div class="active"><div class="litem">%s</div></div>' % this_title
+            menu_out += '<li class="active"><li>%s</li></li>' % this_title
         else:
             temp_rec = BibFormatObject(recid)
             try:
                 title = temp_rec.fields('245__a')[0]
             except:
-                title = 'Untitled'
-            menu_out += '<div class="litem"><a href="%s/record/%s%s">%s</a></div>' % (CFG_SITE_URL,
-                                                                                      recid,
-                                                                                      (bfo.lang=="fr") and "?ln=fr" or "",
-                                                                                      title)
-
+                title = 'Unknown title'
+            menu_out += '<li><a href="%s/record/%s?ln=%s">%s</a></li>' % (CFG_SITE_SECURE_URL,
+                                                                      recid,
+                                                                      bfo.lang,
+                                                                      title)
+    menu_out += """<li class="divider"></li></ul></div></div>"""
     return menu_out
 
 def escape_values(bfo):
