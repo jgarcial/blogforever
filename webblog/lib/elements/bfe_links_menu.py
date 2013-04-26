@@ -26,8 +26,8 @@ from invenio.search_engine_utils import get_fieldvalues
 from invenio.search_engine import perform_request_search
 
 cfg_messages = {}
-cfg_messages["in_issue"] = {"en": "Reference links on this post",
-                            "es": "Links de referencia en este post"}
+cfg_messages["in_issue"] = {"en": "Reference links",
+                            "es": "Links de referencia"}
 
 def format_element(bfo):
     """
@@ -56,7 +56,7 @@ Returns all the links used as references in a post
             recid_in_archive = perform_request_search(p = link_url, f = '520__u')
             if link_data:
                 if recid_in_archive:
-                    link_icon = '  <i class="icon-hand-left"></i>'
+                    link_icon = ''
                 else:
                     link_icon = '  <i class="icon-external-link"></i>'
                 menu_out += """<li class="divider"></li>"""
@@ -66,7 +66,7 @@ Returns all the links used as references in a post
                 # the archive and sources outside
                 if recid_in_archive:
                     menu_out += \
-                    '<script type="text/javascript"> $(function(){$("#pop_%s").popover({ trigger:"hover", title:"This content is also available in the archive: ", html:true, delay: { show: 100, hide: 1500 }, ' % (pop_id)
+                    '<script type="text/javascript"> $(function(){$("#pop_%s").popover({ trigger:"hover", title:"This content is also available in the archive ", html:true, delay: { show: 100, hide: 2000 }, ' % (pop_id)
                     try:
                         title = get_fieldvalues(recid_in_archive[0], "245__a")[0]
                     except:

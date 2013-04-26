@@ -28,8 +28,8 @@ from invenio.search_engine import call_bibformat
 
 
 cfg_messages = {}
-cfg_messages["in_issue"] = {"en": "Posts on this blog: ",
-                            "fr": "Posts sur ce blog:"}
+cfg_messages["in_issue"] = {"en": "Posts on this blog ",
+                            "fr": "Posts sur ce blog"}
 
 
 def format_element(bfo):
@@ -80,7 +80,6 @@ def format_element(bfo):
             out += '<a class="moreinfo" id="see_all_link" \
                     href="javascript:void(0)" onclick="displayAllPosts()""></a>'
             out += '<script type="text/javascript">displayAllPosts()</script>'
-
     return out
 
 

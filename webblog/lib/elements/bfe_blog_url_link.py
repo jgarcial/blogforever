@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 ## This file is part of CDS Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## Copyright (C) 2012, 2013 CERN.
 ##
 ## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,27 +17,25 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 """
-BibFormat Element - format the link to the next post
+BibFormat Element - displays the original blog link
 """
 from invenio.bibformat_engine import BibFormatObject
 
 def format_element(bfo):
     """
-    Returns the url of the previous post record in the current language.
+    Displays the original blog link
     """
 
     # get variables
     this_recid = bfo.control_field('001')
-    available_languages = bfo.fields('041__a')
     current_language = bfo.lang
-    try:
-        blog_url = bfo.fields('520__u')[0]
-    except:
-	blog_url = ''
+    blog_url = bfo.fields('520__u')[0]
 
-    # assemble the HTML output
-
-    out = """<h4>Original URL: </h4> <a href="%s">%s</a>""" % (blog_url, blog_url)
+    out = """<h4>Original blog URL</h4>
+             <div class="span10" style="font-size:16px;margin-top:10px;">
+             <span>
+             <a href="%s">%s</a></span>
+             </div>""" % (blog_url, blog_url)
 
     return out
 

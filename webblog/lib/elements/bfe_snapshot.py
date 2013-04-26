@@ -39,7 +39,7 @@ def format_element(bfo):
             snapshot_url = f['u']
 
     img = """<img src="%s"> """ % snapshot_url
-    out = """<h4>Snapshot:</h4> <div class="well well-small"> 
+    out = """<div class="well well-small modal-margin"> 
             <a href="#SnapshotModal" data-toggle="modal"><div class="snapshot-thumb">%s</div> <small>
             <p>This is a snapshot of this blog as it appeared when it was archived. Click to enlarge</p></small></a></div> """ % (img)
     out += """<!-- Snapshot Modal -->

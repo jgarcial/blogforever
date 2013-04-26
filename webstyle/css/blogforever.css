@@ -977,6 +977,10 @@ overflow: hidden;
 margin-bottom: 10px;
 }
 
+.modal-margin {
+margin-top: 20px;
+}
+
 .bfe-disclaimer a {
 color: #333333;
 }

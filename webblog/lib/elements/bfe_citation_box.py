@@ -86,8 +86,9 @@ def format_element(bfo):
         except:
             blog_title = 'Unknown title'
 
-        out = """<h4>Citation:</h4> 
+        out = """ 
         <div class="well well-large">
+        <h4>Cite this page as:</h4>
         <span><b>%s</b>. '%s'. Blog: '%s' </br> \
         Date posted: %s. Retrieved from the original post <i>'%s'</i> </br>\
         Date archived: %s. Archived at <i>'%s'</i> </span> </div>""" \
@@ -103,16 +104,18 @@ def format_element(bfo):
         except:
             post_title = 'Unknown title'
 
-        out = """<h4>Citation:</h4>
+        out = """
         <div class="well well-large">\
+        <h4>Cite this page as:</h4>
         <span><b>%s. </b>Blog post: '%s'</br> \
          Retrieved from the original comment <i>'%s'</i></br> \
          Date archived: %s. Archived at <i>'%s'</i> </span> </div>""" \
         % (author, post_title, original_url, record_creation_date, record_url)
 
     else: # coll == "BLOG"
-        out = """<h4>Citation:</h4>
+        out = """
         <div class="well well-large">\
+        <h4>Cite this page as:</h4>
         <span>'%s' </br> \
         Retrieved from the original blog <i>'%s'</i></br> \
         Date archived: %s. Archived at <i>'%s'</i> </span> </div>""" \
