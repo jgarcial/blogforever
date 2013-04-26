@@ -39,6 +39,10 @@
 			<div class="bfe-tags">
 				<BFE_TAGS >
 			</div> <!-- end bfe-tags -->
+
+			<div>
+				<BFE_DOI prefix="<small><strong>DOI: </strong>" suffix=" </small><br />" />
+			</div>
 	</div>
 
 	<div class="span3 associated-content">

@@ -16,11 +16,10 @@
 		<div class="bfe-commment-author">
 			<BFE_COMMENT_AUTHOR prefix='<h4> ' suffix='</h4>' />
 		</div>
-	
+
 		<div class="post-text">
 		    <i class="icon-col-Comments"></i> <BFE_ABSTRACT escape='4'/>
 		</div>
-
 
 		<div class="bfe-citation-box">	
 			<BFE_CITATION_BOX>
@@ -28,6 +27,10 @@
 
 	<div class="bfe-citation-box">
 		<BFE_DISCLAIMER>
+	</div>
+
+	<div>
+		<BFE_DOI prefix="<small><strong>DOI: </strong>" suffix=" </small><br />" />
 	</div>
 
 	</div> <!-- end span9 -->
