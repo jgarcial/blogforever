@@ -54,7 +54,7 @@ def format_element(bfo):
         menu_title = '<h4>%s</h4>' % cfg_messages["in_issue"]['en']
 
     menu_out += """<div class="sidebar-nav">
-                    <div class="well" style="width:250px; padding: 5px 0;">
+                    <div class="well" style="width:250px; padding: 10px 10px;">
                     <ul class="nav nav-list">
                     <li class="nav-header">%s</li>""" % menu_title
 
@@ -92,7 +92,3 @@ def escape_values(bfo):
     should be escaped.
     """
     return 0
-
-if __name__ == "__main__":
-    myrec = BibFormatObject(619)
-    format(myrec)

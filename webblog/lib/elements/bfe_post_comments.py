@@ -28,8 +28,8 @@ from invenio.search_engine import call_bibformat
 
 
 cfg_messages = {}
-cfg_messages["in_issue"] = {"en": "Comments on this post: ",
-                            "fr": "Commentaires sur ce post:"}
+cfg_messages["in_issue"] = {"en": "Comments",
+                            "fr": "Commentaires"}
 
 def format_element(bfo):
     """
@@ -44,9 +44,9 @@ def format_element(bfo):
         # let's print just the 3 latest posts
         latest_post_comments_recids = post_comments_recids[:2]
         try:
-            out += "<h4>%s</h4>" % cfg_messages["in_issue"][current_language]
+            out += '<div style="margin-bottom:20px;"><h4>%s</h4></div>' % cfg_messages["in_issue"][current_language]
         except:
-            out += "<h4>%s</h4>" % cfg_messages["in_issue"]["en"]
+            out += '<div style="margin-bottom:20px;"><h4>%s</h4></div>' % cfg_messages["in_issue"]["en"]
 
         for comment_recid in latest_post_comments_recids:
             out += call_bibformat(comment_recid, format='hb')
@@ -74,7 +74,7 @@ def format_element(bfo):
                 </script>
                 """
 
-            out += '<span id="all_comments" style="">' + all_comments + '</span>'
+            out += '<div id="all_comments" style="">' + all_comments + '</div>'
             out += '<a class="moreinfo" id="see_all_link" \
                     href="javascript:void(0)" onclick="displayAllComments()""></a>'
             out += '<script type="text/javascript">displayAllComments()</script>'

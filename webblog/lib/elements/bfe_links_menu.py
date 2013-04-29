@@ -37,6 +37,7 @@ Returns all the links used as references in a post
     current_language = bfo.lang
     links = bfo.fields('856_0')
     menu_out = ""
+    out = ""
     pop_id = 0
 
     if links:
@@ -44,14 +45,12 @@ Returns all the links used as references in a post
             menu_title = '<h4>%s</h4>' % cfg_messages["in_issue"][current_language]
         except: # in english by default
             menu_title = '<h4>%s</h4>' % cfg_messages["in_issue"]["en"]
-        
-        '<a id="see_all_link" \
-                href="javascript:void(0)" onclick="displayAllLinks()""></a>'
+
         out = """<div class="sidebar-nav">
-                    <div class="well" style="width:250px; padding: 5px 0;">
+                    <div class="well" style="width:250px; padding: 10px 10px;">
                     <ul class="nav nav-list">
                     <li class="nav-header">%s</li>
-                      <a class="moreinfo" id="see_all_link" href="javascript:void(0)" onclick="displayAllLinks()"></a>
+                      <a class="moreinfo" id="see_all" href="javascript:void(0)" onclick="displayAllLinks()"></a>
                     """ % menu_title
 
         for link in links:
@@ -87,13 +86,13 @@ Returns all the links used as references in a post
                 <script type="text/javascript">
                 function displayAllLinks(){
                     var reference_links = document.getElementById('reference_links');
-                    var see_all_link = document.getElementById('see_all_link');
+                    var see_all = document.getElementById('see_all');
                     if (reference_links.style.display == 'none'){
                         reference_links.style.display = '';
-                        see_all_link.innerHTML = "Hide links"
+                        see_all.innerHTML = "Hide links"
                     } else {
                         reference_links.style.display = 'none';
-                        see_all_link.innerHTML = 'Click here to see all links <i class="icon-double-angle-down"></i>'
+                        see_all.innerHTML = 'Click here to see all links <i class="icon-double-angle-down"></i>'
                     }
                 }
                 </script>

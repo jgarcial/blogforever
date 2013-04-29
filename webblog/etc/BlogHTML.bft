@@ -5,31 +5,28 @@
 	<BFE_TRANSLATE />
 <div class="translate-link"></div>
 
+<div class="bfe-disclaimer">
+	<BFE_DISCLAIMER>
+</div>
+
 <div class="row blog-record-page">
 	<div class="span12">
-		<BFE_TITLE prefix='<h2 class="articleTitle"> <i class="icon-col-Blogs"></i>' suffix='</h2>' />
+		<BFE_TITLE prefix='<h2 class="articleTitle"> <i class="icon-col-Blogs"></i>' suffix='</h2>'/>
 	</div>
+
 	<div class="text span9 pull-right">
 
-			<div class="bfe-blog-url-link">
-				<BFE_BLOG_URL_LINK />
-			</div>
+		<div class="bfe-blog-url-link">
+			<BFE_BLOG_URL_LINK />
+		</div>
 
-			<div class="bfe-blog-posts" style="margin-top:30px;">
-				<BFE_BLOG_POSTS>
-			</div>
+		<div class="bfe-blog-posts" style="margin-top:30px;">
+			<BFE_BLOG_POSTS>
+		</div>
 
 		<div class="bfe-citation-box">
 			<BFE_CITATION_BOX>
 		</div>
-
-		<div class="bfe-disclaimer">
-			<BFE_DISCLAIMER>
-		</div>
-
-		<div>
-			<BFE_TAGS>
-		</div> 
 
 		<div>
 			<BFE_DOI prefix="<small><strong>DOI: </strong>" suffix=" </small><br />" />
@@ -40,8 +37,34 @@
 	<div class="span3">
 
 		<div class="bfe-snapshot">
-				<BFE_SNAPSHOT/>
+			<BFE_SNAPSHOT/>
 		</div> <!-- end bfe-snapshot -->
+
+		<div class="post-extra-data">
+			<BFE_RECORD_DATES />
+			<br />
+			<BFE_TAGS >
+			<br />
+			<BFE_DOI prefix="<small><strong>DOI: </strong>" suffix=" </small><br />" />
+		</div>
+
+		<div class="well " style="width:250px; padding: 10px 10px;">
+			<h4><i class="icon-download-alt">   </i>Export as</h4>
+			<a style="font-weight:normal" href="<BFE_SERVER_INFO var='CFG_SITE_URL'/><BFE_SERVER_INFO var='CFG_SITE_RECORD'/>/<BFE_RECORD_ID/>/export/hx?ln=<BFE_CLIENT_INFO var='ln'/>">BibTeX</a>,
+			<a style="font-weight:normal" href="<BFE_SERVER_INFO var='CFG_SITE_URL'/><BFE_SERVER_INFO var='CFG_SITE_RECORD'/>/<BFE_RECORD_ID/>/export/hm?ln=<BFE_CLIENT_INFO var='ln'/>">MARC</a>,
+			<a style="font-weight:normal" href="<BFE_SERVER_INFO var='CFG_SITE_URL'/><BFE_SERVER_INFO var='CFG_SITE_RECORD'/>/<BFE_RECORD_ID/>/export/xm?ln=<BFE_CLIENT_INFO var='ln'/>">MARCXML</a>,
+			<a style="font-weight:normal" href="<BFE_SERVER_INFO var='CFG_SITE_URL'/><BFE_SERVER_INFO var='CFG_SITE_RECORD'/>/<BFE_RECORD_ID/>/export/xmets?ln=<BFE_CLIENT_INFO var='ln'/>">METS</a>,
+			<a style="font-weight:normal" href="<BFE_SERVER_INFO var='CFG_SITE_URL'/><BFE_SERVER_INFO var='CFG_SITE_RECORD'/>/<BFE_RECORD_ID/>/export/xd?ln=<BFE_CLIENT_INFO var='ln'/>">DC</a>,
+			<a style="font-weight:normal" href="<BFE_SERVER_INFO var='CFG_SITE_URL'/><BFE_SERVER_INFO var='CFG_SITE_RECORD'/>/<BFE_RECORD_ID/>/export/xe?ln=<BFE_CLIENT_INFO var='ln'/>">EndNote</a>,
+			<a style="font-weight:normal" href="<BFE_SERVER_INFO var='CFG_SITE_URL'/><BFE_SERVER_INFO var='CFG_SITE_RECORD'/>/<BFE_RECORD_ID/>/export/xw?ln=<BFE_CLIENT_INFO var='ln'/>">RefWorks</a></li>
+			<h4><i class="icon-share-alt">   </i>Share</h4>
+			<BFE_BOOKMARK prefix="<div style='padding-bottom:25px;'>" suffix="</div>" />
+			<h4><i class="icon-wrench">   </i>Other options</h4>
+			<div> <BFE_EDIT_RECORD /></div>
+			<div> <BFE_ASK_FOR_DELETION /></div>
+			<div> <BFE_ASK_FOR_MODIFICATION /></div>
+			<div> <BFE_EDIT_FILES /></div>
+		</div>
 
 	</div>
 

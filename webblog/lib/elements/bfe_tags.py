@@ -21,7 +21,8 @@
 BibFormat Element - displays tags on blogs and blog posts
 """
 
-from invenio.config import CFG_SITE_URL
+from invenio.config import CFG_SITE_SECURE_URL
+from invenio.urlutils import create_html_link
 
 cfg_messages = {}
 cfg_messages["in_issue"] = {"en": "Tags",
@@ -36,17 +37,18 @@ def format_element(bfo):
     current_language = bfo.lang
     #TODO: to decide new MARC tag for tags
     tags = bfo.fields('653__1')
-
-    out = ""
+    out = '<h4><i class="icon-tags"></i>%s  </h4>' % cfg_messages["in_issue"][current_language]
+    
+    tags = ["blog", "post"]
 
     if tags:
-        out += """<span style="font-size:smaller;font-weight:bold;color:#0D2B88;" >%s:</span> <span class="moreinfo">""" % \
-            cfg_messages["in_issue"][current_language]
-
         for tag in tags:
-            out += """<a href = "%s/search?ln=%s&p=653__1:%s">%s</a>  """ % (CFG_SITE_URL, current_language, tag, tag)
+#            out += """<a href = "%s/search?ln=%s&p=653__1:%s">%s</a>  """ % (CFG_SITE_URL, current_language, tag, tag)
+            url = create_html_link(CFG_SITE_SECURE_URL + "/search", \
+                                    {'p': '653__1:%s' % tag, \
+                                     'ln': current_language}, tag, linkattrd = {'style':"color:white"})
+            out += '<span class="label">%s</span>&nbsp;&nbsp;' % url
 
-        out += """</span>"""
     return out
 
 def escape_values(bfo):

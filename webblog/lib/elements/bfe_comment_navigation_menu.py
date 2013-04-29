@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 ## This file is part of CDS Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## Copyright (C) 2012, 2013 CERN.
 ##
 ## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -22,24 +22,27 @@ BibFormat Element - creates the comment navigation menu
 """
 
 from invenio.bibformat_engine import BibFormatObject
-from invenio.config import CFG_SITE_URL
+from invenio.config import CFG_SITE_SECURE_URL
 from invenio.webblog_utils import get_parent_post, get_comments
 from invenio.bibformat_utils import get_contextual_content
+import datetime
 
 
 cfg_messages = {}
-cfg_messages["in_issue"] = {"en": "Other comments on this post: ",
-                            "es": "Otros comentarios sobre la misma entrada: "}
+cfg_messages["in_issue"] = {"en": "More comments in this post ",
+                            "fr": "Plus commentaires dans ce post "}
 
 
 def format_element(bfo):
     """
-    Creates a navigation for comments.
+    Creates a navigation menu in a comment record with the links
+    of the other comments in the same post
     """
 
     # get variables
     this_recid = bfo.control_field('001')
     this_content = bfo.fields('520__a')[0]
+    menu_out = ""
     try:
         this_author = bfo.fields('100__a')[0]
     except:
@@ -50,20 +53,26 @@ def format_element(bfo):
                                                 max_lines=1)[0]
     menu_recids = []
     current_language = bfo.lang
-    menu_out = ""
     post_recid = get_parent_post(this_recid)
+
     if post_recid:
         menu_recids = get_comments(post_recid)
+
         if menu_recids:
             try:
-                menu_out = '<h4>%s</h4>' % cfg_messages["in_issue"][current_language]
-            except:
-                menu_out = '<h4>%s</h4>' % cfg_messages["in_issue"]['en']
+                menu_title = '<h4>%s</h4>' % cfg_messages["in_issue"][current_language]
+            except: # in english by default
+                menu_title = '<h4>%s</h4>' % cfg_messages["in_issue"]['en']
+
+            menu_out += """<div class="sidebar-nav">
+                <div class="well" style="width:250px; padding: 10px 10px;">
+                <ul class="nav nav-list">
+                <li class="nav-header">%s</li>""" % menu_title
 
             for recid in menu_recids:
+                menu_out += """<li class="divider"></li>"""
                 if str(this_recid) == str(recid):
-                    menu_out += '<div class="active"><div class="litem"><b><i class="icon-user"></i> %s</b>: %s [...]</div></div>' % \
-                                (this_author, this_limit_content)
+                    menu_out += '<li class="active"><span><b><i class="icon-user"></i>%s</b> %s [...]</span></li>' % (this_author, this_limit_content)
                 else:
                     temp_rec = BibFormatObject(recid)
                     content = temp_rec.fields('520__a')[0]
@@ -74,10 +83,10 @@ def format_element(bfo):
                         author = temp_rec.fields('100__a')[0]
                     except:
                         this_author = ""
-                    menu_out += '<div class="litem"><a href="%s/record/%s?%s"><b><i class="icon-user"></i> %s</b>: %s [...]</a></div>' % (CFG_SITE_URL,
-                                                                                                               recid,
-                                                                                                               bfo.lang,
-                                                                                                               author, limit_content)        
+                    menu_out += '<li><a href="%s/record/%s?ln=%s"><span><b><i class="icon-user"></i>%s</b> %s [...]</spam></a></li>' % \
+                                    (CFG_SITE_SECURE_URL, recid, bfo.lang, author, limit_content)
+            menu_out += """<li class="divider"></li></ul></div></div>"""
+
     return menu_out
 
 def escape_values(bfo):

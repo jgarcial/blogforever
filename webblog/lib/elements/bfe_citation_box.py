@@ -26,6 +26,7 @@ from invenio.config import CFG_SITE_URL
 from invenio.webblog_utils import get_parent_blog, get_parent_post
 from invenio.search_engine import get_creation_date
 from invenio.bibformat_engine import BibFormatObject
+import datetime
 
 def format_element(bfo):
     """
@@ -57,7 +58,7 @@ def format_element(bfo):
                 posted_date = "Unknown date"
             else:
                 date = datetime.datetime.strptime(posted_date, "%m/%d/%Y %I:%M:%S %p")
-                posted_date = date.strftime("%Y/%m/%d %H:%M:%S")
+                posted_date = date.strftime("%Y/%m/%d")
         except:
             posted_date = "Unknown date"
 
@@ -73,8 +74,14 @@ def format_element(bfo):
 
     # creation date of a record
     record_creation_date = get_creation_date(recid)
+    date = datetime.datetime.strptime(record_creation_date, "%Y-%m-%d")
+    record_creation_date = date.strftime("%Y/%m/%d")
     # url in the archive
     record_url = CFG_SITE_URL + "/record/" + recid
+
+    out = """
+        <div class="well well-large">
+        <h4><i class="icon-pencil"></i>   Cite as</h4>"""
 
     if coll == "BLOGPOST":
         # we will also show the blog's title of 
@@ -86,12 +93,10 @@ def format_element(bfo):
         except:
             blog_title = 'Unknown title'
 
-        out = """ 
-        <div class="well well-large">
-        <h4>Cite this page as:</h4>
+        out += """
         <span><b>%s</b>. '%s'. Blog: '%s' </br> \
         Date posted: %s. Retrieved from the original post <i>'%s'</i> </br>\
-        Date archived: %s. Archived at <i>'%s'</i> </span> </div>""" \
+        Date archived: %s. Archived at <i>'%s'</i> </span>""" \
         % (author, title, blog_title, posted_date, original_url, record_creation_date, record_url)
 
     elif coll == "COMMENT":
@@ -104,23 +109,20 @@ def format_element(bfo):
         except:
             post_title = 'Unknown title'
 
-        out = """
-        <div class="well well-large">\
-        <h4>Cite this page as:</h4>
+        out += """
         <span><b>%s. </b>Blog post: '%s'</br> \
          Retrieved from the original comment <i>'%s'</i></br> \
-         Date archived: %s. Archived at <i>'%s'</i> </span> </div>""" \
+         Date archived: %s. Archived at <i>'%s'</i> </span>""" \
         % (author, post_title, original_url, record_creation_date, record_url)
 
     else: # coll == "BLOG"
-        out = """
-        <div class="well well-large">\
-        <h4>Cite this page as:</h4>
+        out += """
         <span>'%s' </br> \
         Retrieved from the original blog <i>'%s'</i></br> \
-        Date archived: %s. Archived at <i>'%s'</i> </span> </div>""" \
+        Date archived: %s. Archived at <i>'%s'</i> </span>""" \
         % (title, original_url, record_creation_date, record_url)
 
+    out += "</div>"
     return out
 
 def escape_values(bfo):
