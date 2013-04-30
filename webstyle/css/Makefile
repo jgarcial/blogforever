@@ -3,9 +3,8 @@
 include ../../config.mk
 
 CSSFILES = bootstrap.css blogforever.css \
-		font-awesome.css font-awesome-ie7.css \
-		fontawesome-webfont.eot fontawesome-webfont.svg \
-		fontawesome-webfont.ttf fontawesome-webfont.woff
+		font-awesome.css font-awesome-ie7.min.css \
+		font-awesome.min.css
 CSSDIR = $(PREFIX)/var/www/css/
 
 all:

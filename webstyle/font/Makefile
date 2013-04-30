@@ -2,7 +2,7 @@
 
 include ../../config.mk
 
-FONTFILES = fontawesome-webfont.eot fontawesome-webfont.svg fontawesome-webfont.ttf fontawesome-webfont.woff
+FONTFILES = fontawesome-webfont.eot fontawesome-webfont.svg fontawesome-webfont.ttf fontawesome-webfont.woff FontAwesome.otf
 FONTDIR = $(PREFIX)/var/www/font/
 
 all:
@@ -14,6 +14,6 @@ test:
 	@echo "Not implemented."
 
 install:
-	mkdir -p ${PREFIX}/var/www/font
+	mkdir -p $(FONTDIR)
 	$(INSTALL) $(FONTFILES) $(FONTDIR)
 	$(foreach SUBDIR, $(SUBDIRS), cd $(SUBDIR) && make install && cd .. ;)
