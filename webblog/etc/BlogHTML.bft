@@ -48,7 +48,7 @@
 			<BFE_DOI prefix="<small><strong>DOI: </strong>" suffix=" </small><br />" />
 		</div>
 
-		<div class="well " style="width:250px; padding: 10px 10px;">
+		<div class="well " style="width:250px; padding: 10px 6px 20px 15px;">
 			<h4><i class="icon-download-alt">   </i>Export as</h4>
 			<a style="font-weight:normal" href="<BFE_SERVER_INFO var='CFG_SITE_URL'/><BFE_SERVER_INFO var='CFG_SITE_RECORD'/>/<BFE_RECORD_ID/>/export/hx?ln=<BFE_CLIENT_INFO var='ln'/>">BibTeX</a>,
 			<a style="font-weight:normal" href="<BFE_SERVER_INFO var='CFG_SITE_URL'/><BFE_SERVER_INFO var='CFG_SITE_RECORD'/>/<BFE_RECORD_ID/>/export/hm?ln=<BFE_CLIENT_INFO var='ln'/>">MARC</a>,

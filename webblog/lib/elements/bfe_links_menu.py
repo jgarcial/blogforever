@@ -49,8 +49,10 @@ Returns all the links used as references in a post
         out = """<div class="sidebar-nav">
                     <div class="well" style="width:250px; padding: 10px 10px;">
                     <ul class="nav nav-list">
-                    <li class="nav-header">%s</li>
-                      <a class="moreinfo" id="see_all" href="javascript:void(0)" onclick="displayAllLinks()"></a>
+                    <li class="nav-header"><div style="display:inline-block;">%s</div>
+                    <div style="display:inline-block;">
+                       <a id="see_all" href="javascript:void(0)" onclick="displayAllLinks()"></a>
+                    </div></li>
                     """ % menu_title
 
         for link in links:
@@ -89,18 +91,16 @@ Returns all the links used as references in a post
                     var see_all = document.getElementById('see_all');
                     if (reference_links.style.display == 'none'){
                         reference_links.style.display = '';
-                        see_all.innerHTML = "Hide links"
+                        see_all.innerHTML = '  <i class="icon-double-angle-up icon-2x"></i>'
                     } else {
                         reference_links.style.display = 'none';
-                        see_all.innerHTML = 'Click here to see all links <i class="icon-double-angle-down"></i>'
+                        see_all.innerHTML = '  <i class="icon-double-angle-down icon-2x"></i>'
                     }
                 }
                 </script>
                 """
 
         out += '<span id="reference_links" style="">' + menu_out + '</span>'
-#        out += '<a id="see_all_link" \
-#                href="javascript:void(0)" onclick="displayAllLinks()""></a>'
         out += '<script type="text/javascript">displayAllLinks()</script>'
 
     return out

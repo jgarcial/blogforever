@@ -37,6 +37,7 @@ def format_element(bfo):
     # get variables
     this_recid = bfo.control_field('001')
     menu_recids = []
+    out = ""
     menu_out = ""
     current_language = bfo.lang
     try:
@@ -46,44 +47,100 @@ def format_element(bfo):
 
     blog_recid = get_parent_blog(this_recid)
     menu_recids = get_posts(blog_recid)
-    menu_recids.reverse()
 
-    try:
-        menu_title = '<h4>%s</h4>' % cfg_messages["in_issue"][current_language]
-    except: # in english by default
-        menu_title = '<h4>%s</h4>' % cfg_messages["in_issue"]['en']
+    if menu_recids:
+        menu_recids.reverse()
+        latest_posts = menu_recids[:6]
 
-    menu_out += """<div class="sidebar-nav">
-                    <div class="well" style="width:250px; padding: 10px 10px;">
-                    <ul class="nav nav-list">
-                    <li class="nav-header">%s</li>""" % menu_title
-
-    for recid in menu_recids:
-        temp_rec = BibFormatObject(recid)
         try:
-            posted_date = temp_rec.fields('269__c')[0]
-            # hack
-            if posted_date.find("ERROR") > -1:
-                posted_date = ""
-            else:
-                date = datetime.datetime.strptime(posted_date, "%m/%d/%Y %I:%M:%S %p")
-                posted_date = date.strftime("%Y/%m/%d %H:%M:%S")
-        except:
-            posted_date = ""
+            menu_title = '<h4>%s</h4>' % cfg_messages["in_issue"][current_language]
+        except: # in english by default
+            menu_title = '<h4>%s</h4>' % cfg_messages["in_issue"]['en']
 
-        menu_out += """<li class="divider"></li>"""
-        if str(this_recid) == str(recid):
-            menu_out += '<li class="active">%s<br/><span><small>%s</small></span></li>' % (this_title, posted_date)
-        else:
+        menu_out += """<div class="sidebar-nav">
+                        <div class="well" style="width:250px; padding: 10px 10px;">
+                        <ul class="nav nav-list">
+                        <li class="nav-header">%s</li>""" % menu_title
+
+        for recid in latest_posts:
+            temp_rec = BibFormatObject(recid)
             try:
-                title = temp_rec.fields('245__a')[0]
+                posted_date = temp_rec.fields('269__c')[0]
+                # hack
+                if posted_date.find("ERROR") > -1:
+                    posted_date = ""
+                else:
+                    date = datetime.datetime.strptime(posted_date, "%m/%d/%Y %I:%M:%S %p")
+                    posted_date = date.strftime("%Y/%m/%d %H:%M:%S")
             except:
-                title = 'Unknown title'
-            menu_out += '<li><a href="%s/record/%s?ln=%s">%s</a><span><small>%s</small></span></li>' % (CFG_SITE_SECURE_URL,
-                                                                      recid,
-                                                                      bfo.lang,
-                                                                      title, posted_date)
-    menu_out += """<li class="divider"></li></ul></div></div>"""
+                posted_date = ""
+
+            menu_out += """<li class="divider"></li>"""
+            if str(this_recid) == str(recid):
+                menu_out += '<li class="active">%s<br/><span><small>%s</small></span></li>' % (this_title, posted_date)
+            else:
+                try:
+                    title = temp_rec.fields('245__a')[0]
+                except:
+                    title = 'Unknown title'
+                menu_out += '<li><a href="%s/record/%s?ln=%s">%s</a><span><small>%s</small></span></li>' % (CFG_SITE_SECURE_URL,
+                                                                                                            recid,
+                                                                                                            bfo.lang,
+                                                                                                            title, posted_date)
+
+        all_posts = menu_recids[6:]
+        if all_posts:
+            for recid in all_posts:
+                temp_rec = BibFormatObject(recid)
+                try:
+                    posted_date = temp_rec.fields('269__c')[0]
+                    # hack
+                    if posted_date.find("ERROR") > -1:
+                        posted_date = ""
+                    else:
+                        date = datetime.datetime.strptime(posted_date, "%m/%d/%Y %I:%M:%S %p")
+                        posted_date = date.strftime("%Y/%m/%d %H:%M:%S")
+                except:
+                    posted_date = ""
+
+                out += """<li class="divider"></li>"""
+                if str(this_recid) == str(recid):
+                    out += '<li class="active">%s<br/><span><small>%s</small></span></li>' % (this_title, posted_date)
+                else:
+                    try:
+                        title = temp_rec.fields('245__a')[0]
+                    except:
+                        title = 'Unknown title'
+                    out += '<li><a href="%s/record/%s?ln=%s">%s</a><br/><span><small>%s</small></span></li>' % (CFG_SITE_SECURE_URL,
+                                                                                                           recid,
+                                                                                                           bfo.lang,
+                                                                                                           title, posted_date)
+            out += """<li class="divider"></li>"""
+
+            out += """
+                <script type="text/javascript">
+                function displayAllPosts(){
+                    var all_posts_menu = document.getElementById('all_posts_menu');
+                    var see_all_link = document.getElementById('see_all_link');
+                    if (all_posts_menu.style.display == 'none'){
+                        all_posts_menu.style.display = '';
+                        see_all_link.innerHTML = '  <i class="icon-double-angle-up icon-2x"></i>'
+                    } else {
+                        all_posts_menu.style.display = 'none';
+                        see_all_link.innerHTML = '  <i class="icon-double-angle-down icon-2x"></i>'
+                    }
+                }
+                </script>
+                """
+
+            menu_out += '<span id="all_posts_menu" style="">' + out + '</span>'
+            menu_out += '<div style="padding-left: 215px;"> \
+                            <a id="see_all_link" href="javascript:void(0)" onclick="displayAllPosts()""></a>\
+                        </div>'
+            menu_out += '<script type="text/javascript">displayAllPosts()</script>'
+
+        menu_out += """</ul></div></div>"""
+
     return menu_out
 
 def escape_values(bfo):
