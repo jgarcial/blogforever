@@ -411,6 +411,9 @@ class Collection(db.Model):
                     latest_additions_recids = plugin(reclist=self.reclist)
             else: # by default
                 latest_additions_recids = self.reclist
+	#FIXME:
+	else:
+	    latest_additions_recids = []
 
         return latest_additions_recids
 
