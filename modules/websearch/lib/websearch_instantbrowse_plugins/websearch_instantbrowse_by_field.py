@@ -23,35 +23,24 @@ from invenio.search_engine import sort_records
 from invenio.config import CFG_SITE_LANG
 
 def websearch_instantbrowse_by_field(reclist, \
-                                     field="", order="d", \
-                                     pattern="", verbose=0, of="hb", \
-                                     ln=CFG_SITE_LANG):
+                                     sf="", so="d"):
     """
     Plugin used to sort and list
     records by a given field.
     @param reclist: HitSet of recIDs
     @type reclist: HitSet
-    @param field: field code (E.g.: "author")
+    @param sf: field code (E.g.: "author")
     or MARC tag (E.g.: "100__a")
-    @type field: string
-    @param order: order for listing records
+    More examples:
+    field code: "title" or MARC tag: "245__a"
+    field code: "posted date" or MARC tag: "269__c" (used to display Posts collection)
+    @type sf: string
+    @param so: order for listing records
     ("a"=ascending, "d"=descending)
-    @type order: string
-    @param pattern: pattern to search for
-    (E.g.: "ellis")
-    @type pattern: string
-    @param verbose: verbose level (0=min, 9=max)
-    @type verbose: Useful to print some
-    internal information on the searching process
-    in case something goes wrong.
-    @param of: output format (E.g.: "hb")
-    @type of: string
-    @param ln: language (E.g.: "en")
-    @type ln: string
-    @return: sorted list of recIDs
+    @type so: string
+    @return: sorted list of recIDs according to the selected plugin
     @rtype: list
     """
 
-    recIDs = sort_records(None, reclist, sort_field=field, sort_order=order, \
-                          sort_pattern=pattern, verbose=verbose, of=of, ln=ln)
+    recIDs = sort_records(None, reclist, sort_field=sf, sort_order=so)
     return recIDs
