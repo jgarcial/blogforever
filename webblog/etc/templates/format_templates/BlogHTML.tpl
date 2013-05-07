@@ -46,7 +46,9 @@
 			<br />
 			{{ bfe_tags(bfo) }}
 			<br />
-			{{ bfe_doi(bfo, prefix='<small><strong>DOI: </strong>', suffix='</small><br />')}}
+			{{ bfe_license(bfo) }}
+			<br />
+			{{ bfe_doi(bfo, prefix='<small><strong>DOI: </strong>', suffix='</small><br />') }}
 		</div>
 
 		<div class="bfe-actions">

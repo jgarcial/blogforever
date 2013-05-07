@@ -1,6 +1,6 @@
 
 <div class="to-be-translated">
-	{{ bfe_translate}}
+	{{ bfe_translate(bfo) }}
 <div class="translate-link"></div>
 
 <div class="bfe-disclaimer">
@@ -37,6 +37,8 @@
 			{{ bfe_record_dates(bfo) }}
 			<br />
 			{{ bfe_tags(bfo) }}
+			<br />
+			{{ bfe_license(bfo) }}
 			<br />
 			{{ bfe_doi(bfo, prefix='<small><strong>DOI: </strong>', suffix='</small><br />') }}
 		</div>
