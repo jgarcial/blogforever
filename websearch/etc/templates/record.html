@@ -104,10 +104,13 @@ $(function () {
 {% endblock javascript %}
 
 {% block _top_assets %}
-  {% if record_get_field_value(get_bibrecord(recid), tag="980", ind1="", ind2="", code="a") == 'BLOG' %}
-    {% js 'js/simile-timeline-settings.js', '50-timeline' %}
-    {% js 'js/simile-timeline_2.3.0/src/webapp/api/timeline-api.js', '50-timeline' %}
-    {% js 'js/simile-timeline-onload.js', '50-timeline' %}
+  {% set rec = get_bibrecord(recid) %}
+  {% if rec %}
+    {% if record_get_field_value(rec, tag="980", ind1="", ind2="", code="a") == 'BLOG' %}
+      {% js 'js/simile-timeline-settings.js', '50-timeline' %}
+      {% js 'js/simile-timeline_2.3.0/src/webapp/api/timeline-api.js', '50-timeline' %}
+      {% js 'js/simile-timeline-onload.js', '50-timeline' %}
+    {%- endif -%}
   {%- endif -%}
 {% for bundle in get_js_bundle(iterate=True) %}
 {% assets bundle %}
