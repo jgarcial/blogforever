@@ -52,7 +52,7 @@ class Premium(db.Model):
                      nullable=False)
     """@type: L{Column}"""
 
-    details = db.Column(db.String,
+    details = db.Column(db.Text,
                         nullable=False)
     """@type: L{Column}"""
 
