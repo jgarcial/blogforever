@@ -76,9 +76,9 @@ def format_element(bfo):
                 </script>
                 """
 
-            out += '<span id="all_posts" style="">' + all_posts + '</span>'
-            out += '<a class="moreinfo" id="see_all_link" \
-                    href="javascript:void(0)" onclick="displayAllPosts()""></a>'
+            out += '<span id="all_posts">' + all_posts + '</span>'
+            out += '<div class="pull-right"> <a class="moreinfo" id="see_all_link" \
+                    href="javascript:void(0)" onclick="displayAllPosts()""></a></div>'
             out += '<script type="text/javascript">displayAllPosts()</script>'
     return out
 
