@@ -3,6 +3,8 @@
 	{{ bfe_translate(bfo) }}
 <div class="translate-link"></div>
 
+<br />
+
 <div class="bfe-disclaimer">
 	{{ bfe_disclaimer(bfo) }}
 </div>
