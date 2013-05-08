@@ -22,7 +22,6 @@
 		</div>
 
 		<div class="post-text">
-			<i class="icon-col-Comments"></i>
 			{{ bfe_abstract(bfo, escape='4',
 				prefix_en='<div class="highlightable" style="margin-right:20px;"><span>',
 				suffix_en='</span></div><br />') }}
