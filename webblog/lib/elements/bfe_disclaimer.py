@@ -39,7 +39,7 @@ def format_element(bfo):
     elem_html_url = """<a href = '%(url)s'>Please click here to go to the original</a>""" % {'url': elem_url}
     disclaimer_content = "<strong>Disclaimer: </strong> The content of this %s is an archived copy. " % coll.lower()
     out = """<div class="bottom-left-folded">%(disclaimer)s</div>
-    """ % {'disclaimer': '<div class="disclaimer alert">&nbsp;%(disclaimer_content)s  %(url)s</div>' %
+    """ % {'disclaimer': '<div class="disclaimer alert"><button type="button" class="close" data-dismiss="alert">×</button>&nbsp;%(disclaimer_content)s  %(url)s</div>' %
            {'disclaimer_content': disclaimer_content,
             'url': elem_html_url}}
 

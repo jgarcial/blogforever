@@ -16,7 +16,7 @@
 	<div class="span9 pull-right" >
 
 		<div class="bfe-commment-author">
-			{{ bef_comment_author(bfo, prefix='<h4>', suffix='</h4>') }}
+			{{ bfe_comment_author(bfo, prefix='<h4>', suffix='</h4>') }}
 		</div>
 
 		<div class="post-text">
@@ -52,5 +52,6 @@
 		</div>
 
 	</div>
+	<div id="bottom">  </div>
 
-</div> <!-- end row -->
+</div> <!-- end blog-record-page -->

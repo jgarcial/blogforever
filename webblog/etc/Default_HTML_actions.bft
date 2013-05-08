@@ -12,6 +12,9 @@
 	<BFE_BOOKMARK prefix='<div style="padding-bottom:25px;">' suffix='</div>' />
 	<h4><i class="icon-wrench">   </i>Other options</h4>
 	<div>
+		<a href="<BFE_SERVER_INFO var='CFG_SITE_URL'/>yourbaskets/add?ln=<BFE_CLIENT_INFO var='ln'/>&amp;recid=<BFE_RECORD_ID/>">_(Add to Personal Collection)_</a>
+	</div>
+	<div>
 		<BFE_EDIT_RECORD />
 	</div>
 	<div>
