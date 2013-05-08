@@ -219,10 +219,14 @@ def comments(recid):
         CmtRECORDCOMMENT.star_score == 0
         )).all()
     display_translate = CFG_TRANSLATE_RECORD_COMMENT and len(comments)
+    translate_section = (display_translate and construct_translate_section()
+                         or "")
+    translate_script = (display_translate and get_translate_script('comments')
+                        or "")
     return render_template('webcomment_comments.html', comments=comments,
                            display_translate=display_translate,
-                           translate_section=construct_translate_section(''),
-                           translate_script=get_translate_script('comments'))
+                           translate_section=translate_section,
+                           translate_script=translate_script)
 
 
 @blueprint.route('/<int:recid>/reviews', methods=['GET', 'POST'])
@@ -249,10 +253,14 @@ def reviews(recid):
         CmtRECORDCOMMENT.star_score > 0
         )).all()
     display_translate = CFG_TRANSLATE_RECORD_REVIEW and len(comments)
+    translate_section = (display_translate and construct_translate_section()
+                         or "")
+    translate_script = (display_translate and get_translate_script('reviews')
+                        or "")
     return render_template('webcomment_reviews.html', comments=comments,
                            display_translate=display_translate,
-                           translate_section=construct_translate_section(''),
-                           translate_script=get_translate_script('reviews'))
+                           translate_section=translate_section,
+                           translate_script=translate_script)
 
 
 @blueprint.route('/<int:recid>/report/<int:id>', methods=['GET', 'POST'])

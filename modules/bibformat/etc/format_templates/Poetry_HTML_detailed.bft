@@ -1,5 +1,6 @@
 <name>Poetry HTML detailed</name>
 <div class="to-be-translated" style="padding-left:10px;padding-right:10px">
+	<BFE_TRANSLATE />
 <div class="translate-link"></div>
 <description>The detailed HTML format suitable for displaying poetry.</description>
 

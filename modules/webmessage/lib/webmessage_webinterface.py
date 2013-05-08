@@ -23,10 +23,7 @@ __revision__ = "$Id$"
 
 __lastupdated__ = """$Date$"""
 
-from invenio.config import CFG_SITE_SECURE_URL, \
-                            CFG_SITE_URL, \
-                            CFG_ACCESS_CONTROL_LEVEL_SITE, \
-                            CFG_TRANSLATE_WEBMESSAGE
+from invenio.config import CFG_SITE_SECURE_URL, CFG_SITE_URL, CFG_ACCESS_CONTROL_LEVEL_SITE
 from invenio.webuser import getUid, isGuestUser, page_not_authorized, collect_user_info
 from invenio.webmessage import perform_request_display_msg, \
                                perform_request_write, \
@@ -361,14 +358,6 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
                                            argd['msgid'],
                                            argd['ln'])
         title = _("Read a message")
-        
-        metaheaderadd = ""
-        if CFG_TRANSLATE_WEBMESSAGE:
-            metaheaderadd = """
-<link rel="stylesheet" href="%(cssurl)s/img/translate.css" type="text/css" />
-<script src="%(cssurl)s/js/translate.js"></script>
- """ % {'cssurl': 1 and CFG_SITE_SECURE_URL or CFG_SITE_URL}
-
         return page(title       = title,
                     body        = body,
                     navtrail    = get_navtrail(argd['ln'], title),
@@ -377,6 +366,5 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
                     req         = req,
                     language    = argd['ln'],
                     navmenuid   = "yourmessages",
-                    metaheaderadd = metaheaderadd,
                     secure_page_p=1)
 

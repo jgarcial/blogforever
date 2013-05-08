@@ -27,9 +27,7 @@ from invenio.webmessage_mailutils import email_quoted_txt2html, email_quote_txt
 from invenio.webmessage_config import CFG_WEBMESSAGE_STATUS_CODE, \
                                       CFG_WEBMESSAGE_SEPARATOR, \
                                       CFG_WEBMESSAGE_RESULTS_FIELD
-from invenio.config import  CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES, \
-                            CFG_TRANSLATE_WEBMESSAGE
-
+from invenio.config import CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES
 from invenio.dateutils import convert_datetext_to_dategui, \
                               datetext_default, \
                               create_day_selectbox, \
@@ -40,7 +38,6 @@ from invenio.htmlutils import escape_html
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG
 from invenio.messages import gettext_set_language
 from invenio.webuser import get_user_info
-from invenio.translate_utils import construct_translate_section
 
 class Template:
     """Templates for WebMessage module"""
@@ -355,59 +352,9 @@ class Template:
                                 escape_html(groups[-1]))
         # format the msg so that the '>>' chars give vertical lines
         final_body = email_quoted_txt2html(msg_body)
-        
-        translate_section = ""
-        message_body = ""
-        if CFG_TRANSLATE_WEBMESSAGE:
-            translate_section = construct_translate_section("message")
-            message_body = """
-<!-- start translate script -->
-<div id="translate_script">
-    <script>
-        function googleSectionalElementInit() {
-          new google.translate.SectionalElement({
-            sectionalNodeClassName: 'mailboxrecord',
-            controlNodeClassName: 'translate_link',
-            background: 'transparent'
-          }, 'google_sectional_element');
-        }
-    </script>
-</div>
-<!-- end translate script -->
-<tr>
-    <td colspan="2">
-        <div class="language_dropdown">
-        %(translate_section)s
-        </div>
-    </td>
-</tr>
-<tr class="mailboxrecord">
-    <td colspan="2">
-            <div class="translate_section">
-                <div class="translate_link" id="message">
-                </div>
-                <div class="dummy_translate_link" id="message">
-                    <span id="dummy_translate_link_message">%(Translate_your_message)s</span>
-                </div>
-            </div>
-            %(body)s
-    </td>
-</tr>
-    """ % {'translate_section': translate_section,
-            'body': final_body,
-            'Translate_your_message': _("Translate your message")}
-        else:
-            message_body = """
-<tr class="mailboxrecord">
-    <td colspan="2">
-        %(body)s
-    </td>
-</tr>
-            """ % {'body': final_body}
 
         out = """
 <table class="mailbox" style="width: 70%%;">
-    <tr class="translate-link"/>
   <thead class="mailboxheader">
     <tr>
       <td class="inboxheader" colspan="2">
@@ -453,7 +400,9 @@ class Template:
     </tr>
   </tfoot>
   <tbody class="mailboxbody">
-    %(message_body)s
+    <tr class="mailboxrecord">
+      <td colspan="2">%(body)s</td>
+    </tr>
     <tr class="mailboxfooter">
       <td>
         <form name="reply" action="%(reply_url)s" method="post">
@@ -491,6 +440,7 @@ class Template:
                      'sent_to': sent_to_link,
                      'sent_to_group': group_to_link,
                      'subject' : msg_subject,
+                     'body' : final_body,
                      'reply_to': msg_from_id,
                      'ln': ln,
                      'from_label':_("From:"),
@@ -500,8 +450,7 @@ class Template:
                      'sent_to_label': _("Sent to:"),
                      'groups_label': _("Sent to groups:"),
                      'reply_but_label':_("REPLY"),
-                     'delete_but_label': _("DELETE"),
-                     'message_body': message_body}
+                     'delete_but_label': _("DELETE")}
 
     def tmpl_navtrail(self, ln=CFG_SITE_LANG, title=""):
         """

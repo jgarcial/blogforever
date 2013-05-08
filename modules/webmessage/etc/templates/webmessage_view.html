@@ -18,18 +18,18 @@
 #}
 {% extends "page.html" %}
 {% set title = _("Read a message") %}
+
+{%- if display_translate -%}
+{% block javascript %}
+	{# 
+	{% js "js/translate.js" %} includes translate.js at the top and translate.js cannot reach jQuery
+	#}
+	<script type="text/javascript" src="/js/translate.js"></script>
+	{{ translate_script|safe }}
+{% endblock javascript %}
+{%- endif -%}
+
 {% block body %}
-
-{%- if display_translate -%}
-  {% block header %}
-    {{ super() }}
-    {% js "js/translate.js" %}
-  {% endblock header %}
-{%- endif -%}
-
-{%- if display_translate -%}
-  {{ translate_script|safe }}
-{%- endif -%}
 
 <div class="row">
 <dl class="dl-horizontal well offset1 span5">

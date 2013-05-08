@@ -8,6 +8,7 @@
 	<script type="text/javascript" src="/js/video_platform_record.js"></script>
 
 <div class="to-be-translated" style="padding-left:10px;padding-right:10px">
+	<BFE_TRANSLATE />
 <div class="translate-link"></div>
 		<!-- VIDEO PLAYER -->
 		<div class="video_black_band">

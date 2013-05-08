@@ -133,16 +133,36 @@ def is_in_lang_codes(l_name, l_code):
     return lang
 
 
-def construct_translate_section(div_id):
+def match_language_code(invenio_lang_code, record_lang_code):
+    """
+    Returns if the given invenio language code matches with any of the
+    language codes
+
+    @param invenio_lang_code: invenio language code from the keys of
+                              L{INVENIO_LANGUAGE_CODES}
+    @type invenio_lang_code: str
+
+    @param: record_lang_code: value of the 041__a of a record
+    @type record_lang_code: str
+
+    @rtype: bool
+    """
+    return (invenio_lang_code in INVENIO_LANGUAGE_CODES.keys()
+            # invenio_lang_code is a valid invenio language code
+            and record_lang_code in
+            LANGUAGE_CODES[INVENIO_LANGUAGE_CODES[invenio_lang_code]]
+            # and given code matches with the other language codes
+            )
+
+
+def construct_translate_section():
     """
     Constructs drop-down language list.
-    @param div_id -str- : id of the corresponding drop-down list container.
-                          (Required for css)
     """
     out = """
-<div class="languages" id="%(id)s">
+<div class="languages">
 <select id="language-combo-box">
-    <option value="">Select Language</option>""" % {'id': div_id}
+    <option value="">Select Language</option>"""
 
     keys = sorted(LANGUAGE_CODES)
     for key in keys:
@@ -160,6 +180,9 @@ def construct_translate_section(div_id):
 
 def get_translate_script(sectional_node_class_name, ln=CFG_SITE_LANG,
                          load_script=False):
+    """
+    Returns google translate script
+    """
     out = """
     <div id="translate-script">
         <script>
@@ -167,7 +190,8 @@ def get_translate_script(sectional_node_class_name, ln=CFG_SITE_LANG,
               new google.translate.SectionalElement({
                 sectionalNodeClassName: '%(sectional_node)s',
                 controlNodeClassName: 'translate-link',
-                background: '#ffffff'
+                background: '#ffffff',
+                multilanguagePage: true
               }, 'google_sectional_element');
             }
         </script>

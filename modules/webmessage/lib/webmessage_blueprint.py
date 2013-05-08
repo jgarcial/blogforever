@@ -210,9 +210,13 @@ def view(msgid):
             ## I wonder if the autocommit works ...
             # Commit changes before rendering for correct menu update.
             db.session.commit()
+            translate_section = (CFG_TRANSLATE_WEBMESSAGE and
+                                 construct_translate_section() or "")
+            translate_script = (CFG_TRANSLATE_WEBMESSAGE and
+                                 get_translate_script('message') or "")
             return dict(m=m, display_translate=CFG_TRANSLATE_WEBMESSAGE,
-                        translate_section=construct_translate_section(''),
-                        translate_script=get_translate_script('message'))
+                        translate_section=translate_section,
+                        translate_script=translate_script)
         except db.sqlalchemy.orm.exc.NoResultFound:
             flash(_('This message does not exist.'), "error")
         except:

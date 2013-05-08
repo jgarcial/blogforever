@@ -21,10 +21,13 @@
 {%- endif -%}
 
 {%- if display_translate -%}
-  {% block header %}
-    {{ super() }}
-    {% js "js/translate.js" %}
-  {% endblock header %}
+{% block javascript %}
+	{# 
+	{% js "js/translate.js" %} includes translate.js at the top and translate.js cannot reach jQuery
+	#}
+	<script type="text/javascript" src="/js/translate.js"></script>
+	{{ translate_script|safe }}
+{% endblock javascript %}
 {%- endif -%}
 
 {% block record_content %}
@@ -61,7 +64,6 @@
   </style>
 
   {%- if display_translate -%}
-    {{ translate_script|safe }}
     {{ translate_section|safe }}
   {%- endif -%}
 
@@ -85,7 +87,7 @@
     </a>
 
     <h4>
-    {{ c.title }}
+    <div>{{ c.title }}</div>
     <small>
       {%- if c.nb_votes_total > 0 -%}
         {%- set votes = c.nb_votes_yes-(c.nb_votes_total-c.nb_votes_yes) -%}

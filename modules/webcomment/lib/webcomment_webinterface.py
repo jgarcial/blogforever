@@ -57,8 +57,7 @@ from invenio.config import \
      CFG_SITE_RECORD, \
      CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE, \
      CFG_WEBCOMMENT_MAX_ATTACHED_FILES, \
-     CFG_ACCESS_CONTROL_LEVEL_SITE, \
-     CFG_TRANSLATE_RECORD_COMMENT
+     CFG_ACCESS_CONTROL_LEVEL_SITE
 from invenio.webuser import getUid, page_not_authorized, isGuestUser, collect_user_info
 from invenio.webpage import page, pageheaderonly, pagefooteronly
 from invenio.search_engine import create_navtrail_links, \
@@ -217,13 +216,6 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         check_warnings = []
 
         (ok, problem) = check_recID_is_in_range(self.recid, check_warnings, argd['ln'])
-        
-        metaheaderadd = ""
-        if CFG_TRANSLATE_RECORD_COMMENT:
-            metaheaderadd = """
-<link rel="stylesheet" href="%(cssurl)s/img/translate.css" type="text/css" />
-<script src="%(cssurl)s/js/translate.js"></script>
-    """ % {'cssurl': 1 and CFG_SITE_SECURE_URL or CFG_SITE_URL}
         if ok:
             body = perform_request_display_comments_or_remarks(req=req, recID=self.recid,
                 display_order=argd['do'],
@@ -264,7 +256,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                         navtrail=navtrail,
                         uid=uid,
                         verbose=1,
-                        metaheaderadd = mathjaxheader + jqueryheader + metaheaderadd,
+                        metaheaderadd = mathjaxheader + jqueryheader,
                         req=req,
                         language=argd['ln'],
                         navmenuid='search',
@@ -280,8 +272,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                         verbose=1,
                         req=req,
                         language=argd['ln'],
-                        navmenuid='search',
-                        metaheaderadd = metaheaderadd)
+                        navmenuid='search')
 
     # Return the same page wether we ask for /CFG_SITE_RECORD/123 or /CFG_SITE_RECORD/123/
     __call__ = index

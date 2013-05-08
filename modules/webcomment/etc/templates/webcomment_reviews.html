@@ -20,11 +20,21 @@
   {% extends "record.html" %}
 {%- endif -%}
 
+{% block css %}
+<style>
+h4 .inline {
+	display: inline;
+}
+</style>
+{% endblock %}
 {%- if display_translate -%}
-  {% block header %}
-    {{ super() }}
-    {% js "js/translate.js" %}
-  {% endblock header %}
+{% block javascript %}
+	{# 
+	{% js "js/translate.js" %} includes translate.js at the top and translate.js cannot reach jQuery
+	#}
+	<script type="text/javascript" src="/js/translate.js"></script>
+	{{ translate_script|safe }}
+{% endblock javascript %}
 {%- endif -%}
 
 {% block record_content %}
@@ -50,7 +60,6 @@
   </div>
   
 {%- if display_translate -%}
-  {{ translate_script|safe }}
   {{ translate_section|safe }}
 {%- endif -%}
 
@@ -69,7 +78,7 @@
   <li name="{{ c.id }}">
     <div>
     <h4>
-    {{ c.title }}
+    <div class="inline">{{ c.title }}</div>
     <small>
        /
       {{ ('<i class="icon-star"></i>'|safe) * (c.star_score) }}{{ ('<i class="icon-star-empty"></i>'|safe) * ((5-c.star_score)) }} &nbsp;
