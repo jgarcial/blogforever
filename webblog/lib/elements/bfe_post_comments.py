@@ -28,8 +28,8 @@ from invenio.search_engine import call_bibformat
 
 
 cfg_messages = {}
-cfg_messages["in_issue"] = {"en": "Comments",
-                            "fr": "Commentaires"}
+cfg_messages["in_issue"] = {"en": "Comments in this post",
+                            "fr": "Commentaires sur ce post"}
 
 def format_element(bfo):
     """

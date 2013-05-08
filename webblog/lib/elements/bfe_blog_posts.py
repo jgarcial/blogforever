@@ -28,7 +28,7 @@ from invenio.search_engine import call_bibformat
 
 
 cfg_messages = {}
-cfg_messages["in_issue"] = {"en": "Posts on this blog ",
+cfg_messages["in_issue"] = {"en": "Posts in this blog ",
                             "fr": "Posts sur ce blog"}
 
 
