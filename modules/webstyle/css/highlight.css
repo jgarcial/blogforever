@@ -1,0 +1,168 @@
+div.color
+{
+    float:left;
+    width: 20px;
+    height: 20px;
+    margin: 2px;
+    border: 1px solid gray;
+    border-radius: 4px;
+}
+
+div.color:hover
+{
+    box-shadow: -1px -1px 2px #888888;
+    cursor: pointer;
+}
+
+div.selected_color {
+	box-shadow: -1px -1px 2px black;
+}
+
+#color_palette {
+    width: 280px;
+    border: 1px solid gray;
+    z-index: 9001;
+}
+
+div.highlight-modal-header {
+    margin: 0px;
+    padding: 0px;
+    padding-left: 15px;
+    padding-right: 15px;
+    cursor: move;
+}
+
+div.highlight-modal-footer {
+    margin: 0px;
+    padding: 8px 15px;
+    height: 25px;
+}
+
+#colors
+{
+    overflow: overlay;
+}
+
+img#palette_but
+{
+    margin-right: -35px;
+    margin-top: 30px;
+    border: 1px solid lightgray;
+    border-radius: 5px;
+    position: fixed;
+    left: 97%;
+    #top: 175px;
+    cursor: pointer;
+    z-index: 1001;
+    width:25px;
+}
+
+img#palette_but.unchecked:hover
+{
+    box-shadow: -1px -1px 2px #888;
+}
+
+img#palette_but.checked
+{
+    box-shadow: -1px -1px 2px black;
+}
+
+img#palette_but.unchecked
+{
+    box-shadow: 1px 1px 2px black;
+}
+
+img#activate_highlight.unchecked:hover
+{
+    box-shadow: -1px -1px 2px #888;
+}
+
+img#activate_highlight
+{
+    margin-right: -35px;
+    margin-top: -3px;
+    border: 1px solid lightgray;
+    border-radius: 5px;
+    position: fixed;
+    left: 97%;
+    top:auto;
+    cursor: pointer;
+    z-index: 1001;
+    width:25px;
+}
+
+img#activate_highlight.checked
+{
+    box-shadow: -1px -1px 2px black;
+}
+
+img#activate_highlight.unchecked
+{
+    box-shadow: 1px 1px 2px black;
+}
+
+.highlight
+{
+    background-color: yellow;
+}
+
+div.color_edit
+{
+    float:left;
+    width:14px;
+    height:14px;
+    margin:2px;
+    border: 1px solid gray;
+    border-radius: 4px;
+}
+
+div.color_edit:hover
+{
+    box-shadow: -1px -1px 2px #888888;
+    cursor: pointer;
+}
+
+span.option_menu_text
+{
+    margin-left: 5px;
+    margin-top: 1px;
+    margin-bottom: 0px;
+    margin-right: 5px;
+}
+
+.option_menu_text_container
+{
+    border-radius: 1px;
+    margin: 2px;
+}
+
+.option_menu_text_container:hover
+{
+    background-color: rgb(31, 36, 34);
+    cursor: pointer;
+    border-radius: 3px;
+}
+
+#annotation_edit:hover
+{
+    cursor: pointer;
+}
+
+highlight
+{
+    border-radius: 10px;
+}
+
+.highlightable *
+{
+
+}
+
+highlight > *
+{
+    border-radius: inherit;
+}
+
+#close_color_palette_button {
+	margin-left: 5px;
+}

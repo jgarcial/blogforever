@@ -62,7 +62,9 @@ jsdir=$(localstatedir)/www/js
 
 js_DATA = websearch_facet.js \
           websearch_hotkeys.js \
-          websearch_typeahead.js
+          websearch_typeahead.js \
+          highlight.js \
+          annotation.js
 
 EXTRA_DIST = $(pylib_DATA) \
              $(js_DATA)

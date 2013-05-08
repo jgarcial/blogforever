@@ -1,0 +1,81 @@
+div.highlight-modal-header {
+    margin: 0px;
+    padding: 0px;
+    padding-left: 15px;
+    padding-right: 15px;
+    cursor: move;
+}
+div.highlight-modal-footer {
+    margin: 0px;
+    padding: 8px 15px;
+    height: 25px;
+}
+div.highlight-modal-body {
+	padding: 5px;
+    padding-right: 15px;
+    padding-left: 15px;
+}
+
+#annotation_close_but {
+	margin-left: 5px;
+}
+
+#annotation_panel {
+    width: 280px;
+    border: 1px solid gray;
+    z-index: 9001;
+}
+
+#date_info_container {
+    font-family: inherit;
+    font-size: 75%;
+    height: 20px;
+}
+#text_area {
+    resize:none;
+    margin-top: 5px;
+    min-height: 50px;
+    width: 94%;
+}
+
+highlight.has_annotation {
+    cursor : pointer;
+    text-shadow: -5px 5px 10px #000;
+    opacity: 0.7;
+}
+div.option_menu {
+    z-index : 9000;
+}
+
+table#table-anno-tooltip{
+	background-color: inherit;
+	display: initial;
+}
+
+#col-anno-tooltip-left {
+	padding-right: 10px;
+	cursor: pointer;
+}
+
+#col-anno-tooltip-right {
+	text-align: left;
+}
+
+#icon-anno-tooltip {
+	font-size:13px;
+}
+
+#readonly-anno-options {
+	opacity: 1.0 !important;
+}
+
+.anno-options-tooltip {
+	display: inline-block;
+	max-width: 105px;
+	min-width: 105px;
+	text-align: left;
+}
+
+.tooltip.annotation-tooltip{
+	opacity: 0.95 !important;
+}

@@ -22,7 +22,8 @@
 import os
 from pprint import pformat
 from werkzeug import CombinedMultiDict, ImmutableMultiDict
-from flask import render_template, request, flash, redirect, url_for, g, abort
+from flask import render_template, request, flash, redirect, url_for, g, \
+    abort, jsonify
 from invenio.sqlalchemyutils import db
 from invenio.websession_model import User
 from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
@@ -33,20 +34,20 @@ from invenio.config import \
     CFG_SITE_SECURE_URL, \
     CFG_ACCESS_CONTROL_LEVEL_SITE, \
     CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT, \
-    CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS
-from invenio.access_control_config import \
-    CFG_EXTERNAL_AUTH_USING_SSO, \
-    CFG_EXTERNAL_AUTH_LOGOUT_SSO
-from invenio import webuser
-from invenio.access_control_mailcookie import \
-    InvenioWebAccessMailCookieError, \
-    mail_cookie_check_authorize_action
-from invenio.pluginutils import PluginContainer
-
-from invenio.webaccount_forms import LoginForm, RegisterForm
-from invenio.webuser_flask import login_user, logout_user, current_user
+    CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
+    CFG_SITE_RECORD
 from invenio.websession_webinterface import wash_login_method
 
+from invenio.webaccount_query import set_user_bibrec_highlights, \
+    get_user_bibrec_highlights, \
+    get_user_bibrec_annotation, \
+    set_user_bibrec_annotation, \
+    delete_user_bibrec_annotation, \
+    get_all_annotations
+
+
+from invenio.webuser import check_bibrec_modification_date
+from invenio.dateutils import difference_between_times
 
 CFG_HAS_HTTPS_SUPPORT = CFG_SITE_SECURE_URL.startswith("https://")
 CFG_FULL_HTTPS = CFG_SITE_URL.lower().startswith("https://")
@@ -274,3 +275,96 @@ def edit(name):
 
     return render_template(getattr(plugin, 'edit_template', '') or
                            'webaccount_edit.html', plugin=plugin, form=form)
+
+@blueprint.route('/loadhighlights', methods=['POST'])
+@blueprint.invenio_force_https
+def loadhighlights():
+    path = request.form['path'].split('/')
+    recid = path[path.index(CFG_SITE_RECORD)+1]
+
+    uid = current_user.get_id()
+
+    highlights = get_user_bibrec_highlights(uid, recid)
+    annotations = get_all_annotations(uid, recid)
+
+    return_dict = {'msg': "", 'highlights_from_server': "", 'annotations': ""}
+    if not highlights[0]:
+        return jsonify(**return_dict)
+
+    try:
+        if(check_bibrec_modification_date(highlights[1], recid)):
+            return jsonify(**{'msg': "",
+                                'highlights_from_server': highlights[0],
+                                'annotations': annotations
+                                })
+        else:
+            return jsonify(**{'msg': _("The context may have been changed\
+                                . Do you still want to load your highlights?"),
+                                'highlights_from_server': highlights[0],
+                                'annotations': annotations})
+    except:
+        return jsonify(**{'msg': "",
+                            'highlights_from_server': highlights[0],
+                            'annotations': annotations})
+
+
+
+@blueprint.route('/savehighlights', methods=['POST'])
+@blueprint.invenio_force_https
+def savehighlights():
+    path = request.form['path'].split('/')
+    recid = path[path.index(CFG_SITE_RECORD)+1]
+    uid = current_user.get_id()
+
+    set_user_bibrec_highlights(uid, recid, request.form['highlights_to_be_saved'])
+
+    return jsonify(**{})
+
+
+@blueprint.route('/saveannotation', methods=['POST'])
+@blueprint.invenio_force_https
+def saveannotation():
+    path = request.form['path'].split('/')
+    recid = path[path.index(CFG_SITE_RECORD)+1]
+    uid = current_user.get_id()
+
+    if (request.form.has_key('last_updated')):
+        last_updated = request.form['last_updated']
+    else:
+        last_updated = ''
+
+    return jsonify(**set_user_bibrec_annotation(uid,
+                                        recid,
+                                        request.form['annotation'],
+                                        request.form['id'],
+                                        last_updated))
+
+
+@blueprint.route('/getannotation', methods=['POST'])
+@blueprint.invenio_force_https
+def getannotation():
+    path = request.form['path'].split('/')
+    recid = path[path.index(CFG_SITE_RECORD)+1]
+    uid = current_user.get_id()
+
+    return_dict = get_user_bibrec_annotation(uid, recid, request.form['id'])
+
+    if return_dict["last_updated"] != '':
+        return_dict['time'] = difference_between_times(return_dict['last_updated'])
+
+    return_dict['last_updated'] = str(return_dict['last_updated'])
+    return_dict['message'] = _('Edit Note')
+
+    return jsonify(**return_dict)
+
+
+@blueprint.route('/removeannotation', methods=['POST'])
+@blueprint.invenio_force_https
+def removeannotation():
+    path = request.form['path'].split('/')
+    recid = path[path.index(CFG_SITE_RECORD)+1]
+    uid = current_user.get_id()
+
+    annotation_id = request.form["id"]
+
+    return jsonify(**delete_user_bibrec_annotation(uid, recid, annotation_id))

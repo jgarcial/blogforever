@@ -548,3 +548,68 @@ def strftime(fmt, dt):
 
 def strptime(date_string, fmt):
     return real_datetime(*(time.strptime(date_string, fmt)[:6]))
+
+
+def difference_between_times(time1, time2="", ln=CFG_SITE_LANG):
+    """
+        Formats the time difference between two times
+
+        ** It must be time1 < time2 to work proper **
+
+        @param time1 -datetime.datetime- : the first time
+
+        @param time2 -datetime.datetime- : the second time
+
+        @param ln -str- : language
+
+        @return -str- : formatted time difference
+    """
+    import datetime
+    _ = gettext_set_language(ln)
+
+    if not time2:
+        time2 = datetime.datetime.now()
+    total_seconds = int((time2 - time1).total_seconds())
+
+    if total_seconds < 60:
+        if total_seconds <= 1:
+            return "1 " + _("second ago")
+        return str(total_seconds) + " " + _("seconds ago")
+    elif 60 <= total_seconds < 60 * 60:
+        if total_seconds / 60 == 1:
+            return "1 " + _("minute ago")
+        return str(total_seconds / 60) + " " + _("minutes ago")
+    elif 60 * 60 <= total_seconds < 60 * 60 * 24:
+        if total_seconds / 60 / 60 == 1:
+            return "1 " + _("hour ago")
+        return str(total_seconds / 60 / 60) + " " + _("hours ago")
+
+    hour = "%02d" % (time1.hour)
+    minute = "%02d" % (time1.minute)
+
+    if (time2 - datetime.timedelta(days=1)).day == time1.day:
+        return _("Yesterday") + " %(hour)s:%(minute)s" % {
+                                                "hour": hour,
+                                                "minute": minute
+                                                }
+    elif ((time2 - datetime.timedelta(days=10)) <=
+          time1 <
+          (time2 - datetime.timedelta(days=1))):
+        return str(int((time2 - time1).days)) + " " + _("days ago")
+    else:
+        if (time1.year == datetime.datetime.now().year):
+            return _("%(month)s %(day)s %(hour)s:%(minute)s") % {
+                        "day": time1.day,
+                        "month": get_i18n_month_name(time1.month - 1),
+                        "hour": hour,
+                        "minute": minute
+                        }
+        else:
+            return _("%(month)s %(day)s, %(year)s %(hour)s:\
+%(minute)s") % {
+                "day": time1.day,
+                "month": get_i18n_month_name(time1.month - 1),
+                "year": time1.year,
+                "hour": hour,
+                "minute": minute
+                }

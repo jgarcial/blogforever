@@ -316,7 +316,9 @@ img_DATA = add-small.png \
            discover.png \
            maestro.png \
            mastercard.png \
-           visa.png
+           visa.png \
+           highlight.png \
+           palette-icon.png
 
 tmpdir=$(localstatedir)/tmp
 

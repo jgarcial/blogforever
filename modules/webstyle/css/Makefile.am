@@ -18,10 +18,12 @@
 webdir = $(localstatedir)/www/css
 
 web_DATA = invenio.css \
-            invenio-ie7.css \
-            tablesorter.css \
-            jquery.ajaxPager.css \
-            translate.css
+           invenio-ie7.css \
+           tablesorter.css \
+           jquery.ajaxPager.css \
+           translate.css \
+           annotation.css \
+           highlight.css
 
 EXTRA_DIST = $(web_DATA)
 

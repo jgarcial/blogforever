@@ -1402,3 +1402,216 @@ def collect_user_info(req, login_time=False, refresh=False):
     except Exception, e:
         register_exception()
     return user_info
+
+def check_bibrec_modification_date(highlight_date, recid):
+    """
+    Checks if there is any modification after highlight date.
+
+    @param highlight_date -datetime.datetime- : Last updated time of a highlight
+        or annotation entry.
+
+    @param recid -int- : Id of the record that changes are made on.
+
+    @return -bool- : True if there is not any modification on record, False
+        otherwise.
+    """
+    query = """
+            SELECT      modification_date
+            FROM        bibrec
+            WHERE       id = %s"""  % recid
+
+    modification_date = run_sql(query)
+    if not highlight_date:
+        return True
+    try:
+        if highlight_date < modification_date[0][0]:
+            return False
+        else:
+            return True
+    except:
+        return False
+
+def set_user_bibrec_annotation(uid, recid, annotation, annotation_id=0,
+                                                               last_updated=""):
+    """
+    Inserts or updates an annotation and returns that record.
+
+    @param uid -int- : user ID
+
+    @param recid -int- : record ID
+
+    @param annotation -str- : annotation text
+
+    @param annotation_id -int- : Id of the annotation corresponding to a
+        highlight.
+
+    @param last_updated -int- : The last updated time of an annotation (used in
+        undo operations)
+    """
+    from invenio.dateutils import convert_datestruct_to_datetext
+    from time import localtime
+
+    return_dict = {}
+    if (not last_updated):
+        last_updated = convert_datestruct_to_datetext(localtime())
+
+    return_dict = get_user_bibrec_annotation(uid, recid, annotation_id)
+    return_dict["last_updated"] = str(return_dict["last_updated"])
+
+    try:
+        query = """
+                INSERT INTO bibrec_annotations
+                VALUES(%s, %s, %s, %s, %s)
+                """
+        params = (recid, annotation_id, uid, serialize_via_marshal(annotation),
+                                                                   last_updated)
+        run_sql(query, params)
+    except:
+        query = """
+                UPDATE      bibrec_annotations
+                SET         annotation = %s,
+                            last_updated = %s
+                WHERE       id_user = %s
+                    AND     id_bibrec = %s
+                    AND     id_annotation = %s
+                """
+        params = (serialize_via_marshal(annotation),
+                        last_updated, uid, recid, annotation_id)
+        run_sql(query, params)
+
+    return return_dict
+
+def get_user_bibrec_annotation(uid, recid, annotation_id):
+    """
+    Gets the annotation record.
+
+    @param uid -int- : user ID
+
+    @param recid -int- : record ID
+
+    @param annotation_id -int- : annotation_id
+
+    @return -dict- : annotatation record
+        keys: ["annotation", "last_updated"]
+    """
+    query = """
+        SELECT      annotation,
+                    last_updated
+        FROM        bibrec_annotations
+        WHERE       id_user = %s
+            AND     id_bibrec = %s
+            AND     id_annotation = %s"""
+
+    params = (uid, recid, annotation_id)
+    try:
+        annotation =  run_sql(query, params)[0]
+        return {"annotation": deserialize_via_marshal(annotation[0]),
+                "last_updated": annotation[1]}
+    except:
+        return {"annotation":"", "last_updated":""}
+
+def delete_user_bibrec_annotation(uid, recid, annotation_id=""):
+    """
+        Deletes the annotation with given user id, record id and
+            annotation id and returns deleted annotation.
+
+        If annotation_id isn't given, it removes all the annotations.
+
+        @param uid -int- : user ID
+
+        @param recid -int- : record ID
+
+        @param annotation_id -int- : annotation ID
+
+        @return -dict- : deleted annotation for undo operation
+            keys: ["annotation", "last_updated"]
+    """
+    if annotation_id:
+        return_dict = get_user_bibrec_annotation(uid,
+                                                recid,
+                                                annotation_id)
+        return_dict["last_updated"] = str(return_dict["last_updated"])
+
+    params = (uid, recid)
+
+    query = """
+        DELETE FROM bibrec_annotations
+        WHERE       id_user = %s
+            AND     id_bibrec = %s"""
+
+    if annotation_id:
+        query += """
+            AND     id_annotation = %s
+            """
+        params = (uid, recid, annotation_id)
+
+    try:
+        run_sql(query, params)
+        return return_dict
+    except:
+        return {"annotation": "", "last_updated": ""}
+
+
+def set_user_bibrec_highlights(uid, recid, highlights=""):
+    """
+        Saves current indexes of highlighted area.
+
+        @param uid -int- : user ID
+
+        @param recid -int- : record ID
+
+        @param highlights -str- : indexes of highlights
+    """
+    if highlights:
+        serialized_highlights = serialize_via_marshal(highlights)
+        try:
+            query = """
+                INSERT INTO bibrec_highlights
+                VALUES(%s, %s, %s, NOW())
+            """
+            params = (recid, uid, serialized_highlights)
+            run_sql(query, params)
+        except:
+            query = """
+                UPDATE      bibrec_highlights
+                SET         highlights = %s,
+                            last_updated = NOW()
+                WHERE       id_user = %s
+                    AND     id_bibrec = %s
+                """
+            params = (serialized_highlights, uid, recid)
+            run_sql(query, params)
+    else:
+        try:
+            query = """
+                DELETE FROM bibrec_highlights
+                WHERE       id_user = %s
+                    AND     id_bibrec = %s
+                    """
+            params = (uid, recid)
+            run_sql(query, params)
+        except:
+            pass
+
+def get_user_bibrec_highlights(uid, recid):
+    """
+        Returns the highlight indexes of the highlighted area.
+
+        @param uid -int- : user ID
+
+        @param recid -int- : record ID
+    """
+
+    try:
+        query = """
+            SELECT      highlights,
+                        last_updated
+            FROM        bibrec_highlights
+            WHERE       id_user = %s
+                AND     id_bibrec = %s
+        """
+        params = (uid, recid)
+        (serialized_highlights, last_updated) = run_sql(query, params)[0]
+        return (deserialize_via_marshal(serialized_highlights), last_updated)
+    except:
+        return ("","")

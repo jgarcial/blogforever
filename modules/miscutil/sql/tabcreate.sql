@@ -4333,25 +4333,6 @@ CREATE TABLE IF NOT EXISTS `collection_instantbrowse` (
   PRIMARY KEY (`collection_id`)
 ) ENGINE=MyISAM;
 
--- maint-1.1 upgrade recipes:
-INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_release_1_1_0',NOW());
-INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_10_31_tablesorter_location',NOW());
-INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_11_01_lower_user_email',NOW());
-INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_11_21_aiduserinputlog_userid_check',NOW());
-INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_11_15_hstRECORD_marcxml_longblob',NOW());
-
--- master upgrade recipes:
-INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_10_29_idxINDEX_new_indexer_column',NOW());
-INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_11_04_circulation_and_linkback_updates',NOW());
-INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_11_07_xtrjob_last_recid',NOW());
-INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_11_27_new_selfcite_tables',NOW());
-INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_12_11_new_citation_errors_table',NOW());
-INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_01_08_new_goto_table',NOW());
-INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_11_15_bibdocfile_model',NOW());
-INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_02_01_oaiREPOSITORY_last_updated',NOW());
-INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_03_07_crcILLREQUEST_overdue_letter',NOW());
-INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_01_12_bibrec_master_format',NOW());
-
 -- tables for web payment
 CREATE TABLE IF NOT EXISTS premium (
   id int(11) NOT NULL AUTO_INCREMENT,
@@ -4389,5 +4370,42 @@ CREATE TABLE IF NOT EXISTS collection_accROLE (
 	id_accROLE int(15),
 	PRIMARY KEY (id_collection, id_accROLE)
 ) ENGINE=MyISAM;
+
+-- tables for highlights and annotations
+CREATE TABLE bibrec_highlights(
+  id_bibrec int NOT NULL,
+  id_user int NOT NULL,
+  highlights MEDIUMBLOB,
+  last_updated datetime NOT NULL DEFAULT '0000:00:00 00:00:00',
+  primary key(id_bibrec, id_user)
+) ENGINE=MyISAM, default charset = utf8;
+
+CREATE TABLE IF NOT EXISTS bibrec_annotations(
+  id_bibrec int NOT NULL,
+  id_annotation int NOT NULL,
+  id_user int NOT NULL,
+  annotation MEDIUMBLOB NOT NULL,
+  last_updated datetime NOT NULL DEFAULT '0000:00:00 00:00:00',
+  PRIMARY KEY (id_bibrec, id_user, id_annotation)
+) ENGINE=MyISAM, default charset = utf8;
+
+-- maint-1.1 upgrade recipes:
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_release_1_1_0',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_10_31_tablesorter_location',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_11_01_lower_user_email',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_11_21_aiduserinputlog_userid_check',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_11_15_hstRECORD_marcxml_longblob',NOW());
+
+-- master upgrade recipes:
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_10_29_idxINDEX_new_indexer_column',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_11_04_circulation_and_linkback_updates',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_11_07_xtrjob_last_recid',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_11_27_new_selfcite_tables',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_12_11_new_citation_errors_table',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_01_08_new_goto_table',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_11_15_bibdocfile_model',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_02_01_oaiREPOSITORY_last_updated',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_03_07_crcILLREQUEST_overdue_letter',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_01_12_bibrec_master_format',NOW());
 
 -- end of file

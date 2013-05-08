@@ -163,8 +163,88 @@ class UserEXT(db.Model):
     __table_args__ = (db.Index('id_user', id_user, method, unique=True),
                       db.Model.__table_args__)
 
+
+class UserBibrecHighlights(db.Model):
+    """Represents a UserBibrecHighlights record."""
+    def __str__(self):
+        return "%s <%s>" % (self.name, self.description)
+
+    __tablename__ = 'bibrec_highlights'
+
+    # FIXME
+    # Insert foreign key referencing Bibrec.id
+    id_bibrec = db.Column(db.Integer(15, unsigned=True),
+                          nullable=False,
+                          primary_key=True)
+
+    id_user = db.Column(db.Integer(15, unsigned=True),
+                        db.ForeignKey(User.id),
+                        nullable=False,
+                        primary_key=True)
+
+    highlights = db.Column(db.LargeBinary, nullable=True)
+
+    last_updated = db.Column(db.DateTime, nullable=False,
+                             server_default='0001-01-01 00:00:00')
+
+    def __init__(self, id_user, id_bibrec, highlights, last_updated = None):
+        self.id_user = id_user
+        self.id_bibrec = id_bibrec
+        # FIXME
+        # Serialize!
+        self.highlights = highlights
+
+        if not last_updated:
+            from datetime import datetime
+            last_updated = datetime.now()
+        self.last_updated = last_updated
+
+
+class UserBibrecAnnotations(db.Model):
+    """Represents a UserBibrecAnnotations record."""
+    def __str__(self):
+        return "%s <%s>" % (self.name, self.description)
+
+    __tablename__ = 'bibrec_annotations'
+
+    # FIXME
+    # Insert foreign key referencing Bibrec.id
+    id_bibrec = db.Column(db.Integer(15, unsigned=True),
+                          nullable=False,
+                          primary_key=True)
+
+    id_annotation = db.Column(db.Integer(15, unsigned=True),
+                              nullable=False,
+                              primary_key=True)
+
+    id_user = db.Column(db.Integer(15, unsigned=True),
+                        db.ForeignKey(User.id),
+                        nullable=False,
+                        primary_key=True)
+
+    annotation = db.Column(db.LargeBinary, nullable=True)
+
+    last_updated = db.Column(db.DateTime, nullable=False,
+                             server_default='0001-01-01 00:00:00')
+
+    def __init__(self, id_bibrec, id_annotation, id_user, annotation, last_updated = None):
+        self.id_bibrec = id_bibrec
+        self.id_annotation = id_annotation
+        self.id_user = id_user
+        # FIXME
+        # Serialize!
+        self.annotation = annotation
+
+        if not last_updated:
+            from datetime import datetime
+            last_updated = datetime.now()
+        self.last_updated = last_updated
+
+
 __all__ = ['User',
            'Usergroup',
            'UserUsergroup',
            'UserEXT',
-           'Session']
+           'Session',
+           'UserBibrecHighlights',
+           'UserBibrecAnnotations']

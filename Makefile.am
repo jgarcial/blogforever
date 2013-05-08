@@ -192,6 +192,16 @@ install-jquery-plugins:
 	mv jquery-1.7.1.min.js jquery.min.js && \
 	wget http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/jquery-ui.min.js && \
         wget http://invenio-software.org/download/jquery/v1.5/js/jquery.jeditable.mini.js && \
+    wget jquery-ui.googlecode.com/files/jquery-ui-1.8.18.zip && \
+	unzip jquery-ui-1.8.18.zip jquery-ui-1.8.18/ui/minified/jquery.ui.core.min.js \
+		jquery-ui-1.8.18/ui/minified/jquery.ui.mouse.min.js \
+		jquery-ui-1.8.18/ui/minified/jquery.ui.button.min.js \
+		jquery-ui-1.8.18/ui/minified/jquery.ui.draggable.min.js \
+		jquery-ui-1.8.18/ui/minified/jquery.ui.position.min.js \
+		jquery-ui-1.8.18/ui/minified/jquery.ui.resizable.min.js \
+		jquery-ui-1.8.18/ui/minified/jquery.ui.widget.min.js && \
+	mv jquery-ui-1.8.18/ui/minified/* ./ && \
+	rm -r jquery-ui-1.8.18 jquery-ui-1.8.18.zip && \
 	wget https://raw.github.com/malsup/form/master/jquery.form.js --no-check-certificate && \
 	wget http://jquery-multifile-plugin.googlecode.com/svn/trunk/jquery.MultiFile.pack.js && \
 	wget -O jquery.tablesorter.zip http://invenio-software.org/download/jquery/jquery.tablesorter.20111208.zip && \
@@ -258,7 +268,14 @@ uninstall-jquery-plugins:
         rm -f jquery-ui-1.7.3.custom.min.js && \
         rm -f jquery.metadata.js && \
         rm -f jquery-latest.js && \
-        rm -f jquery-ui.min.js)
+        rm -f jquery-ui.min.js && \
+		rm -f jquery.ui.core.min.js && \
+		rm -f jquery.ui.button.min.js && \
+		rm -f jquery.ui.draggable.min.js && \
+		rm -f jquery.ui.mouse.min.js && \
+		rm -f jquery.ui.position.min.js && \
+		rm -f jquery.ui.resizable.min.js && \
+		rm -f jquery.ui.widget.min.js) && \
 	(cd ${prefix}/var/www/img && \
 	rm -f cancel.png uploadify.css uploadify.swf uploadify.allglyphs.swf uploadify.fla && \
 	rm -f datatables_jquery-ui.css \

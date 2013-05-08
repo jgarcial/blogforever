@@ -17,10 +17,150 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
 
+{% set highlight_enabled = not current_user.is_guest and breadcrumbs[1][0] in config.CFG_HIGHLIGHT_AND_ANNOTATION_COLLECTIONS %}
+
 {%- if not request.is_xhr -%}
   {% extends "record.html" %}
 {%- endif -%}
 
+{% if highlight_enabled %}
+	{% block header %}
+		{{ super() }}
+		{% css 'css/highlight.css' %}
+		{% css 'css/annotation.css' %}
+		{% js 'js/jquery-ui.min.js' %}
+		{% js 'js/annotation.js' %}
+		{% js 'js/highlight.js' %}
+	{% endblock header %}
+{% endif %}
+
 {% block record_content %}
-  {{ format_record(recid, of='hd', ln=g.ln)|safe }}
+
+{% if not highlight_enabled %}
+	{{ format_record(recid, of='hd', ln=g.ln)|safe }}
+{% else %}
+	<div class="tools" id="highlight">
+		<span hidden="true" id="langEditAnnotation">{{ _("Edit Annotation") }}</span>
+		<span hidden="true" id="langAddAnnotation">{{ _("Add Annotation") }}</span>
+		<span hidden="true" id="langAddNewNote">{{ _("Add New Note") }}</span>
+		<span hidden="true" id="langDelete">{{ _("Delete") }}</span>
+		<span hidden="true" id="langAnnotationInfoText">{{ _("You can stick annotations.") }}</span>
+
+		<img class="unchecked" id="activate_highlight" src="{{config.CFG_SITE_SECURE_URL}}/img/highlight.png"></img>
+		<img class="unchecked" id="palette_but" src="{{config.CFG_SITE_SECURE_URL}}/img/palette-icon.png"></img>
+
+		<div class="option_menu" hidden="true">
+			<button id="annotation_edit" class="btn btn-inverse disabled" style="opacity: 1.0;height:25px; padding: 1px 6px"><i class="icon icon-white icon-edit"></i></button>
+			<!--<img id="annotation_edit" src="{{config.CFG_SITE_SECURE_URL}}/img/edit1.gif"></img>-->
+			<div class="highlight_menu_edit">
+			    <div id="highlight_edit_header">
+			        <div id="edit_menu_link_1" class="option_menu_text_container" onClick="optionMenuTextContainerClick(this, event)">
+			            <span class="option_menu_text" id="add"><i class="icon icon-pencil"></i> Add Annotation</span>
+			        </div>
+			        <div id="edit_menu_link_2" class="option_menu_text_container" onClick="optionMenuTextContainerClick(this, event)">
+			            <span class="option_menu_text" id="remove"><i class="icon icon-trash"></i> {{ _("Delete") }} </span>
+			        </div>
+			    </div>
+
+				<div id="color_palette_edit">
+			        {% for color in config.CFG_COLOR_PALETTE %}
+						<div onClick="colorEditClick(this)" style="background-color:{{color}};" class="color_edit"></div>
+					{% endfor %}
+			    </div>
+			</div>
+		 </div>
+
+		<div id="annotation_panel" class="modal" hidden="true">
+		    <div class="highlight-modal-header modal-header">
+		        <button id="annotation_close_but" type="button" class="close" data-dismiss="modal" aria-hidden="true">
+		            <i class="icon icon-remove-sign"></i>
+		        </button>
+		         <h4 id="annotation_panel_title">{{ _("Add New Note") }}</h4>
+		    </div>
+		    <div class="highlight-modal-body modal-body">
+		        <div id="date_info_container">
+		            <span id="date_info" title="2013-03-29 16:06:42">2 seconds ago</span>
+		        </div>
+		        <div id="text_area_container">
+		            <textarea id="text_area"></textarea>
+		        </div>
+		    </div>
+		    <div id="color_palette_footer" class="highlight-modal-footer  modal-footer">
+		        <button id="annotation_save_but" class="btn btn-small btn-success"><i class="icon icon-white icon-check"></i> {{ _("Save") }}</button>
+		        <button id="annotation_remove_but" class="btn btn-small btn-danger"><i class="icon icon-white icon-trash"></i> {{ _("Delete") }}</button>
+		    </div>
+		</div>
+
+		<div id="color_palette" class="modal" hidden="true">
+		    <div id="color_palette_header" class="highlight-modal-header modal-header">
+	        	<button id="close_color_palette_button" type="button" class="close" data-dismiss="modal" aria-hidden="true">
+	        		<i class="icon icon-remove-sign"></i>
+	        	</button>
+	            <h4>{{ _("Color Palette") }}</h4>
+			</div>
+			<div class="modal-body">
+				<div id="colors">
+					{% for color in config.CFG_COLOR_PALETTE %}
+						<div style="background-color:{{color}};" class="color"></div>
+					{% endfor %}
+				</div>
+			</div>
+			<div id="color_palette_footer" class="highlight-modal-footer  modal-footer">
+				<button id="undo" class="btn btn-small btn-inverse disabled"><i class="icon icon-repeat"></i> {{ _("Undo") }}</button>
+				<button id="remove_all" class="btn btn-small btn-danger"><i class="icon icon-trash"></i> {{ _("Remove All") }}</button>
+	    	</div>
+		</div>
+
+		{{ format_record(recid, of='hd', ln=g.ln)|safe }}
+
+	{% endif %}
+
+  <hr/>
+
+<style>
+div.star {
+  height: 30px !important;
+  float: left;
+  clear: none;
+  width: auto;
+  text-align: left;
+  background: url(/img/star_empty-icon-30x30.gif) no-repeat;
+}
+
+div.star a {
+  text-indent: -9000px;
+  height: 30px;
+  width: 30px;
+  float: left;
+}
+
+div.star:hover {
+   background-image:url(/img/star-icon-30x30.gif) !important;
+}
+
+/*div.half {
+   background-image:url(/img/star_empty-icon-30x30.gif) ;
+}*/
+</style>
+
+  <div class="row">
+  <div class="span12">
+    <div class="well">
+    <div class="row">
+      <div style="text-align: center;" class="span3">
+        {{ format_record(recid, of='HDFILE', ln=g.ln)|safe }}
+      </div>
+      <div style="text-align: center;" class="span5">
+      {%- if config.CFG_WEBCOMMENT_ALLOW_REVIEWS -%}
+        {{ get_mini_reviews(recid=recid, ln=g.ln)|safe }}
+      {%- endif -%}
+      &nbsp;
+      </div>
+      <div class="span3">
+		{{ format_record(recid, of='HDACT', ln=g.ln)|safe }}
+      </div>
+    </div>
+    </div>
+  </div>
+  </div>
 {% endblock %}

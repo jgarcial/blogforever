@@ -22,10 +22,10 @@ suffix='</div><hr/>'/>
 <p style="margin-left: 15%; width: 70%">
 
 <BFE_ABSTRACT
-prefix_en="<small><strong>Abstract: </strong>"
-prefix_fr="<small><strong>Résumé: </strong>"
-suffix_en="</small><br />"
-suffix_fr="</small><br />"
+prefix_en="<div class='highlightable' style='margin-left: 15%; width: 70%'><small><strong>Abstract: </strong><span class='highlightable'>"
+prefix_fr="<div class='highlightable' style='margin-left: 15%; width: 70%'><small><strong>Résumé: </strong><span class='highlightable'>"
+suffix_en="</span></small></div><br />"
+suffix_fr="</span></small></div><br />"
 />
 
 <BFE_KEYWORDS
