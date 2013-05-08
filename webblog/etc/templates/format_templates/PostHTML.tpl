@@ -17,7 +17,9 @@
 		{{ bfe_title(bfo, prefix='<h1 class="articleTitle">', suffix='</h1>') }}
 
 		<div class="post-text">
-			{{ bfe_abstract(bfo, escape="0") }}
+			{{ bfe_abstract(bfo, escape="0",
+				prefix_en='<div class="highlightable" style="margin-right:20px;"><span>',
+				suffix_en='</span></div><br />') }}
 		</div>
 
 		<div class="bfe-citation-box">
