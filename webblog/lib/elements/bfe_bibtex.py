@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -16,11 +16,13 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
 """BibFormat element - Prints BibTeX meta-data
 """
 __revision__ = "$Id$"
 
 from invenio.config import CFG_SITE_LANG
+import datetime
 
 def format_element(bfo, width="50"):
     """
@@ -41,16 +43,14 @@ def format_element(bfo, width="50"):
     value_width = width-name_width
     recID = bfo.control_field('001')
 
-    #Print entry type
-    import invenio.bibformat_elements.bfe_collection as bfe_collection
-    collection = bfe_collection.format_element(bfo=bfo, kb="DBCOLLID2BIBTEX")
-    if collection == "":
-        out += "article"
-    else:
-        out += collection
+#    collections = bfo.fields("980__a")
+##    #Print entry type
+#    if collections:
+#        out += collections[0].lower()
+
+    out += "misc"
 
     out += "{"
-
     #Print BibTeX key
     #
     #Try to have: author_name:recID
@@ -66,52 +66,23 @@ def format_element(bfo, width="50"):
     if author != "":
         key = get_name(author)+":"+recID
     else:
-        author = bfo.field("700__a")
-        if author != "":
-            key = get_name(author)+":"+recID
-        else:
-            primary_report_number = bfo.field("037__a")
-            if primary_report_number != "":
-                key = primary_report_number
-            else:
-                additional_report_number = bfo.field("088__a")
-                if additional_report_number != "":
-                    key = primary_report_number
-                else:
-                    title = bfo.field("245__a")
-                    if title != "":
-                        key = get_name(title)+":"+recID
+        title = bfo.field("245__a")
+        if title != "":
+            key = get_name(title)+":"+recID
     out += key +","
 
     #Print authors
     #If author cannot be found, print a field key=recID
-    import invenio.bibformat_elements.bfe_authors as bfe_authors
-    authors = bfe_authors.format_element(bfo=bfo,
-                                         limit="",
-                                         separator=" and ",
-                                         extension="",
-                                         print_links="no")
-    if authors == "":
+    if author == "":
         out += format_bibtex_field("key",
                                    recID,
                                    name_width,
                                    value_width)
     else:
         out += format_bibtex_field("author",
-                                   authors,
+                                   author,
                                    name_width,
                                    value_width)
-
-    #Print editors
-    import invenio.bibformat_elements.bfe_editors as bfe_editors
-    editors = bfe_editors.format_element(bfo=bfo, limit="",
-                                         separator=" and ",
-                                         extension="",
-                                         print_links="no")
-    out += format_bibtex_field("editor",
-                               editors,
-                               name_width,
-                               value_width)
 
     #Print title
     import invenio.bibformat_elements.bfe_title as bfe_title
@@ -121,197 +92,37 @@ def format_element(bfo, width="50"):
                                name_width,
                                value_width)
 
-    #Print institution
-    if collection ==  "techreport":
-        publication_name = bfo.field("269__b")
-        out += format_bibtex_field("institution",
-                                   publication_name,
-                                   name_width, value_width)
-
-    #Print organization
-    if collection == "inproceedings" or collection == "proceedings":
-        organization = []
-        organization_1 = bfo.field("260__b")
-        if organization_1 != "":
-            organization.append(organization_1)
-        organization_2 = bfo.field("269__b")
-        if organization_2 != "":
-            organization.append(organization_2)
-        out += format_bibtex_field("organization",
-                                   ". ".join(organization),
-                                   name_width,
-                                   value_width)
-
-    #Print publisher
-    if collection == "book" or \
-           collection == "inproceedings" \
-           or collection == "proceedings":
-        publishers = []
-        import invenio.bibformat_elements.bfe_publisher as bfe_publisher
-        publisher = bfe_publisher.format_element(bfo=bfo)
-        if publisher != "":
-            publishers.append(publisher)
-        publication_name = bfo.field("269__b")
-        if publication_name != "":
-            publishers.append(publication_name)
-        imprint_publisher_name = bfo.field("933__b")
-        if imprint_publisher_name != "":
-            publishers.append(imprint_publisher_name)
-        imprint_e_journal__publisher_name = bfo.field("934__b")
-        if imprint_e_journal__publisher_name != "":
-            publishers.append(imprint_e_journal__publisher_name)
-
-        out += format_bibtex_field("publisher",
-                                   ". ".join(publishers),
-                                   name_width,
-                                   value_width)
-
-    #Print journal
-    if collection == "article":
-        journals = []
-        host_title = bfo.field("773__p")
-        if host_title != "":
-            journals.append(host_title)
-        journal = bfo.field("909C4p")
-        if journal != "":
-            journals.append(journal)
-
-        out += format_bibtex_field("journal",
-                                   ". ".join(journals),
-                                   name_width,
-                                   value_width)
-
-    #Print school
-    if collection == "phdthesis":
-        university = bfo.field("502__b")
-
-        out += format_bibtex_field("school",
-                                   university,
-                                   name_width,
-                                   value_width)
-
-    #Print address
-    if collection == "book" or \
-           collection == "inproceedings" or \
-           collection == "proceedings" or \
-           collection == "phdthesis" or \
-           collection == "techreport":
-        addresses = []
-        publication_place = bfo.field("260__a")
-        if publication_place != "":
-            addresses.append(publication_place)
-        publication_place_2 = bfo.field("269__a")
-        if publication_place_2 != "":
-            addresses.append(publication_place_2)
-        imprint_publisher_place = bfo.field("933__a")
-        if imprint_publisher_place != "":
-            addresses.append(imprint_publisher_place)
-        imprint_e_journal__publisher_place = bfo.field("934__a")
-        if imprint_e_journal__publisher_place != "":
-            addresses.append(imprint_e_journal__publisher_place)
-
-        out += format_bibtex_field("address",
-                                   ". ".join(addresses),
-                                   name_width,
-                                   value_width)
-
-    #Print number
-    if collection == "techreport" or \
-           collection == "article":
-        numbers = []
-        primary_report_number = bfo.field("037__a")
-        if primary_report_number != "":
-            numbers.append(primary_report_number)
-        additional_report_numbers = bfo.fields("088__a")
-        additional_report_numbers = ". ".join(additional_report_numbers)
-        if additional_report_numbers != "":
-            numbers.append(additional_report_numbers)
-        host_number = bfo.field("773__n")
-        if host_number != "":
-            numbers.append(host_number)
-        number = bfo.field("909C4n")
-        if number != "":
-            numbers.append(number)
-        out += format_bibtex_field("number",
-                                   ". ".join(numbers),
-                                   name_width,
-                                   value_width)
-
-    #Print volume
-    if collection == "article" or \
-           collection == "book":
-        volumes = []
-        host_volume = bfo.field("773__v")
-        if host_volume != "":
-            volumes.append(host_volume)
-        volume = bfo.field("909C4v")
-        if volume != "":
-            volumes.append(volume)
-
-        out += format_bibtex_field("volume",
-                                   ". ".join(volumes),
-                                   name_width,
-                                   value_width)
-
-    #Print series
-    if collection == "book":
-        series = bfo.field("490__a")
-        out += format_bibtex_field("series",
-                                   series,
-                                   name_width,
-                                   value_width)
-
-    #Print pages
-    if collection == "article" or \
-           collection == "inproceedings":
-        pages = []
-        host_pages = bfo.field("773c")
-        if host_pages != "":
-            pages.append(host_pages)
-        nb_pages = bfo.field("909C4c")
-        if nb_pages != "":
-            pages.append(nb_pages)
-        phys_pagination = bfo.field("300__a")
-        if phys_pagination != "":
-            pages.append(phys_pagination)
-
-        out += format_bibtex_field("pages",
-                                   ". ".join(pages),
-                                   name_width,
-                                   value_width)
+    try:
+        posted_date = bfo.fields('269__c')[0]
+        # hack
+        if posted_date.find("ERROR") > -1:
+            posted_date = ""
+        else:
+            date = datetime.datetime.strptime(posted_date, "%m/%d/%Y %I:%M:%S %p")
+            posted_date = date.strftime("%Y/%m/%d")
+    except:
+        posted_date = ""
 
     #Print month
-    month = get_month(bfo.field("269__c"))
-    if month == "":
-        month = get_month(bfo.field("260__c"))
-        if month == "":
-            month = get_month(bfo.field("502__c"))
-
-    out += format_bibtex_field("month",
-                               month,
-                               name_width,
-                               value_width)
+    try:
+        month = get_month(posted_date)
+        out += format_bibtex_field("month",
+                                   month,
+                                   name_width,
+                                   value_width)
+    except:
+        pass
 
     #Print year
-    year = get_year(bfo.field("269__c"))
-    if year == "":
-        year = get_year(bfo.field("260__c"))
-        if year == "":
-            year = get_year(bfo.field("502__c"))
-            if year == "":
-                year = get_year(bfo.field("909C0y"))
+    try:
+        year = get_year(posted_date)
 
-    out += format_bibtex_field("year",
-                               year,
-                               name_width,
-                               value_width)
-
-    #Print note
-    note = bfo.field("500__a")
-    out += format_bibtex_field("note",
-                               note,
-                               name_width,
-                               value_width)
+        out += format_bibtex_field("year",
+                                   year,
+                                   name_width,
+                                   value_width)
+    except:
+        pass
 
     out +="\n}"
 
@@ -433,13 +244,13 @@ def get_year(date, default=""):
 
 def get_month(date, ln=CFG_SITE_LANG, default=""):
     """
-    Returns the year from a textual date retrieved from a record
+    Returns the month from a textual date retrieved from a record
 
     The returned value is the 3 letters short month name in language 'ln'
     If year cannot be found, returns 'default'
 
-    @param date: the textual date to retrieve the year from
-    @param default: a default value to return if year not fount
+    @param date: the textual date to retrieve the month from
+    @param default: a default value to return if month not found
     """
     import re
     from invenio.dateutils import get_i18n_month_name
@@ -462,7 +273,7 @@ def get_month(date, ln=CFG_SITE_LANG, default=""):
 
     #Look for month specified as number in the form 2004/03/08 or 17 02 2004
     #(always take second group of 2 or 1 digits separated by spaces or - etc.)
-    month_pattern = re.compile(r'\d([\s]|[-/.,])+(?P<month>(\d){1,2})([\s]|[-/.,])')
+    month_pattern = re.compile(r'\d([\s]|[-/.,])+(?P<month>(\d){1,2})')
     result = month_pattern.search(date)
     if result is not None:
         try:
