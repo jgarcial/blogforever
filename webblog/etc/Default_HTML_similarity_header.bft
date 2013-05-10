@@ -1,0 +1,5 @@
+<name>Default HTML similarity</name>
+<description>Small HTML record printed in "Similar Documents" section</description>
+<strong><a href="/<BFE_SERVER_INFO var='CFG_SITE_RECORD'/>/<BFE_RECORD_ID/><BFE_CLIENT_INFO var="ln" prefix="?ln=">"><BFE_TITLE_BRIEF /></a></strong>
+<br/>
+<BFE_AUTHORS />
