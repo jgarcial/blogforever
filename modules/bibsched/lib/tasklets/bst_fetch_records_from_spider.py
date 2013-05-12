@@ -87,7 +87,7 @@ def process_record(client, api_key, match):
         # Let's create a subdirectory for each document fetched
         # to store in it all the files, images... within the METS
         # document
-        path_mets_attachedfiles_doc = path_mets_attachedfiles + "/" + metadata_file_name + "/"
+        path_mets_attachedfiles_doc = path_mets_attachedfiles + metadata_file_name + "/"
         if not os.path.isdir(path_mets_attachedfiles_doc):
             os.mkdir(path_mets_attachedfiles_doc)
 
