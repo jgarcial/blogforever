@@ -25,6 +25,8 @@
 import os
 from xml.dom.minidom import parseString
 from invenio.search_engine import search_pattern
+from invenio.search_engine_utils import get_fieldvalues
+from invenio.webblog_utils import get_parent_blog
 from invenio.config import CFG_BATCHUPLOADER_DAEMON_DIR, \
                            CFG_PREFIX
 from invenio.bibtask import  task_update_progress
@@ -129,6 +131,30 @@ class MetsIngestion:
                         return None
 
 
+    def insert_parent_blog_visibility(self):
+        """ Inserts the visibility of the parent blog. """
+
+        if self.record_type == 'BLOGPOST':
+            parent_blog_url = self.get_fieldvalue(tag='760', code='o')
+            if parent_blog_url:
+                parent_blog_recid = search_pattern(p='520__u:' + parent_blog_url)
+        elif self.record_type == 'COMMENT':
+            parent_post_url = self.get_fieldvalue(tag='773', code='o')
+            if parent_post_url:
+                parent_post_recid = search_pattern(p='520__u:' + parent_post_url)
+                parent_blog_recid = get_parent_blog(parent_post_recid)
+
+        try:
+            visibility = get_fieldvalues(parent_blog_recid, "542__f")
+            new_node = self.create_new_field('datafield', tag='542', ind1='', ind2='')
+            sub_node1 = self.create_new_field('subfield', code='f', \
+                                              value=visibility)
+            new_node.appendChild(sub_node1)
+            self.marc_record.appendChild(new_node)
+        except:
+            pass
+
+
     def insert_parent_blog_recid(self):
         """ Inserts the recid of the parent blog of a post. """
 
@@ -148,6 +174,27 @@ class MetsIngestion:
                     if tag.getAttribute('tag') == '760':
                         tag.appendChild(self.create_new_field('subfield', code="w", \
                                                               value=parent_blog_recid[0]))
+
+
+    def insert_parent_blog_info(self):
+        """ Inserts the recid and url of the parent blog of a comment. """
+
+        parent_post_url = self.get_fieldvalue(tag='773', code='o')
+        if parent_post_url:
+            parent_post_recid = search_pattern(p='520__u:' + parent_post_url)
+            if parent_post_recid:
+                parent_blog_recid = get_parent_blog(parent_post_recid)
+                if parent_blog_recid:
+                    parent_blog_url = get_fieldvalues(parent_blog_recid, "520__u")
+                    new_node = self.create_new_field('datafield', tag='760', ind1='', ind2='')
+                    if parent_blog_url:
+                        sub_node1 = self.create_new_field('subfield', code='o', \
+                                                          value=parent_blog_url[0])
+                    sub_node2 = self.create_new_field('subfield', code='w', \
+                                                      value=parent_blog_recid)
+                    new_node.appendChild(sub_node1)
+                    new_node.appendChild(sub_node2)
+                    self.marc_record.appendChild(new_node)
 
 
     def insert_parent_post_recid(self):
@@ -296,11 +343,17 @@ class MetsIngestion:
         # let's add the record type
         if self.record_type == None:
             self.record_type = self.get_fieldvalue(tag='980', code='a')
+
         # let's add the parent recid depending on the record type
-        if self.record_type == 'BLOGPOST':
-            self.insert_parent_blog_recid()
-        if self.record_type == 'COMMENT':
-            self.insert_parent_post_recid()
+        if self.record_type in ['BLOGPOST', 'COMMENT']:
+            self.insert_parent_blog_visibility()
+
+            if self.record_type == 'BLOGPOST':
+                self.insert_parent_blog_recid()
+
+            if self.record_type == 'COMMENT':
+                self.insert_parent_post_recid()
+                self.insert_parent_blog_info()
 
 
 def bp_pre_ingestion(file_path):
