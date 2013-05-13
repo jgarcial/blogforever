@@ -21,7 +21,7 @@ BibFormat Element - creates the blog navigation menu
 """
 from invenio.bibformat_engine import BibFormatObject
 from invenio.config import CFG_SITE_SECURE_URL
-from invenio.webblog_utils import get_parent_blog, get_posts
+from invenio.webblog_utils import get_parent_blog, get_posts, transform_format_date
 import datetime
 
 cfg_messages = {}
@@ -64,16 +64,10 @@ def format_element(bfo):
 
         for recid in latest_posts:
             temp_rec = BibFormatObject(recid)
-            try:
-                posted_date = temp_rec.fields('269__c')[0]
-                # hack
-                if posted_date.find("ERROR") > -1:
-                    posted_date = ""
-                else:
-                    date = datetime.datetime.strptime(posted_date, "%m/%d/%Y %I:%M:%S %p")
-                    posted_date = date.strftime("%Y/%m/%d %H:%M:%S")
-            except:
-                posted_date = ""
+	    posted_date = transform_format_date(temp_rec.fields('269__c')[0], "%Y/%m/%d %H:%M:%S")
+	    # HACK
+	    if posted_date == "Unknown date":
+		posted_date = ""
 
             menu_out += """<li class="divider"></li>"""
             if str(this_recid) == str(recid):

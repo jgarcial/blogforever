@@ -29,17 +29,6 @@ from invenio.bibformat_engine import BibFormatObject
 
 def format_element(bfo):
     """
-    Displays the description of how users should cite
-    any content of the archive. The citation includes:
-    For blogs: "title".
-    Date created: creation_date. record_url
-    Retrieved from the original "original_url"
-    For blog posts: author. "title". Blog: "blog_title".
-    Date created: creation_date. record_url
-    Date posted: posted_date. Retrieved from the original "original_url"
-    For comments: author. Blog post: "post_title".
-    Date created: creation_date. record_url
-    Retrieved from the original "original_url"
     """
     
     recid = bfo.control_field('001')

@@ -21,13 +21,12 @@
 BibFormat element - Last Post Date
 """
 
-from invenio.webblog_utils import get_blog_descendants
+from invenio.webblog_utils import get_blog_descendants, transform_format_date
 from invenio.htmlutils import escape_html
 from invenio.bibformat_engine import BibFormatObject
 
 def format_element(bfo):
     """
-    Returns the METS representation of the corresponding record
     """
 
     last_posted_date = ""
@@ -36,12 +35,9 @@ def format_element(bfo):
    
     for record in descendants:
 	child_bfo = BibFormatObject(record)
-        try:
-            posted_date = child_bfo.fields('269__c')[0]
-            if posted_date.find("ERROR") > -1:
-                posted_date = "000"
-        except:
-            posted_date = "000"
+        posted_date = transform_format_date(child_bfo.fields('269__c')[0], "%Y/%m/%d %H:%M:%S")
+	if posted_date == "Unknown date":
+	    posted_date = "0000/00/00 00:00:00"
 
 	if posted_date > last_posted_date:
 	    last_posted_date = posted_date

@@ -23,7 +23,7 @@ BibFormat Element - displays the description of how to cite a record
 """
 
 from invenio.config import CFG_SITE_URL
-from invenio.webblog_utils import get_parent_blog, get_parent_post
+from invenio.webblog_utils import get_parent_blog, get_parent_post, transform_format_date
 from invenio.search_engine import get_creation_date
 from invenio.bibformat_engine import BibFormatObject
 import datetime
@@ -51,16 +51,6 @@ def format_element(bfo):
         author = bfo.fields('100__a')[0]
         if not author:
             author = "Unknown author"
-        try:
-            posted_date = bfo.fields('269__c')[0]
-            # hack
-            if posted_date.find("ERROR") > -1:
-                posted_date = "Unknown date"
-            else:
-                date = datetime.datetime.strptime(posted_date, "%m/%d/%Y %I:%M:%S %p")
-                posted_date = date.strftime("%Y/%m/%d")
-        except:
-            posted_date = "Unknown date"
 
     try:
         title = bfo.fields('245__a')[0]
@@ -93,6 +83,7 @@ def format_element(bfo):
         except:
             blog_title = 'Unknown title'
 
+        posted_date = transform_format_date(bfo.fields('269__c')[0])
         out += """
         <span><b>%s</b>. '%s'. Blog: '%s' </br> \
         Date posted: %s. Retrieved from the original post <i>'%s'</i> </br>\

@@ -26,6 +26,7 @@ from invenio.websearch_instantbrowse import instantbrowse_manager
 from invenio.pluginutils import PluginContainer
 import os
 import json
+import datetime
 from invenio.config import CFG_PYLIBDIR
 from invenio.search_engine import perform_request_search
 from invenio.websearch_external_collections_utils import get_collection_id
@@ -49,9 +50,6 @@ def get_parent_blog(recid):
     coll = get_fieldvalues(recid, '980__a')[0]
     if coll == 'BLOG':
         return recid
-    elif coll == 'COMMENT':
-        parent_post = get_parent_post(recid)
-        recid = parent_post
 
     parent_blog = get_fieldvalues(recid, '760__w')
 
@@ -96,6 +94,7 @@ def get_posts(blog_recid):
         if params:
             argd.update(json.loads(params))
     argd['p'] = '760__w:"%s"' % blog_recid
+    argd['cc'] = 'Posts'
     return perform_request_search(None, **argd)
 
 def get_parent_post(comment_recid):
@@ -115,75 +114,6 @@ def get_parent_post(comment_recid):
            return None
     else:
         return None
-
-def get_sibling_posts(post_recid, newest_first=True, exclude_this_post=True):
-    """ This function returns the list of the sibling posts of any 
-    post given its recid
-    @param post_recid: post recid
-    @type post_recid: int
-    @param newest_first: order in wich the sibling posts will be displayed. If
-    it is True the newest sibling posts will be displayed first
-    @type newest_first: boolean
-    @param exclude_this_post: if it is True the given post will not be returned
-    as a sibling post
-    @type exclude_this_post: boolean
-    @return: list of sibling posts recids
-    @rtype: list
-    """
-
-    main_blog_recid = get_parent_blog(post_recid)
-    siblings_list = get_posts(main_blog_recid)
-    if exclude_this_post:
-        siblings_list.remove(post_recid)
-
-    return siblings_list
-
-def get_next_post(post_recid):
-    """ This function returns the next post of the
-    given one that was published
-    @param post_recid: post recid
-    @type post_recid: int
-    @return: the next post recid of the
-    given one that was published
-    @rtype: recid
-    """
-
-    next_post_recid = None
-    main_blog_recid = get_parent_blog(post_recid)
-    post_date = get_fieldvalues(post_recid, '269__c')
-    if post_date:
-        post_date = post_date[0]
-        from invenio.search_engine import perform_request_search
-        recid_list = perform_request_search(p='760__w:"%s" 269__c:%s-->9999-99-99' % \
-                                            (main_blog_recid, post_date), sf='date', so='d')
-        if len(recid_list) > 1:
-            next_post_recid = recid_list[0]
-
-    return next_post_recid
-
-
-def get_previous_post(post_recid):
-    """ This function returns the previous post of the
-    given one that was published
-    @param post_recid: post recid
-    @type post_recid: int
-    @return: the previous post recid of the
-    given one that was published
-    @rtype: recid
-    """
-
-    previous_post_recid = None
-    main_blog_recid = get_parent_blog(post_recid)
-    post_date = get_fieldvalues(post_recid, '269__c')
-    if post_date:
-        post_date = post_date[0]
-        from invenio.search_engine import perform_request_search
-        recid_list = perform_request_search(p='760__w:"%s" 269__c:0000-00-00-->%s' % \
-                                            (main_blog_recid, post_date), sf='date', so='a')
-        if len(recid_list) > 1:
-            previous_post_recid = recid_list[1]
-
-    return previous_post_recid
 
 ##### COMMENTS #####
 
@@ -207,34 +137,17 @@ def get_comments(post_recid):
         if params:
             argd.update(json.loads(params))
     argd['p'] = '773__w:"%s"' % post_recid
-    print argd
     return perform_request_search(None, **argd)
 
-def get_sibling_comments(comment_recid, newest_first=True, exclude_this_comment=True):
-    """ This function returns the list of the sibling comments of any 
-    comment given its recid
-    @param comment_recid: comment recid
-    @type comment_recid: int
-    @param newest_first: order in wich the sibling comments will be displayed. If
-    it is True the newest sibling comments will be displayed first
-    @type newest_first: boolean
-    @param exclude_this_comment: if it is True the given post will not be returned
-    as a sibling post
-    @type exclude_this_comment: boolean
-    @return: list of sibling comments recids
-    @rtype: list
-    """
+##### GENERAL FUNCTIONS #####
 
-    post_recid = get_parent_post(comment_recid)
-    siblings_list = get_comments(post_recid)
-    if exclude_this_comment:
-        siblings_list.remove(comment_recid)
+def transform_format_date(date, format="%Y/%m/%d"):
+    """Transforms the given date into the given format"""
 
-    return siblings_list
+    try:
+        date_datetime = datetime.datetime.strptime(date, "%m/%d/%Y %I:%M:%S %p")
+        formated_date = date_datetime.strftime(format)
+    except:
+        formated_date = "Unknown date"
+    return formated_date
 
-def get_next_comment(comment_recid):
-    pass
-
-def get_previous_comment(comment_recid):
-    pass
- 

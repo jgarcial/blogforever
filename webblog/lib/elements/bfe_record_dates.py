@@ -23,6 +23,7 @@ BibFormat Element - displays the archived and/or the posted dates
 """
 
 from invenio.search_engine import get_creation_date
+from invenio.webblog_utils import transform_format_date
 import datetime
 
 def format_element(bfo):
@@ -33,16 +34,9 @@ def format_element(bfo):
     recid = bfo.control_field('001')
     out = ""
     try:
-        posted_date = bfo.fields('269__c')[0]
-        # hack
-        if posted_date.find("ERROR") > -1:
-            posted_date = "Unknown date"
-        else:
-            date = datetime.datetime.strptime(posted_date, "%m/%d/%Y %I:%M:%S %p")
-            posted_date = date.strftime("%Y/%m/%d")
+        posted_date = transform_format_date(bfo.fields('269__c')[0])
     except:
         posted_date = ""
-
     record_creation_date = get_creation_date(recid)
     date = datetime.datetime.strptime(record_creation_date, "%Y-%m-%d")
     record_creation_date = date.strftime("%Y/%m/%d")

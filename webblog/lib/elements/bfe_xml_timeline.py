@@ -21,7 +21,7 @@
 BibFormat element - TimeLine
 """
 
-from invenio.webblog_utils import get_blog_descendants
+from invenio.webblog_utils import get_blog_descendants, transform_format_date
 from invenio.htmlutils import escape_html
 from invenio.bibformat_engine import BibFormatObject
 from invenio.search_engine import call_bibformat
@@ -29,7 +29,6 @@ from lxml import etree
 
 def format_element(bfo):
     """
-    Returns the METS representation of the corresponding record
     """
 
     recid = bfo.control_field('001')
@@ -38,14 +37,7 @@ def format_element(bfo):
  
     for record in descendants:
         child_bfo = BibFormatObject(record)
-        try:
-            posted_date = child_bfo.fields('269__c')[0]
-            # hack
-            if posted_date.find("ERROR") > -1:
-                posted_date = "Date not available"
-        except:
-            posted_date = "Date not available"
-
+        posted_date = transform_format_date(child_bfo.fields('269__c')[0], "%Y/%m/%d %H:%M:%S")
         title = child_bfo.fields('245__a')[0]
         body = escape_html(call_bibformat(record, format='HTL'))
 
