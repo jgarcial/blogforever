@@ -59,6 +59,9 @@ def format_element(bfo, prefix_en, prefix_fr, suffix_en, suffix_fr, limit, max_c
         escape_mode_int = 0
 
     abstract_en = bfo.fields('520__a', escape=escape_mode_int)
+    if (abstract_en and abstract_en[-1] == "") or not abstract_en:
+        abstract_en = bfo.fields('520__b', escape=escape_mode_int)
+
     abstract_en = separator_en.join(abstract_en)
 
     if contextual == 'yes' and limit != "" and \
