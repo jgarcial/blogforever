@@ -323,6 +323,8 @@ class MetsIngestion:
                 for subfield in tag.getElementsByTagName('subfield'):
                     if subfield.getAttribute('code')=='a':
                         subfield.firstChild.data = self.clean_html(subfield.firstChild.data)
+                    if subfield.getAttribute('code')=='b':
+                        subfield.firstChild.data = self.clean_html(subfield.firstChild.data)
         # before adding the recid, check if the coming
         # record is already in the repository
         recid = self.get_recid()
