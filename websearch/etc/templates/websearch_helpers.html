@@ -1,6 +1,6 @@
 {#
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -107,12 +107,14 @@
   <div {{ kwargs|xmlattr }}>
     <ul class="thumbnails">
     {% for cp in portalboxes %}
-    <li class="span{{ width }}">
-    <div class="thumbnail">
-      <h5>{{ cp.portalbox.title }}</h5>
-      <p>{{ cp.portalbox.body|safe }}</p>
-    </div>
-    </li>
+	    {% if cp.portalbox.body %}
+		    <li class="span{{ cp.portalbox.size }}">
+		    <div class="thumbnail">
+		      <h5>{{ _(cp.portalbox.title) }}</h5>
+		      <p>{{ cp.portalbox.body|safe }}</p>
+		    </div>
+		    </li>
+	    {% endif %}
     {% endfor %}
     </ul>
   </div>
