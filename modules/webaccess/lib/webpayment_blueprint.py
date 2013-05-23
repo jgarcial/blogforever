@@ -57,7 +57,7 @@ blueprint = InvenioBlueprint('webpayment',
                                            'youraccount.display'),
                                           ('Your Premium Memberships',
                                            'webpayment.display')],
-                             menubuilder= CFG_PREMIUM_SERVICE and [('main.personalize.webpayment',
+                             menubuilder= CFG_PREMIUM_SERVICE and [('personalize.webpayment',
                                           _('Your premium memberships'),
                                           'webpayment.index', 20)] or None)
 
