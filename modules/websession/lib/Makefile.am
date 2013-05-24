@@ -36,7 +36,9 @@ pylib_DATA = session.py webuser.py webuser_unit_tests.py \
 	websession_web_tests.py \
 	webuser_flask.py \
 	dashboard_user_settings.py \
-	session_flask.py
+	session_flask.py \
+	webrecommend.py \
+	webrecommend_user_settings.py
 
 noinst_DATA = password_migration_kit.py
 

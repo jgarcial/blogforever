@@ -815,6 +815,31 @@ class CollectionFieldFieldvalue(db.Model):
                 lazy='joined')
 
 
+class QueryTerm(db.Model):
+    """Represents a QueryTerm record."""
+    __table_name__ = 'query_term'
+    id = db.Column(db.Integer(15, unsigned=True),
+                   primary_key=True,
+                   autoincrement=True)
+    term = db.Column(db.String(255),
+                     unique=True,
+                     nullable=False)
+
+
+class UserQueryTerm(db.Model):
+    """Represents a UserQueryTerm record."""
+    __table_name__ = 'user_query_term'
+    id_user = db.Column(db.Integer(11),
+                        primary_key=True,
+                        nullable=False)
+    id_term = db.Column(db.Integer(11),
+                        primary_key=True,
+                        nullable=False)
+    count = db.Column(db.Integer(11),
+                      nullable=False,
+                      default=1)
+
+
 __all__ = ['Collection',
            'Collectionname',
            'Collectiondetailedrecordpagetabs',
@@ -835,4 +860,8 @@ __all__ = ['Collection',
            'FieldTag',
            'WebQuery',
            'UserQuery',
-           'CollectionFieldFieldvalue']
+           'CollectionFieldFieldvalue',
+           'CollectionClsMETHOD',
+           'CollectionRnkMETHOD',
+           'QueryTerm',
+           'UserQueryTerm']

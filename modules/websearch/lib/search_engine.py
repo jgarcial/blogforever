@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 ## This file is part of Invenio.
 ## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 ##
@@ -6213,6 +6212,10 @@ def prs_log_query(kwargs=None, req=None, uid=None, of=None, ln=None, p=None, f=N
         id_query = log_query(req.host,
             '&'.join(map(lambda (k,v): k+'='+v, req.args.to_dict().items())),
             uid)
+        log_query_terms([req.args.get('p', None),
+                         req.args.get('p1', None),
+                         req.args.get('p2', None),
+                         req.args.get('p3', None)])
         #id_query = log_query(req.remote_host, req.args, uid)
         if of.startswith("h") and id_query and (em == '' or EM_REPOSITORY["alert"] in em):
             if not of in ['hcs', 'hcs2']:
@@ -6630,3 +6633,68 @@ def perform_external_collection_search_with_em(req, current_collection, pattern_
                             print_search_info=em == "" or EM_REPOSITORY["search_info"] in em,
                             print_see_also_box=em == "" or EM_REPOSITORY["see_also_box"] in em,
                             print_body=em == "" or EM_REPOSITORY["body"] in em)
+
+
+def log_query_terms(terms=None):
+    """
+    Saves the query terms into database.
+
+    @param terms: the tuple of terms
+    @type terms: (str, str, str, str)
+
+    @param uid: the ID of the user
+    @type uid: int
+    """
+
+    if not terms:
+        return
+
+    from invenio.webuser_flask import current_user
+    uid = current_user.get_id()
+
+    if not uid:
+        return
+
+    from invenio.sqlalchemyutils import db
+    from invenio.websearch_model import QueryTerm
+    from invenio.websearch_model import UserQueryTerm
+    from datetime import datetime
+
+    if type(terms) != type([]):
+        terms = [terms]
+
+    for term in terms:
+        if not term:
+            continue
+
+        try:
+            query_term = QueryTerm()
+            query_term.term = term
+            db.session.add(query_term)
+            db.session.commit()
+        except:
+            db.session.rollback()
+            register_exception()
+            query_term = QueryTerm.query.filter(QueryTerm.term == term).one()
+
+        try:
+            user_query_term = (UserQueryTerm
+                               .query
+                               .filter(UserQueryTerm.id_term == query_term.id)
+                               .filter(UserQueryTerm.id_user == uid)
+                               .one())
+            user_query_term.count = user_query_term.count + 1
+            db.session.commit()
+        except Exception, e:
+            db.session.rollback()
+            register_exception()
+            try:
+                new_user_query_term = UserQueryTerm()
+                new_user_query_term.id_term = query_term.id
+                new_user_query_term.id_user = uid
+                new_user_query_term.count = 1
+                db.session.add(new_user_query_term)
+                db.session.commit()
+            except Exception, e:
+                db.session.rollback()
+                register_exception()
