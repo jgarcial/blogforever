@@ -107,7 +107,7 @@ def set_user_bibrec_annotation(uid, recid, annotation, annotation_id=0, last_upd
     return_dict["last_updated"] = str(return_dict["last_updated"])
 
     if isinstance(annotation, unicode):
-        annotation = annotation.encode("utf8", errors="replace")
+        annotation = annotation.encode("utf8", "replace")
 
     user_annotation_entry = UserBibrecAnnotations(int(recid), int(annotation_id), int(uid),\
                                                   annotation, last_updated)
