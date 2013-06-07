@@ -38,8 +38,8 @@ def format_element(bfo):
     for record in descendants:
         child_bfo = BibFormatObject(record)
         posted_date = transform_format_date(child_bfo.fields('269__c')[0], "%Y/%m/%d %H:%M:%S")
-        title = child_bfo.fields('245__a')[0]
-        body = escape_html(call_bibformat(record, format='HTL'))
+        title = escape_html(child_bfo.fields('245__a')[0], escape_quotes=True)
+        body = escape_html(call_bibformat(record, format='HTL'), escape_quotes=True)
 
         formatted_record = """<event start = "%s" title = "%s">""" % (posted_date, escape_html(title))
         formatted_record += body
