@@ -22,6 +22,7 @@
 
 from invenio.bibrank_model import RnkPAGEVIEWS
 from invenio.sqlalchemyutils import db
+from invenio.dateutils import get_total_seconds
 
 
 def record_view_to_index(unit_time):
@@ -56,8 +57,8 @@ def record_view_to_index(unit_time):
             record_table[index].client_host ==
             record_table[index + 1].client_host
             and
-            (record_table[index + 1].view_time -
-            record_table[index].view_time).total_seconds() < unit_time):
+            (get_total_seconds(record_table[index + 1].view_time,
+            record_table[index].view_time)) < unit_time):
             pass
         else:
             count = index_dict.get(record_table[index].id_bibrec, 0)

@@ -22,6 +22,7 @@
 from invenio.sqlalchemyutils import db
 from invenio.websession_model import UserBibrecHighlights, UserBibrecAnnotations
 from flask import jsonify
+from datetime import datetime
 
 def set_user_bibrec_highlights(uid, recid, highlights):
     """
@@ -37,8 +38,15 @@ def set_user_bibrec_highlights(uid, recid, highlights):
     recid = int(recid)
 
     if highlights:
-        user_highlight_entry = UserBibrecHighlights(uid, recid, highlights)
-        db.session.merge(user_highlight_entry)
+        try:
+            user_highlight_entry = UserBibrecHighlights.query.filter(UserBibrecHighlights.id_user == uid).filter(UserBibrecHighlights.id_bibrec == recid).one()
+            user_highlight_entry.highlights = highlights
+            user_highlight_entry.last_updated = datetime.now()
+            db.session.commit()
+        except:
+            user_highlight_entry = UserBibrecHighlights(uid, recid, highlights)
+            db.session.add(user_highlight_entry)
+            db.session.commit()
     else:
         UserBibrecHighlights.query.filter(UserBibrecHighlights.id_user == uid).\
             filter(UserBibrecHighlights.id_bibrec == recid).delete(synchronize_session=False)
@@ -109,9 +117,21 @@ def set_user_bibrec_annotation(uid, recid, annotation, annotation_id=0, last_upd
     if isinstance(annotation, unicode):
         annotation = annotation.encode("utf8", "replace")
 
-    user_annotation_entry = UserBibrecAnnotations(int(recid), int(annotation_id), int(uid),\
+    try:
+        user_annotation_entry = (UserBibrecAnnotations
+                                 .query
+                                 .filter(UserBibrecAnnotations.id_bibrec == recid)
+                                 .filter(UserBibrecAnnotations.id_annotation == annotation_id)
+                                 .filter(UserBibrecAnnotations.id_user == uid)
+                                 .one())
+        user_annotation_entry.annotation = annotation
+        user_annotation_entry.last_updated = datetime.now()
+        db.session.commit()
+    except:
+        user_annotation_entry = UserBibrecAnnotations(int(recid), int(annotation_id), int(uid),\
                                                   annotation, last_updated)
-    db.session.merge(user_annotation_entry)
+        db.session.add(user_annotation_entry)
+        db.session.commit()
 
     return return_dict
 

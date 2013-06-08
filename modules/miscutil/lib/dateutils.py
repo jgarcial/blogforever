@@ -569,7 +569,8 @@ def difference_between_times(time1, time2="", ln=CFG_SITE_LANG):
 
     if not time2:
         time2 = datetime.datetime.now()
-    total_seconds = int((time2 - time1).total_seconds())
+
+    total_seconds = int(get_total_seconds(time2, time1))
 
     if total_seconds < 60:
         if total_seconds <= 1:
@@ -613,3 +614,19 @@ def difference_between_times(time1, time2="", ln=CFG_SITE_LANG):
                 "hour": hour,
                 "minute": minute
                 }
+
+def get_total_seconds(time2, time1):
+    """
+    Returns difference between times by seconds
+
+    @param time2:
+    @type time2: datetime.datetime
+
+    @param time1:
+    @type time1: datetime.datetime
+    """
+    try:
+        return (time2 - time1).total_seconds()
+    except:
+        td = time2 - time1
+        return (td.microseconds + (td.seconds + td.days * 24 * 3600) * 10**6) / 10**6.
