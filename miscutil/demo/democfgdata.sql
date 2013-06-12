@@ -375,8 +375,8 @@ INSERT INTO portalbox VALUES (2,'Top Rated Recods','', 8);
 INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) VALUES (1,1,'en','rt',100);
 INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) VALUES (1,2,'en','rt',90);
 
-INSERT INTO bibrank_portalbox (id_bibrank, id_portalbox) VALUES (2, 2);
-INSERT INTO bibrank_portalbox (id_bibrank, id_portalbox) VALUES (3, 1);
+INSERT INTO bibrank_portalbox (id_bibrank, id_portalbox) VALUES (4, 2);
+INSERT INTO bibrank_portalbox (id_bibrank, id_portalbox) VALUES (5, 1);
 
 
 -- end of file
