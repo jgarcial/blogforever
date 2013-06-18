@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -21,7 +21,8 @@ import cgi
 import urllib
 from httplib import urlsplit, HTTPConnection
 from invenio.websubmit_config import InvenioWebSubmitFunctionStop
-# from invenio.webbasket import url_is_valid
+from invenio.search_engine import search_pattern
+
 
 CFG_INVALID_URL = """
             <SCRIPT>
@@ -32,6 +33,18 @@ CFG_INVALID_URL = """
                alert('The given url (%s) is invalid.');
                document.forms[0].submit();
             </SCRIPT>"""
+
+
+CFG_REPEATED_URL = """
+            <SCRIPT>
+               document.forms[0].action="/submit";
+               document.forms[0].curpage.value = 1;
+               document.forms[0].step.value = 0;
+               user_must_confirm_before_leaving_page = false;
+               alert('The given url is already registered in the database.');
+               document.forms[0].submit();
+            </SCRIPT>"""
+
 
 def Check_URL(parameters, curdir, form, user_info=None):
     """Returns (True, status, reason) if the url is valid or
@@ -45,6 +58,11 @@ def Check_URL(parameters, curdir, form, user_info=None):
     except:
         url = "The URL is needed"
 
+    # Check if the provided url is already in the database or not
+    recids = search_pattern(p = '520__u:"%s"' % url)
+    if recids: # there are records in the dabase with the same url
+        raise InvenioWebSubmitFunctionStop(CFG_REPEATED_URL)
+
     common_errors_list = [400, 404, 500]
     url_tuple = urlsplit(url)
     if not url_tuple[0]:
@@ -54,7 +72,7 @@ def Check_URL(parameters, curdir, form, user_info=None):
     if not url_tuple[0] and not url_tuple[1]:
         #return (False, 000, "Not Valid")
         raise InvenioWebSubmitFunctionStop(CFG_INVALID_URL % (url,))
-        
+
     # HTTPConnection had the timeout parameter introduced in python 2.6
     # for the older versions we have to get and set the default timeout
     # In order to use a custom timeout pass it as an extra argument to this function
