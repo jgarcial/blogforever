@@ -23,6 +23,8 @@ BibFormat Element - displays license name and url if available
 
 from invenio.config import CFG_SITE_SECURE_URL
 from invenio.urlutils import create_html_link
+from invenio.webblog_utils import get_parent_blog
+from invenio.bibformat_engine import BibFormatObject
 
 cfg_messages = {}
 cfg_messages["in_issue"] = {"en": "License",
@@ -35,9 +37,15 @@ def format_element(bfo):
     """
 
     current_language = bfo.lang
-    licenses = bfo.fields('540')
-
-    licenses = [{'a': 'Creative Commons', 'u': 'http://creativecommons.org/licenses/'}]
+    # let's check if the record is either a blog or a post
+    coll = bfo.field("980__a")
+    if coll == "BLOGPOST":
+        # let's get the license of the parent blog
+        parent_blog = get_parent_blog(bfo.recID)
+        bfo_parent_blog = BibFormatObject(parent_blog)
+        licenses = bfo_parent_blog.fields("540")
+    elif coll == "BLOG":
+        licenses = bfo.fields("540")
 
     if licenses:
         try:
@@ -51,6 +59,8 @@ def format_element(bfo):
 
             url = create_html_link(license_url, {}, license_name)
             out += '<span>%s</span>' % url
+            if license is not licenses[-1]:
+                out += '<br/>'
 
     return out
 
