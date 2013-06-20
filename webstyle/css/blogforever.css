@@ -640,6 +640,13 @@ transition: background-position 0.1s linear;
 .input-prepend {
 margin-bottom: 10px;
 }
+
+/* Portalboxes */
+
+.portalbox {
+margin-top: 25px;
+}
+
 /* Hero styles */
 
 .centered {

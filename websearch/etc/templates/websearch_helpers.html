@@ -104,19 +104,17 @@
 
 {% macro portalbox_sidebar(portalboxes, width=2) %}
   {% if portalboxes %}
-  <div {{ kwargs|xmlattr }}>
-    <ul class="thumbnails">
+  <div class="span9 offset2" {{ kwargs|xmlattr }}>
+    <div class="row portalbox">
     {% for cp in portalboxes %}
 	    {% if cp.portalbox.body %}
-		    <li class="span{{ cp.portalbox.size }}">
-		    <div class="thumbnail">
+		    <div class="span4">
 		      <h5>{{ _(cp.portalbox.title) }}</h5>
 		      <p>{{ cp.portalbox.body|safe }}</p>
 		    </div>
-		    </li>
 	    {% endif %}
     {% endfor %}
-    </ul>
+    </div>
   </div>
   {% endif %}
 {% endmacro %}
