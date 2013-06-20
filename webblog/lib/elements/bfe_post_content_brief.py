@@ -26,7 +26,7 @@ __revision__ = "$Id$"
 from invenio import bibformat_utils
 
 def format_element(bfo, prefix, suffix, limit, max_chars, extension="[...] ", contextual="no",
-                   highlight='no', escape="3", separator="<br/>", latex_to_html='no'):
+                   highlight='no', escape="3", separator="<br/>"):
     """ Prints the abstract of a post in HTML.
 
 
@@ -39,7 +39,6 @@ def format_element(bfo, prefix, suffix, limit, max_chars, extension="[...] ", co
     @param highlight: if 'yes' highlights words from user search keyword
     @param escape: escaping method (overrides default escape parameter to not escape separators)
     @param separator: a separator between each abstract
-    @param latex_to_html: if 'yes', interpret as LaTeX abstract
     """
 
     out = ""
@@ -50,7 +49,8 @@ def format_element(bfo, prefix, suffix, limit, max_chars, extension="[...] ", co
         escape_mode_int = 0
 
     abstract = bfo.fields('520__a', escape=escape_mode_int)
-#    abstract.extend(bfo.fields('520__b', escape=escape_mode_int))
+    if (abstract and abstract[-1] == "") or not abstract:
+        abstract = bfo.fields('520__b', escape=escape_mode_int)
     abstract = separator.join(abstract)
 
     if contextual == 'yes' and limit != "" and \
@@ -92,12 +92,6 @@ def format_element(bfo, prefix, suffix, limit, max_chars, extension="[...] ", co
         out += suffix
 
         out += "<div></div>"
-#
-#    if highlight == 'yes':
-#        out = bibformat_utils.highlight(out, bfo.search_pattern)
-#
-#    if latex_to_html == 'yes':
-#        out = bibformat_utils.latex_to_html(out)
 
     return out
 
