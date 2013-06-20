@@ -37,18 +37,19 @@ def format_element(bfo):
     current_language = bfo.lang
     #TODO: to decide new MARC tag for tags
     tags = bfo.fields('653__1')
-    tags = ["blog", "post"]
-    if tags:
-        try:
-            out = '<h4><i class="icon-tags"></i>&nbsp;%s</h4>' % cfg_messages["in_issue"][current_language]
-        except: # in english by default
-            out = '<h4><i class="icon-tags"></i>&nbsp;%s</h4>' % cfg_messages["in_issue"]['en']
+    try:
+        out = '<h4><i class="icon-tags"></i>&nbsp;%s</h4>' % cfg_messages["in_issue"][current_language]
+    except: # in english by default
+        out = '<h4><i class="icon-tags"></i>&nbsp;%s</h4>' % cfg_messages["in_issue"]['en']
 
+    if tags:
         for tag in tags:
             url = create_html_link(CFG_SITE_SECURE_URL + "/search", \
                                     {'p': '653__1:%s' % tag, \
                                      'ln': current_language}, tag, linkattrd = {'style':"color:white"})
             out += '<span class="label">%s</span>&nbsp;&nbsp;' % url
+    else:
+        out += '<span>No tags yet</span>'
 
     return out
 
