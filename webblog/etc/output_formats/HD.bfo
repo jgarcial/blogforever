@@ -2,3 +2,4 @@ tag 980.a:
 BLOG --- BlogHTML.tpl
 BLOGPOST --- PostHTML.tpl
 COMMENT --- CommentHTML.tpl
+PROVBLOG --- BlogHTML.tpl
