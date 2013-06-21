@@ -23,6 +23,7 @@ pylib_DATA = \
 	bibsched.py \
 	bibsched_model.py \
 	bibtask.py \
+	bibtask_regression_tests.py \
 	bibtaskex.py \
 	bibtask_config.py \
 	bibtasklet.py \
