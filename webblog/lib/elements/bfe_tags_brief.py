@@ -40,8 +40,6 @@ def format_element(bfo):
                                     {'p': '653__1:%s' % tag, \
                                      'ln': current_language}, tag, linkattrd = {'style':"color:white"})
             out += '<span class="label">%s</span>&nbsp;&nbsp;' % url
-    else:
-        out = '<span>No tags yet</span>'
 
     return out
 
