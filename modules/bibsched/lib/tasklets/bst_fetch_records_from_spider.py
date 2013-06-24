@@ -105,13 +105,13 @@ def process_record(client, api_key, match):
                 try:
                     attach = client.service.GetDocument(api_key, match.Object.DocumentId, file.Filename)
                     if validate_content(content=decodestring(attach), md5_hash=file.MD5):
-                        f = open(path_mets_attachedfiles_doc + file.Type, 'w')
+                        f = open(path_mets_attachedfiles_doc + file.Type + "_" + file.Filename, 'w')
                         f.write(decodestring(attach))
                         f.close()
                     else:
                         error_file = open("/tmp/error_file", "a")
                         error_file.write("Attached file %s validation failed in %s \n" % \
-                                         (file.Filename, metadata_file_name))
+                                         (file.Type + "_" + file.Filename, metadata_file_name))
                         error_file.close()
                 except Exception:
                     error_file = open("/tmp/error_file", "a")
