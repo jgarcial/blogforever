@@ -612,6 +612,7 @@ AC_CONFIG_FILES([config.nice  \
      modules/bibdocfile/doc/Makefile \
      modules/bibdocfile/doc/hacking/Makefile \
      modules/bibdocfile/lib/Makefile \
+     modules/bibdocfile/lib/format_migration_plugins/Makefile \
      modules/bibrecord/Makefile \
      modules/bibrecord/bin/Makefile \
      modules/bibrecord/bin/xmlmarc2textmarc \

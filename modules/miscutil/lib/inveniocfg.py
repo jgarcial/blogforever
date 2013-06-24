@@ -177,6 +177,7 @@ Please, update your invenio-local.conf file accordingly.""" % (option_name, new_
                        'CFG_BIBEDIT_EXTEND_RECORD_WITH_COLLECTION_TEMPLATE',
                        'CFG_OAI_METADATA_FORMATS',
                        'CFG_BIBDOCFILE_DESIRED_CONVERSIONS',
+		       'CFG_FORMAT_MIGRATION_PLUGINS_MAPPING',
                        'CFG_BIBDOCFILE_BEST_FORMATS_TO_EXTRACT_TEXT_FROM',
                        'CFG_WEB_API_KEY_ALLOWED_URL',
                        'CFG_BIBDOCFILE_DOCUMENT_FILE_MANAGER_MISC',
