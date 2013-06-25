@@ -43,7 +43,7 @@
 			{{ bfe_snapshot(bfo) }}
 		</div> <!-- end bfe-snapshot -->
 
-		<div class="post-extra-data">
+		<div class="post-extra-data left-menu-well">
 			{{ bfe_record_dates(bfo) }}
 			<br />
 			{{ bfe_tags(bfo) }}

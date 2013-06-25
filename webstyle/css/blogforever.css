@@ -992,6 +992,16 @@ margin-top: 20px;
 color: #333333;
 }
 
+.big-icon:before {
+font-size: 30px;
+line-height: 12px;
+}
+
+.left-menu-well {
+width: 250px;
+padding: 10px 10px;
+}
+
 /* BLOG */
 
 h2 [class^="icon-"] {
@@ -1070,7 +1080,10 @@ text-decoration: none;
 @media (max-width: 767px) {
 .browse > li {
 width: 100%;
+font-size: 24.5px;
+line-height: 35px;
 }
+
 .search-index .input-prepend.input-append input {
 height: 44px;
 }
@@ -1098,7 +1111,6 @@ left: inherit;
 margin: 10px 10px 0;
 }
 
-
 form {
 margin: 0;
 }
@@ -1106,5 +1118,5 @@ margin: 0;
 .dropdown-menu {
    min-width:inherit;
 }
-
 }
+

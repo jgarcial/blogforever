@@ -47,7 +47,7 @@ Returns all the links used as references in a post
             menu_title = '<h4>%s</h4>' % cfg_messages["in_issue"]["en"]
 
         out = """<div class="sidebar-nav">
-                    <div class="well" style="width:250px; padding: 10px 10px;">
+                    <div class="well left-menu-well">
                     <ul class="nav nav-list">
                     <li class="nav-header"><div style="display:inline-block;">%s</div>
                     <div style="display:inline-block;">
@@ -91,10 +91,10 @@ Returns all the links used as references in a post
                     var see_all = document.getElementById('see_all');
                     if (reference_links.style.display == 'none'){
                         reference_links.style.display = '';
-                        see_all.innerHTML = '  <i class="icon-double-angle-up icon-2x"></i>'
+                        see_all.innerHTML = '&nbsp; &nbsp;<i class="icon-double-angle-up big-icon"></i>'
                     } else {
                         reference_links.style.display = 'none';
-                        see_all.innerHTML = '  <i class="icon-double-angle-down icon-2x"></i>'
+                        see_all.innerHTML = ' &nbsp; &nbsp;<i class="icon-double-angle-down big-icon"></i>'
                     }
                 }
                 </script>

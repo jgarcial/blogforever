@@ -58,7 +58,7 @@ def format_element(bfo):
             menu_title = '<h4>%s</h4>' % cfg_messages["in_issue"]['en']
 
         menu_out += """<div class="sidebar-nav">
-                        <div class="well" style="width:250px; padding: 10px 10px;">
+                        <div class="well left-menu-well">
                         <ul class="nav nav-list">
                         <li class="nav-header">%s</li>""" % menu_title
 
@@ -118,10 +118,10 @@ def format_element(bfo):
                     var see_all_link = document.getElementById('see_all_link');
                     if (all_posts_menu.style.display == 'none'){
                         all_posts_menu.style.display = '';
-                        see_all_link.innerHTML = '  <i class="icon-double-angle-up icon-2x"></i>'
+                        see_all_link.innerHTML = '  <i class="icon-double-angle-up big-icon"></i>'
                     } else {
                         all_posts_menu.style.display = 'none';
-                        see_all_link.innerHTML = '  <i class="icon-double-angle-down icon-2x"></i>'
+                        see_all_link.innerHTML = '  <i class="icon-double-angle-down big-icon"></i>'
                     }
                 }
                 </script>

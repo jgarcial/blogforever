@@ -35,7 +35,7 @@
 	</div>
 
 	<div class="span3 associated-content pull-left">
-		<div class="post-extra-data">
+		<div class="post-extra-data left-menu-well">
 			{{ bfe_authors(bfo) }}
 			<br />
 			{{ bfe_record_dates(bfo) }}
