@@ -47,11 +47,12 @@ def format_element(bfo):
     elif coll == "BLOG":
         licenses = bfo.fields("540")
 
+    try:
+        out = '<h4><i class="icon-legal"></i>&nbsp;%s</h4>' % cfg_messages["in_issue"][current_language]
+    except: # in english by default
+        out = '<h4><i class="icon-legal"></i>&nbsp;%s</h4>' % cfg_messages["in_issue"]['en']
+
     if licenses:
-        try:
-            out = '<h4><i class="icon-legal"></i>&nbsp;%s</h4>' % cfg_messages["in_issue"][current_language]
-        except: # in english by default
-            out = '<h4><i class="icon-legal"></i>&nbsp;%s</h4>' % cfg_messages["in_issue"]['en']
 
         for license in licenses:
             license_name = license.get('a')
@@ -61,8 +62,10 @@ def format_element(bfo):
             out += '<span>%s</span>' % url
             if license is not licenses[-1]:
                 out += '<br/>'
+    else:
+        out += "Unknown"
 
-    return out
+        return out
 
 def escape_values(bfo):
     """
