@@ -131,6 +131,27 @@ class MetsIngestion:
                         return None
 
 
+    def replace_empty_author(self):
+        """ Replaces the empty author value with (unknown). If the
+        author MARC tag is not provided, then creates it with value
+        (unknown)
+        """
+
+        empty_author= "(unknown)"
+        try:
+            author = self.get_fieldvalue(tag='100', code='a')
+        except:
+            for tag in self.marc_record.getElementsByTagName('datafield'):
+                if tag.getAttribute('tag')=='100':
+                    self.marc_record.removeChild(tag)
+
+            new_node = self.create_new_field('datafield', tag='100', ind1='', ind2='')
+            sub_node1 = self.create_new_field('subfield', code='a', \
+                                              value=empty_author)
+            new_node.appendChild(sub_node1)
+            self.marc_record.appendChild(new_node)
+
+
     def insert_parent_blog_visibility(self):
         """ Inserts the visibility of the parent blog. """
 
@@ -348,6 +369,7 @@ class MetsIngestion:
 
         # let's add the parent recid depending on the record type
         if self.record_type in ['BLOGPOST', 'COMMENT']:
+            self.replace_empty_author()
             self.insert_parent_blog_visibility()
 
             if self.record_type == 'BLOGPOST':
