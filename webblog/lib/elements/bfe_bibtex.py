@@ -23,6 +23,8 @@ __revision__ = "$Id$"
 
 from invenio.config import CFG_SITE_LANG
 from invenio.webblog_utils import transform_format_date
+from invenio.search_engine import get_creation_date
+import datetime
 
 def format_element(bfo, width="50"):
     """
@@ -63,13 +65,13 @@ def format_element(bfo, width="50"):
     #written in EL, in old BibFormat.
     key = recID
     author = bfo.field("100__a")
-    if author != "":
-        key = get_name(author)+":"+recID
+    if author:
+        key = author + ":" + recID
     else:
         title = bfo.field("245__a")
-        if title != "":
-            key = get_name(title)+":"+recID
-    out += key +","
+        if title:
+            key = title + ":" + recID
+    out += key + ","
 
     #Print authors
     #If author cannot be found, print a field key=recID
@@ -92,14 +94,24 @@ def format_element(bfo, width="50"):
                                name_width,
                                value_width)
 
-    posted_date = transform_format_date(bfo.fields('269__c')[0])
-    # hack
-    if posted_date == "Unknown date":
-        posted_date = ""
+    creation_date = get_creation_date(recID)
+    creation_date = datetime.datetime.strptime(creation_date, "%Y-%m-%d")
+    formatted_creation_date = creation_date.strftime("%Y/%m/%d")
+
+    # if BLOGPOST shows posted date
+    if bfo.field("980__a") == "BLOGPOST":
+        posted_date = transform_format_date(bfo.fields('269__c')[0])
+        # hack
+        if posted_date == 'Unknown date':
+            date = formatted_creation_date
+        else:
+            date = posted_date
+    else: # if BLOG or COMMENT shows creation date
+        date = formatted_creation_date
 
     #Print month
     try:
-        month = get_month(posted_date)
+        month = get_month(date)
         out += format_bibtex_field("month",
                                    month,
                                    name_width,
@@ -109,7 +121,7 @@ def format_element(bfo, width="50"):
 
     #Print year
     try:
-        year = get_year(posted_date)
+        year = get_year(date)
 
         out += format_bibtex_field("year",
                                    year,

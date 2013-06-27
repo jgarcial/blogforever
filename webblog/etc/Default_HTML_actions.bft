@@ -5,9 +5,7 @@
 	<a style="font-weight:normal" href="<BFE_SERVER_INFO var='CFG_SITE_URL'/><BFE_SERVER_INFO var='CFG_SITE_RECORD'/>/<BFE_RECORD_ID/>/export/hm?ln=<BFE_CLIENT_INFO var='ln'/>">MARC</a>,
 	<a style="font-weight:normal" href="<BFE_SERVER_INFO var='CFG_SITE_URL'/><BFE_SERVER_INFO var='CFG_SITE_RECORD'/>/<BFE_RECORD_ID/>/export/xm?ln=<BFE_CLIENT_INFO var='ln'/>">MARCXML</a>,
 	<a style="font-weight:normal" href="<BFE_SERVER_INFO var='CFG_SITE_URL'/><BFE_SERVER_INFO var='CFG_SITE_RECORD'/>/<BFE_RECORD_ID/>/export/xmets?ln=<BFE_CLIENT_INFO var='ln'/>">METS</a>,
-	<a style="font-weight:normal" href="<BFE_SERVER_INFO var='CFG_SITE_URL'/><BFE_SERVER_INFO var='CFG_SITE_RECORD'/>/<BFE_RECORD_ID/>/export/xd?ln=<BFE_CLIENT_INFO var='ln'/>">DC</a>,
-	<a style="font-weight:normal" href="<BFE_SERVER_INFO var='CFG_SITE_URL'/><BFE_SERVER_INFO var='CFG_SITE_RECORD'/>/<BFE_RECORD_ID/>/export/xe?ln=<BFE_CLIENT_INFO var='ln'/>">EndNote</a>,
-	<a style="font-weight:normal" href="<BFE_SERVER_INFO var='CFG_SITE_URL'/><BFE_SERVER_INFO var='CFG_SITE_RECORD'/>/<BFE_RECORD_ID/>/export/xw?ln=<BFE_CLIENT_INFO var='ln'/>">RefWorks</a></li>
+	<a style="font-weight:normal" href="<BFE_SERVER_INFO var='CFG_SITE_URL'/><BFE_SERVER_INFO var='CFG_SITE_RECORD'/>/<BFE_RECORD_ID/>/export/xd?ln=<BFE_CLIENT_INFO var='ln'/>">DC</a>
 	<h4><i class="icon-share-alt">   </i>Share</h4>
 	<BFE_BOOKMARK prefix='<div style="padding-bottom:25px;">' suffix='</div>' />
 	<h4><i class="icon-wrench">   </i>Other options</h4>
