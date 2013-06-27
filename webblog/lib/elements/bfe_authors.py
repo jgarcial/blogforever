@@ -45,18 +45,14 @@ def format_element(bfo):
 
     out = '<i class="icon-user"></i>'
     if authors:
-        # HACK
-        if len(authors) == 1 and not authors[0]:
-            out += "&nbsp;Unknown"
-        else:
-            # Process authors to add link, highlight and format affiliation
-            for author in authors:
-                if author:
-     #               out = cfg_messages["in_issue"][bfo.lang]
-                    out += '  <a href="' + CFG_SITE_URL + \
-                            '/search?f=author&amp;p=' + quote(author) + \
-                            '&amp;ln=' + bfo.lang + \
-                            '">' + escape(author) + '</a>'
+        # Process authors to add link, highlight and format affiliation
+        for author in authors:
+            if author:
+ #               out = cfg_messages["in_issue"][bfo.lang]
+                out += '  <a href="' + CFG_SITE_URL + \
+                        '/search?f=author&amp;p=' + quote(author) + \
+                        '&amp;ln=' + bfo.lang + \
+                        '">' + escape(author) + '</a>'
 
     return out
 

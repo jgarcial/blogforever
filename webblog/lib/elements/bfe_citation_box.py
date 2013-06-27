@@ -48,9 +48,7 @@ def format_element(bfo):
 
     # let's get the fields we want to show
     if coll in ["BLOGPOST", "COMMENT"]:
-        author = bfo.fields('100__a')[0]
-        if not author:
-            author = "Unknown author"
+        author = bfo.field('100__a')
 
     try:
         title = bfo.fields('245__a')[0]
