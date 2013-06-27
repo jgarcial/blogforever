@@ -32,6 +32,7 @@ def format_element(bfo):
 
     current_language = bfo.lang
     tags = bfo.fields('653__1')
+    out = ""
 
     if tags:
         out = """| <i class="icon-tags"></i>  """
