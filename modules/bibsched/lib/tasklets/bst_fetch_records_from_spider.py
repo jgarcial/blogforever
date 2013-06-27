@@ -26,6 +26,7 @@ import tempfile
 import sys
 from invenio.bibtask import task_low_level_submission, task_update_progress
 from invenio.bibupload_preprocess import bp_pre_ingestion
+from invenio.config import CFG_TMPDIR
 
 # Parameters CS 1, 2
 # url = 'http://bf.cyberwatcher.com/System3/SpiderService.svc?wsdl'
@@ -95,7 +96,7 @@ def process_record(client, api_key, match):
         try:
             docstorage = client.service.GetDocumentStorage(api_key, match.Object.DocumentId)
         except Exception:
-            error_file = open("/tmp/error_file", "a")
+            error_file = open(CFG_TMPDIR + "/error_file", "a")
             error_file.write("There are not attached files for %s, %s \n" % \
                              (metadata_file_name, match.Object.WatchPointId))
             error_file.close()
@@ -109,18 +110,18 @@ def process_record(client, api_key, match):
                         f.write(decodestring(attach))
                         f.close()
                     else:
-                        error_file = open("/tmp/error_file", "a")
+                        error_file = open(CFG_TMPDIR + "/error_file", "a")
                         error_file.write("Attached file %s validation failed in %s \n" % \
                                          (file.Type + "_" + file.Filename, metadata_file_name))
                         error_file.close()
                 except Exception:
-                    error_file = open("/tmp/error_file", "a")
+                    error_file = open(CFG_TMPDIR + "/error_file", "a")
                     error_file.write("Fail retrieving attached files for %s, %s \n" % \
                                      (metadata_file_name, match.Object.WatchPointId))
                     error_file.close()
 
         # Let's save the last record id it was retrieved
-        last_id_file = open("/tmp/last_id", "w")
+        last_id_file = open(CFG_TMPDIR + "/last_id", "w")
         last_id_file.write(repr(match.Object.Id))
         last_id_file.close()
 
@@ -131,12 +132,12 @@ def process_record(client, api_key, match):
                                       '--pre-plugin=bp_pre_ingestion', \
                                       '--post-plugin=bp_post_ingestion')
         else:
-            error_file = open("/tmp/error_file", "a")
+            error_file = open(CFG_TMPDIR + "/error_file", "a")
             error_file.write("No such as file %s \n" % metadata_file_name)
             error_file.close()
     else:
         # TODO: write down this url to fetch this record again
-        error_file = open("/tmp/error_file", "a")
+        error_file = open(CFG_TMPDIR + "/error_file", "a")
         error_file.write("METS validation failed in %s, %s \n" % metadata_file_name, match.Object.WatchPointId)
         error_file.close()
 
@@ -159,7 +160,7 @@ def create_error_file():
     Create an error logging file
     """
 
-    error_file = open("/tmp/error_file", "a")
+    error_file = open(CFG_TMPDIR + "/error_file", "a")
     error_file.write("----- Start error file -----\n")
     error_file.close()
 
@@ -225,9 +226,9 @@ def get_last_id():
     """
 
     # Let's read the last id that was fetched
-    if os.path.isfile("/tmp/last_id"):
-        last_id_file = open("/tmp/last_id", "r")
-        if os.path.getsize("/tmp/last_id") > 0:
+    if os.path.isfile(CFG_TMPDIR + "/last_id"):
+        last_id_file = open(CFG_TMPDIR + "/last_id", "r")
+        if os.path.getsize(CFG_TMPDIR + "/last_id") > 0:
             last_id = int(last_id_file.read()) + 1
             last_id_file.close()
         # It is the first iteration
@@ -296,7 +297,7 @@ def bst_fetch_records_from_spider(api_key, url, constant_set=100, id_max=2147483
                 result = client.service.SearchEntities(api_key, sr)
                 matches = result.Matches.BlogSearchMatch
             except Exception: # no more results were found
-                error_file = open("/tmp/error_file", "a")
+                error_file = open(CFG_TMPDIR + "/error_file", "a")
                 error_file.write("No more results were found \n")
                 error_file.close()
                 break
@@ -340,6 +341,6 @@ def bst_fetch_records_from_spider(api_key, url, constant_set=100, id_max=2147483
         task_low_level_submission('webcoll', 'admin')
 
     task_update_progress("Finish fetching blog records")
-    error_file = open("/tmp/error_file", "a")
+    error_file = open(CFG_TMPDIR + "/error_file", "a")
     error_file.write("Finished fetching blog records\n")
     error_file.close()

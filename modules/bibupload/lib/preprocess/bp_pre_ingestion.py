@@ -28,7 +28,7 @@ from invenio.search_engine import search_pattern
 from invenio.search_engine_utils import get_fieldvalues
 from invenio.webblog_utils import get_parent_blog
 from invenio.config import CFG_BATCHUPLOADER_DAEMON_DIR, \
-                           CFG_PREFIX
+                           CFG_PREFIX, CFG_TMPDIR
 from invenio.bibtask import  task_update_progress
 from bs4 import BeautifulSoup
 import bleach
@@ -183,7 +183,7 @@ class MetsIngestion:
             parent_blog_url = self.get_fieldvalue(tag='760', code='o')
         except Exception, e: # post coming without parent blog url
             wp = self.get_fieldvalue(tag='99999', code='watchpointid')
-            error_file = open("/tmp/error_file", "a")
+            error_file = open(CFG_TMPDIR + "/error_file", "a")
             error_file.write("Not parent blog url present in file %s, wp: %s. Error: %s\n" %
                             (self.file_name, wp, str(e)))
             error_file.close()
@@ -225,7 +225,7 @@ class MetsIngestion:
             parent_post_url = self.get_fieldvalue(tag='773', code='o')
         except Exception, e: # comment coming without parent post url
             wp = self.get_fieldvalue(tag='99999', code='watchpointid')
-            error_file = open("/tmp/error_file", "a")
+            error_file = open(CFG_TMPDIR + "/error_file", "a")
             error_file.write("Not parent post url present in file %s, wp: %s. Error: %s\n" %
                             (self.file_name, wp, str(e)))
             error_file.close()
@@ -281,11 +281,11 @@ class MetsIngestion:
                                    attributes=attr_white_list, tags=tag_white_list)
         except AttributeError, e:
             # TODO: write down this url to fetch this record again
-            wrong_html_file = open("/tmp/wrong_html_file_%s" % self.file_name, "w")
+            wrong_html_file = open(CFG_TMPDIR + "/wrong_html_file_%s" % self.file_name, "w")
             wrong_html_file.write(content.encode('utf8'))
             wrong_html_file.close()
             wp = self.get_fieldvalue(tag='99999', code='watchpointid')
-            error_file = open("/tmp/error_file", "a")
+            error_file = open(CFG_TMPDIR + "/error_file", "a")
             error_file.write("AttributeError in file %s, wp: %s. Error: %s\n" %
                             (self.file_name, wp, str(e)))
             error_file.close()

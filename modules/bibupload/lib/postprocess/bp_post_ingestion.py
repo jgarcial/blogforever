@@ -29,6 +29,7 @@ import datetime
 from invenio.bibtask import task_update_progress
 from lxml import etree
 from invenio.bibupload_preprocess import bp_pre_ingestion
+from invenio.config import CFG_TMPDIR
 
 
 path_mets_attachedfiles = bp_pre_ingestion.path_mets_attachedfiles
@@ -54,7 +55,7 @@ def bp_post_ingestion(file_path):
         mets_file = f.read()
         f.close()
     except:
-        error_file = open("/tmp/error_file", "a")
+        error_file = open(CFG_TMPDIR + "/error_file", "a")
         error_file.write("Could not find the METS file %s" % mets_file_path +"\n")
         error_file.close()
 
@@ -71,7 +72,7 @@ def bp_post_ingestion(file_path):
         record_collection = xml_tree.xpath("mets:dmdSec/mets:mdWrap/mets:xmlData/marc:record/marc:datafield[@tag='980']/marc:subfield[@code='a']/text()", \
                                             namespaces=namespaces)[0].strip()
     except:
-        error_file = open("/tmp/error_file", "a")
+        error_file = open(CFG_TMPDIR + "/error_file", "a")
         error_file.write("Could not find the METS file %s" % mets_file_path +"\n")
         error_file.close()
         record_collection = "DEFAULT"
@@ -102,7 +103,7 @@ def bp_post_ingestion(file_path):
     if os.path.exists(metadata_file_path):
         os.remove(metadata_file_path)
     else:
-        error_file = open("/tmp/error_file", "a")
+        error_file = open(CFG_TMPDIR + "/error_file", "a")
         error_file.write("Could not find the file %s" % metadata_file_path +"\n")
         error_file.close()
 
@@ -113,7 +114,7 @@ def bp_post_ingestion(file_path):
             os.remove(files_dir_path + "/" + file_name)
         os.rmdir(files_dir_path)
     else:
-        error_file = open("/tmp/error_file", "a")
+        error_file = open(CFG_TMPDIR + "/error_file", "a")
         error_file.write("Could not find the directory %s" % files_dir_path +"\n")
         error_file.close()
 
