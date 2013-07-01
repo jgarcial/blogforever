@@ -74,7 +74,14 @@ def process_record(client, api_key, match):
     """
 
     # Let's store the METS of the corresponding match
-    metadata = client.service.GetDocumentAsMets(api_key, match.Object.Id)
+    try:
+        metadata = client.service.GetDocumentAsMets(api_key, match.Object.Id)
+    except Exception:
+        error_file = open("/tmp/error_file", "a")
+        error_file.write("Error fetching METS document for %s, %s \n" % \
+                         (match.Object.Id, match.Object.WatchPointId))
+        error_file.close()
+        return
     if validate_content(content=metadata.MetsXml.encode('utf-8'), md5_hash=metadata.MD5):
         fd, path_metadata_file = tempfile.mkstemp(suffix=".xml", \
                                                   prefix= match.Object.Type + "_" + \
