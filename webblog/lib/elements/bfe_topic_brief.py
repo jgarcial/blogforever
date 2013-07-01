@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 ## This file is part of CDS Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2013 CERN.
 ##
 ## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -18,39 +18,29 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-BibFormat Element - displays tags on blogs and blog posts
+BibFormat Element - displays topic on brief format blog records
 """
 
 from invenio.config import CFG_SITE_SECURE_URL
 from invenio.urlutils import create_html_link
 
-cfg_messages = {}
-cfg_messages["in_issue"] = {"en": "Tags",
-                            "es": "Etiquetas",
-                            "fr": "Balises"}
 
 def format_element(bfo):
     """
-    Returns all the tags of the corresponding blog or blogpost
+    Displays the topic on brief format blog records
     """
 
     current_language = bfo.lang
-    #TODO: to decide new MARC tag for tags
-    tags = bfo.fields('653__1')
+    topics = bfo.fields('654__a')
+    out = ""
 
-    try:
-        out = '<h4><i class="icon-tags"></i>&nbsp;%s</h4>' % cfg_messages["in_issue"][current_language]
-    except: # in english by default
-        out = '<h4><i class="icon-tags"></i>&nbsp;%s</h4>' % cfg_messages["in_issue"]['en']
-
-    if tags:
-        for tag in tags:
+    if topics:
+        out = """| <i class="icon-picture"></i>  """
+        for topic in topics:
             url = create_html_link(CFG_SITE_SECURE_URL + "/search", \
-                                    {'p': '653__1:"%s"' % tag, \
-                                     'ln': current_language}, tag, linkattrd = {'style':"color:white"})
-            out += '<span class="label">%s</span>&nbsp;&nbsp;' % url
-    else:
-        out += '<span>No tags yet</span>'
+                                    {'p': '654__a:"%s"' % topic, \
+                                     'ln': current_language}, topic, linkattrd = {'style':"color:white"})
+            out += '<span class="label label-success">%s</span>&nbsp;&nbsp;' % url
 
     return out
 

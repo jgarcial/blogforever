@@ -40,6 +40,8 @@
 			<br />
 			{{ bfe_record_dates(bfo) }}
 			<br />
+			{{ bfe_topic(bfo) }}
+			<br />
 			{{ bfe_tags(bfo) }}
 			<br />
 			{{ bfe_license(bfo) }}

@@ -90,19 +90,21 @@ def SBI_Mail_Notification_to_User(parameters, curdir, form, user_info=None):
 
     try:
         fp = open("%s/BSI_TOPIC" % curdir,"r")
-        blog_topic = fp.read().replace ("\n"," ")
+        topics = fp.readlines()
         fp.close()
+        blog_topics = [topic.replace ("\n","") for topic in topics]
+        blog_topics = ', '.join(blog_topics)
     except:
-        blog_topic = ""
+        blog_topics = ""
 
     # create email body
     email_txt = "\nThe blog record with reference number [%s] has been correctly received.\n" % rn
     email_txt += """The details of the blog record are as follows:\n
        Title: '%s'
        Blog URL: [%s]
-       Topic: %s
+       Topics: %s
        License: %s
-       \n""" % (blog_title, blog_url, blog_topic, blog_license)
+       \n""" % (blog_title, blog_url, blog_topics, blog_license)
     # The user is either informed that the document has been added to the database, or sent for approval
     if parameters['status'] == "APPROVAL":
         email_txt =  email_txt + "An email has been sent to the referee. You will be warned by email as soon as the referee takes his/her decision \nregarding your blog record.\n"

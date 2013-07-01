@@ -38,7 +38,7 @@ def format_element(bfo):
         out = """| <i class="icon-tags"></i>  """
         for tag in tags:
             url = create_html_link(CFG_SITE_SECURE_URL + "/search", \
-                                    {'p': '653__1:%s' % tag, \
+                                    {'p': '653__1:"%s"' % tag, \
                                      'ln': current_language}, tag, linkattrd = {'style':"color:white"})
             out += '<span class="label">%s</span>&nbsp;&nbsp;' % url
 

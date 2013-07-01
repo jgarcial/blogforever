@@ -147,10 +147,12 @@ def SBI_Mail_Approval_Request_to_Referee(parameters, curdir, form, user_info=Non
 
     try:
         fp = open("%s/BSI_TOPIC" % curdir,"r")
-        blog_topic = fp.read().replace ("\n"," ")
+        topics = fp.readlines()
         fp.close()
+        blog_topics = [topic.replace ("\n","") for topic in topics]
+        blog_topics = ', '.join(blog_topics)
     except:
-        blog_topic = ""
+        blog_topics = ""
 
     ## Send the email:
     mail_subject = "Request for approval of new blog submission: [%s]" % rn
@@ -158,7 +160,7 @@ def SBI_Mail_Approval_Request_to_Referee(parameters, curdir, form, user_info=Non
     mail_body = CFG_MAIL_BODY % \
                 {'title': title,
                  'blog_url': blog_url,
-                 'topic': blog_topic,
+                 'topic': blog_topics,
                  'license': blog_license,
                  'record_id': sysno,
                  'site_name' : CFG_SITE_NAME,

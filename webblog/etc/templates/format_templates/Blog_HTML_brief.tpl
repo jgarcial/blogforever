@@ -9,6 +9,7 @@
                 </p>
                 <p>
                   <i class="icon-col-Posts"></i> {{ bfe_blog_posts_brief(bfo) }}
+                  {{ bfe_topic_brief(bfo) }}
                   {{ bfe_discussion(bfo) }}
                   {{ bfe_reviews(bfo) }}
                 </p>

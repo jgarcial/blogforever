@@ -145,14 +145,15 @@ def MBI_Mail_Approval_Request_to_Referee(parameters, curdir, form, user_info=Non
 
     modifiedrec = create_record(modifiedrec_xml)[0]
     new_title = record_get_field_values(modifiedrec, "245", code = "a")
-    new_topic = record_get_field_values(modifiedrec, "654", code = "a")
+    new_topics = record_get_field_values(modifiedrec, "654", code = "a")
+    new_topics = ', '.join(new_topics)
     new_license = record_get_field_values(modifiedrec, "542", code = "f")
 
     modified_fields = ""
     if new_title:
         modified_fields += "New title: '%s'\n" % new_title[0]
-    if new_topic:
-        modified_fields += "   New topic: '%s'\n" % new_topic[0]
+    if new_topics:
+        modified_fields += "   New topics: '%s'\n" % new_topics
     if new_license:
         modified_fields += "   New license: '%s'" % new_license[0]
 
