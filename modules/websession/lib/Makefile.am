@@ -38,7 +38,14 @@ pylib_DATA = session.py webuser.py webuser_unit_tests.py \
 	dashboard_user_settings.py \
 	session_flask.py \
 	webrecommend.py \
-	webrecommend_user_settings.py
+	webrecommend_user_settings.py \
+	webhistory.py \
+	webhistory_blueprint.py \
+	webhistory_collector.py \
+	webhistory_config.py \
+	webhistory_user_settings.py \
+	webhistory_model.py \
+	webgroup_history.py
 
 noinst_DATA = password_migration_kit.py
 

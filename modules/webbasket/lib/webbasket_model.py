@@ -138,6 +138,10 @@ class UserBskBASKET(db.Model):
                 db.ForeignKey(BskBASKET.id), nullable=False,
                 server_default='0', primary_key=True)
     topic = db.Column(db.String(50), nullable=False, server_default='')
+    creation_date = db.Column(db.DateTime, nullable=False,
+                server_default='0001-01-01 00:00:00')
+    action_code = db.Column(db.CHAR(1), nullable=False,
+                server_default='')
     user = db.relationship(User, backref='user_baskets')
     user_basket = db.relationship(BskBASKET, backref='users')
 

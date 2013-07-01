@@ -72,6 +72,9 @@
   </div>
 {%- endif -%}
   <div style="min-height: 100px;" class="offset1 span10 thumbnail">
+  {%- if share_msg -%}
+  	<div class="alert alert-info">{{share_msg | safe}}</div>
+  {%- endif -%}
   {{ m.message.body }}
   </div>
 </div>

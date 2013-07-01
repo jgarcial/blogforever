@@ -16,6 +16,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+from invenio.webhistory_model import HstShare
 
 """Query definitions for module webmessage"""
 
@@ -196,6 +197,10 @@ def check_if_need_to_delete_message_permanently(msg_ids):
                group_by(UserMsgMESSAGE.id_msgMESSAGE).\
                having(db.func.count(UserMsgMESSAGE.id_user_to)>0).\
                subquery()
+
+    (HstShare.query.filter((HstShare.id_msgMESSAGE.in_(msg_ids))
+                           & (~HstShare.id_msgMESSAGE.in_(msg_used)))
+    .delete(synchronize_session=False))
 
     return MsgMESSAGE.query.filter(MsgMESSAGE.id.in_(msg_ids) & \
            db.not_(MsgMESSAGE.id.in_(msg_used))).\

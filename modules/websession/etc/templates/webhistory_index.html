@@ -1,0 +1,461 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2013 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA. #}
+{% extends "page.html" %}
+{% set title = _('Your Activities') %}
+{% css "img/jquery-ui/themes/redmond/jquery-ui.css" %}
+{% js "js/jquery-ui.min.js" %}
+{#% js "js/jquery-ui-timepicker-addon.js" %#}
+{% block title %}
+	{{super()}}
+{% endblock %}
+{% block body %}
+
+<div class="well">
+	<a data-toggle="collapse" href="#activity-filter"><i
+		class="icon-filter"></i> Filter Your Activities</a>
+	<div class="collapse" id="activity-filter">
+		<form action="{{url_for('webhistory.filteractivities')}}"
+			method="post">
+			<ul class="span11">
+				{%- for collector_name in filter_labels.keys() -%}
+				<li>
+					{%- if active_filters and collector_name in active_filters -%}
+					<span id="{{collector_name}}" class="label label-success history-filter">
+						<input name="active_filters" type="checkbox" value="{{collector_name}}" checked="checked"> 
+					{%- else -%}
+					<span id="{{collector_name}}" class="label history-filter">
+						<input name="active_filters" type="checkbox" value="{{collector_name}}">
+					{%- endif -%}
+						&nbsp;<i class="icon-{{filter_labels[collector_name]['icon']}}"></i>
+						{{filter_labels[collector_name]['label']}}
+					</span>
+				</li>
+				{%- endfor -%}
+			</ul>
+			<br>
+			<ul class="span11">
+				<li><input type="text" id="filter-from" name="filter_from"
+					placeholder="From" value="{{filter_from if filter_from else ''}}" />
+				</li>
+				<li><input type="text" id="filter-to" name="filter_to"
+					placeholder="To" value="{{filter_to if filter_to else ''}}" /></li>
+				<li><select name="per_page">
+						<option value="{{per_page}}">Display per Page</option>
+						<option value="10">10</option>
+						<option value="25">25</option>
+						<option value="50">50</option>
+						<option value="100">100</option>
+				</select></li>
+				<li>
+					<button type="submit" id="apply-filter"
+						class="btn btn-small btn-primary">Apply Filter</button>
+				</li>
+			</ul>
+		</form>
+	</div>
+</div>
+<table id="history-table" class="table table-striped">
+</table>
+
+<div class="hide alert alert-error" id="not-found">No activity is
+	found.</div>
+
+<div id="load-more" class="alert">
+	<img id="load-img" class="hide"
+		src="{{config.CFG_SITE_SECURE_URL+'/img/loading.gif'}}" /> <span
+		id="load-text">Load Older Activities</span>
+</div>
+
+<div class="modal hide fade" id="activity-share-modal">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal"
+			aria-hidden="true">&times;</button>
+		<h3>Share</h3>
+	</div>
+	<div class="modal-body">
+		<div class="alert alert-error hide" id="error-msgs"><ul></ul></div>
+		<div class="input-prepend pp-input">
+			<span class="add-on">{{share_form.sent_to_user_nicks.label}}</span>
+			{{share_form.sent_to_user_nicks(class_="input-block-level")}}
+		</div>
+		<div class="input-prepend pp-input">
+			<span class="add-on">{{share_form.sent_to_group_names.label}}</span>
+			{{share_form.sent_to_group_names(class_="input-block-level")}}
+		</div>
+		<div class="input-prepend pp-input">
+			<span class="add-on">{{share_form.subject.label}}</span>
+			{{share_form.subject(class_="input-block-level")}}
+		</div>
+		<div class="input-prepend pp-input">
+			<span class="add-on">{{_('Activity')}}</span>
+			<div id='activity-message'></div>
+		</div>
+		<div class="input-prepend pp-input">
+			<span class="add-on">{{share_form.body.label}}</span>
+			{{share_form.body(class_="input-block-level")}}
+		</div>
+	</div>
+	<div class="modal-footer">
+		<button class="btn btn-primary" id="share-button">Share</button>
+	</div>
+	{{ share_form.csrf_token() }}
+</div>
+
+{% endblock %} {%- block css -%}
+<style type="text/css">
+#history-table tr td:first-child, #history-table tr td:nth-child(4) {
+	width: 12px;
+}
+
+#history-table tr td:nth-child(2) {
+	width: 180px;
+}
+
+span.history-filter,#activity-filter input[type="text"],#activity-filter select
+	{
+	margin: 5px 0px 0px 5px;
+	cursor: pointer;
+	width: 80%;
+}
+
+span.history-filter input[type="checkbox"] {
+	margin-bottom: 3px;
+}
+
+#apply-filter {
+	float: right;
+	margin-right: 15%;
+	margin-top: 5px;
+}
+
+#activity-filter ul {
+	list-style-type: none;
+	display: inline-block;
+}
+
+#activity-filter li {
+	float: left;
+	width: 25%;
+}
+
+form {
+	margin-bottom: 0px;
+}
+
+div#load-more {
+	cursor: pointer;
+	text-align: center;
+}
+
+.pp-input {
+	margin-right: 10px;
+}
+
+.pp-input div {
+	font-size: initial;
+	border: 1px solid rgb(204, 204, 204);
+	padding: 5px;
+	padding-top: 3px;
+	display: inline-block !important;
+	white-space: normal;
+	width: 406px;
+	border-radius: 5px;
+	min-height: 20px;
+}
+
+.pp-input .add-on {
+	width: 20%;
+}
+
+.pp-input input,.pp-input select,.pp-input textarea,.pp-input button {
+	width: 80%;
+}
+
+.pp-input-double input,.pp-input-double select,.pp-input-double textarea,.pp-input-double button
+	{
+	width: 40%;
+}
+
+.pp-input-button input,.pp-input-button select,.pp-input-button textarea,.pp-input-button button
+	{
+	width: 60%;
+	border-radius: 0px;
+	border-right-style: none;
+	border-left-style: dotted;
+}
+
+.pp-input-button .btn {
+	width: 20%;
+	border-top-right-radius: 5px;
+	border-bottom-right-radius: 5px;
+}
+
+.pp-input-double span+* {
+	border-radius: 0px;
+	border-right-style: none;
+}
+
+.pp-input span   ~* {
+	display: inline;
+}
+
+.pp-input span+* {
+	border-left-style: dotted;
+	border-top-left-radius: 0px;
+	border-bottom-left-radius: 0px;
+}
+
+.ui-autocomplete {
+	z-index: 1100 !important;
+}
+</style>
+{%- endblock -%}
+{% block javascript %}
+{% include "webmessage_common_js.html" %}
+<script type="text/javascript">
+function ShareManager() {
+	this.form = {
+		{{share_form.sent_to_user_nicks.name}} : $("#{{share_form.sent_to_user_nicks.id}}"),
+		{{share_form.sent_to_group_names.name}} : $("#{{share_form.sent_to_group_names.id}}"),
+		{{share_form.subject.name}} : $("#{{share_form.subject.id}}"),
+		{{share_form.body.name}} : $("#{{share_form.body.id}}"),
+		{{share_form.csrf_token.name}} : $("#{{share_form.csrf_token.id}}")
+	};
+
+	this.historyType = null;
+	this.serialized = null;
+
+	this.ui = {
+		'activityMessage': $('#activity-message'),
+		'shareButton' : $("#share-button"),
+		'errorMsgs': $("#error-msgs")
+	};
+
+	this.modal = $("#activity-share-modal").modal({show: false});
+	this.bindEvents();
+}
+
+ShareManager.prototype.display = function(historyType, serialized) {
+	this.historyType = historyType;
+	this.serialized = serialized;
+	this.getShareMessage();
+	this.modal.modal('show');
+}
+
+ShareManager.prototype.getShareMessage = function() {
+	var self = this;
+	var data = {}
+	data['history_type'] = this.historyType;
+	data['serialized'] = this.serialized;
+	$.ajax({
+		url: '{{url_for("webhistory.getsharemessage")}}',
+		type: 'POST',
+		dataType: 'text',
+		data: $.param(data, true),
+		success: function(r) {
+			self.ui.activityMessage.html(r);
+		}
+	});
+}
+
+ShareManager.prototype.bindEvents = function() {
+	var self = this;
+	this.ui.shareButton.click(function() {
+		self.share()
+	});
+	this.modal.on('hidden', function() {
+		self.clear();
+	});
+}
+
+ShareManager.prototype.share = function() {
+	var data = {}
+	for (var elem in this.form) {
+		data[elem] = this.form[elem].val();
+	}
+	data['history_type'] = this.historyType;
+	data['serialized'] = this.serialized;
+	var self = this;
+	$.ajax({
+		url: '{{url_for("webmessage.share")}}',
+		type: 'POST',
+		dataType: 'json',
+		data: $.param(data, true),
+		success: function(r) {
+			if (r.status) {
+				self.modal.modal('hide');
+			} else {
+				self.ui.errorMsgs.removeClass("hide");
+				for (var error in r.errors) {
+					self.ui.errorMsgs.find("ul").append("<li>"
+								+ r.errors[error]
+								+ "</li>")
+				}
+			}
+		}
+	});
+}
+
+ShareManager.prototype.clear = function() {
+	this.form.{{share_form.sent_to_user_nicks.name}}.val("");
+	this.form.{{share_form.sent_to_group_names.name}}.val("");
+	this.form.{{share_form.subject.name}}.val("");
+	this.form.{{share_form.body.name}}.val("");
+	this.ui.activityMessage.html("");
+	this.ui.errorMsgs.addClass("hide");
+}
+
+function HistoryElement(r, shareManager) {
+	this.msg = r.msg;
+	this.serialized = r.serialized;
+	this.type = r.type;
+	this.icon = r.icon;
+	this.date = r.date;
+	this.serialized_date = r.serialized_date;
+	this.body = "";
+	this.shareManager = shareManager;
+}
+
+HistoryElement.prototype.render = function() {
+	this.body = $("<tr><td><i class='icon-"
+		+ this.icon
+		+ "'></i></td><td>"
+		+ this.date
+		+ "</td><td>"
+		+ this.msg
+		+ "</td><td><i class='icon-share'></i></td></tr>");
+	this.bindEvents();
+	return this.body;
+}
+
+HistoryElement.prototype.bindEvents = function() {
+	var self = this;
+	this.body.find("i.icon-share").click(function() {
+		self.shareManager.display(self.type, self.serialized);
+	});
+}
+
+function History(shareManager) {
+	this.oldest = null;
+	this.lastID = null;
+	this.filterFrom = "{{filter_from if filter_from else 'null'}}";
+	this.filterTo = "{{filter_to if filter_to else 'null'}}";
+	this.select = {
+		loadMore: "div#load-more",
+		loadImg: "img#load-img",
+		loadText: "span#load-text",
+		filterTo: "#filter-to",
+		filterFrom: "#filter-from",
+		body: "#history-table",
+		errorMsg: "#not-found"
+	}
+	this.shareManager = shareManager;
+
+	this.fetch();
+}
+
+History.prototype.bindLoadMoreEvent = function() {
+	var self = this;
+	$(this.select.loadMore).live("click", function () {
+		self.fetch();
+	});
+}
+
+History.prototype.render = function(r) {
+	var hst = null;
+	for (hst in r) {
+		if (r[hst].icon) {
+			var elem = new HistoryElement(r[hst], this.shareManager);
+			$(this.select.body).append(elem.render());
+		}
+	}
+	this.lastID = r.last_id || this.lastID
+
+	if (r.has_more) {
+		this.oldest = r["{{per_page - 1}}"].date;
+	}
+}
+
+History.prototype.fetch = function() {
+	this.beforeFetch();
+	var self = this;
+	$.ajax({
+		url: '{{url_for("webhistory.getmore")}}',
+		type: 'POST',
+		dataType: 'json',
+		data: $.param({
+			oldest: self.oldest ? self.oldest : null,
+			filter_to: self.filterTo,
+			filter_from: self.filterFrom,
+			after_id: self.lastID ? self.lastID : null
+		}, true),
+		success: function(r) {
+			self.render(r);
+			self.afterFetch(r);
+		}
+	});
+}
+
+History.prototype.beforeFetch = function() {
+	$(this.select.loadMore).die();
+	$(this.select.loadImg).removeClass("hide");
+	$(this.select.loadText).addClass("hide");
+}
+
+History.prototype.afterFetch = function(r) {
+	if (r.has_more) {
+		$(this.select.loadImg).addClass("hide");
+		$(this.select.loadText).removeClass("hide");
+		this.bindLoadMoreEvent();
+	} else {
+		if (!r['0']) {
+			$(this.select.errorMsg).removeClass('hide');
+		}
+		$(this.select.loadMore).remove();
+	}
+}
+
+$(document).ready(function () {
+	$("span.history-filter").click(function () {
+		if ($(this).hasClass('label-success')) {
+			$(this).removeClass('label-success');
+			console.log(this);
+			$($(this).children().get(0)).attr("checked", false);
+		} else {
+			$(this).addClass('label-success');
+			$($(this).children().get(0)).attr("checked", true);
+		}
+	});
+
+	$("#filter-from").datepicker({
+		dateFormat: "{{datepicker_fmt}}"
+	});
+	$("#filter-to").datepicker({
+		dateFormat: "{{datepicker_fmt}}"
+	});
+
+	$("#activity-filter")
+		.attr('unselectable', 'on')
+		.css('user-select', 'none')
+		.on('selectstart', false);
+
+	var shareManager = new ShareManager();
+	history = new History(shareManager);
+});
+</script>
+{% endblock %}

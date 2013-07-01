@@ -56,7 +56,10 @@ pylib_DATA = \
 	websearch_external_collections_utils.py \
 	websearch_admin_blueprint.py \
 	websearch_admin_forms.py \
-	websearch_instantbrowse.py
+	websearch_instantbrowse.py \
+	websearch_download_history.py \
+	websearch_history.py \
+	websearch_record_view_history.py
 
 jsdir=$(localstatedir)/www/js
 

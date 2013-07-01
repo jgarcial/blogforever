@@ -22,7 +22,8 @@ templates_DATA = webgroup_index.html \
                  webaccount_login.html \
                  webaccount_logout.html \
                  webaccount_register.html \
-                 webaccount_widget.html
+                 webaccount_widget.html \
+                 webhistory_index.html
 
 EXTRA_DIST = $(templates_DATA)
 

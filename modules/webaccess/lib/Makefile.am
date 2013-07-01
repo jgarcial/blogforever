@@ -46,7 +46,8 @@ pylib_DATA = access_control_engine.py \
              webpayment_model.py \
              webpayment_query.py \
              webpayment_user_settings.py \
-             webpayment_config.py
+             webpayment_config.py \
+             webpayment_history.py
 
 noinst_DATA = collection_restrictions_migration_kit.py
 

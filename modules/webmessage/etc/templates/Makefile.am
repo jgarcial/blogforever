@@ -21,7 +21,8 @@ templates_DATA = webmessage_index.html \
 		 webmessage_confirm_delete.html \
 		 webmessage_add.html \
 		 webmessage_menu.html \
-		 webmessage_email_alert.html
+		 webmessage_email_alert.html \
+		 webmessage_common_js.html
 
 EXTRA_DIST = $(templates_DATA)
 

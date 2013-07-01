@@ -41,6 +41,9 @@ try:
 except ImportError:
     UNIDECODE_AVAILABLE = False
 
+from os import urandom
+from base64 import b64encode
+
 CFG_LATEX_UNICODE_TRANSLATION_CONST = {}
 
 CFG_WRAP_TEXT_IN_A_BOX_STYLES = {
@@ -155,7 +158,7 @@ def indent_text(text,
     """
     if not wrap:
         lines = text.split(linebreak_input)
-        tabs = nb_tabs*tab_str
+        tabs = nb_tabs * tab_str
         output = ""
         for line in lines:
             output += tabs + line + linebreak_output
@@ -614,7 +617,7 @@ def xml_entities_to_utf8(text, skip=('lt', 'gt', 'amp')):
                     text = unichr(htmlentitydefs.name2codepoint[text[1:-1]]).encode("utf-8")
                 except KeyError:
                     pass
-        return text # leave as is
+        return text  # leave as is
     return re.sub("&#?\w+;", fixup, text)
 
 def strip_accents(x):
@@ -650,7 +653,7 @@ def strip_accents(x):
     try:
         y = unicode(x, "utf-8")
     except:
-        return x # something went wrong, probably the input wasn't UTF-8
+        return x  # something went wrong, probably the input wasn't UTF-8
     # asciify Latin-1 lowercase characters:
     y = re_unicode_lowercase_a.sub("a", y)
     y = re_unicode_lowercase_ae.sub("ae", y)
@@ -731,3 +734,15 @@ def transliterate_ala_lc(value):
         text = translate_to_ascii(value)
         text = text.pop()
     return text
+
+
+def get_random_string(length):
+    """
+    Returns a random string with given length
+
+    @param length: the length of the string.
+    @type length: int
+
+    @rtype: str
+    """
+    return b64encode(urandom(length))

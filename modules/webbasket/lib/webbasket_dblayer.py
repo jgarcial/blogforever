@@ -410,9 +410,9 @@ def create_basket(uid, basket_name, topic):
     id_bsk = run_sql("""INSERT INTO bskBASKET (id_owner, name, date_modification)
                         VALUES                (%s, %s, %s)""",
                      (uid, basket_name, now))
-    run_sql("""INSERT INTO user_bskBASKET (id_user, id_bskBASKET, topic)
-               VALUES                     (%s, %s, %s)""",
-            (uid, id_bsk, topic))
+    run_sql("""INSERT INTO user_bskBASKET (id_user, id_bskBASKET, topic, creation_date, action_code)
+               VALUES                     (%s, %s, %s, %s, %s)""",
+            (uid, id_bsk, topic, now, 'C'))
     return id_bsk
 
 def get_all_items_in_user_personal_baskets(uid,
@@ -2013,10 +2013,10 @@ def subscribe(uid, bskid):
         # The user is either the owner of the basket or is already subscribed.
         return False
     else:
-        query2 = """INSERT INTO user_bskBASKET (id_user, id_bskBASKET)
-                                   VALUES      (%s, %s)"""
+        query2 = """INSERT INTO user_bskBASKET (id_user, id_bskBASKET, creation_date, action_code)
+                                   VALUES      (%s, %s, NOW(), %s)"""
 
-        params2 = (uid, bskid)
+        params2 = (uid, bskid, 'S')
 
         run_sql(query2, params2)
 

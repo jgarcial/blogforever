@@ -16,28 +16,30 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-
-"""WebMessage Flask Blueprint"""
-
 from datetime import datetime
-from flask import render_template, request, flash, redirect, url_for
+from flask import render_template, request, flash, redirect, url_for, jsonify
 from invenio import webmessage_dblayer as dbplayer
+from invenio import webmessage_query as dbquery
 from invenio.config import CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES, \
                         CFG_WEBMESSAGE_MAX_SIZE_OF_MESSAGE, \
                         CFG_TRANSLATE_WEBMESSAGE
 from invenio.sqlalchemyutils import db
-from invenio.webmessage import is_no_quota_user
-from invenio.webmessage_config import CFG_WEBMESSAGE_STATUS_CODE
-from invenio.webmessage_mailutils import email_quote_txt
-from invenio.webmessage_model import MsgMESSAGE, UserMsgMESSAGE
-from invenio.webmessage_forms import AddMsgMESSAGEForm, FilterMsgMESSAGEForm
-from invenio import webmessage_query as dbquery
-from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
-from invenio.webuser_flask import current_user
 from invenio.translate_utils import construct_translate_section, \
                                     get_translate_script
-
+from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
+from invenio.webmessage import is_no_quota_user
+from invenio.webmessage_config import CFG_WEBMESSAGE_STATUS_CODE
+from invenio.webmessage_forms import AddMsgMESSAGEForm, FilterMsgMESSAGEForm
+from invenio.webmessage_mailutils import email_quote_txt
+from invenio.webmessage_model import MsgMESSAGE, UserMsgMESSAGE
+from invenio.webuser_flask import current_user
 from sqlalchemy.sql import operators
+from invenio.webhistory_model import HstShare
+from invenio.webhistory import HistoryManager
+
+"""WebMessage Flask Blueprint"""
+
+
 
 
 class MessagesMenu(object):
@@ -210,17 +212,35 @@ def view(msgid):
             ## I wonder if the autocommit works ...
             # Commit changes before rendering for correct menu update.
             db.session.commit()
+
+            share_msg = ""
+            try:
+                hst_share = (HstShare
+                             .query
+                             .filter(HstShare.id_msgMESSAGE == msgid)
+                             .all())
+                if hst_share:
+                    share_msg = (HistoryManager
+                                 .get_share_message(hst_share[0].type_history,
+                                                    hst_share[0].serialized))
+            except:
+                pass
+
             translate_section = (CFG_TRANSLATE_WEBMESSAGE and
                                  construct_translate_section() or "")
             translate_script = (CFG_TRANSLATE_WEBMESSAGE and
                                  get_translate_script('message') or "")
-            return dict(m=m, display_translate=CFG_TRANSLATE_WEBMESSAGE,
+            return dict(m=m,
+                        share_msg=share_msg,
+                        display_translate=CFG_TRANSLATE_WEBMESSAGE,
                         translate_section=translate_section,
                         translate_script=translate_script)
         except db.sqlalchemy.orm.exc.NoResultFound:
             flash(_('This message does not exist.'), "error")
         except:
             flash(_('Problem with loading message.'), "error")
+        finally:
+            pass
 
     return redirect(url_for('.index'))
 
@@ -266,3 +286,66 @@ def delete_all(confirmed=0):
     else:
         flash(_("Could not empty your mailbox."), "warning")
     return redirect(url_for('.index'))
+
+
+@blueprint.route("/share", methods=['POST'])
+@blueprint.invenio_authenticated
+@blueprint.invenio_authorized('usemessages')
+@blueprint.invenio_wash_urlargd({'history_type': (unicode, None)})
+def share(history_type=None):
+    serialized = request.values.getlist('serialized')
+    errors = []
+    uid = current_user.get_id()
+    form = AddMsgMESSAGEForm(request.values)
+    if form.validate_on_submit():
+        m = MsgMESSAGE()
+        form.populate_obj(m)
+        m.id_user_from = uid
+        m.sent_date = datetime.now()
+        quotas = dbplayer.check_quota(CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES - 1)
+        users = filter(lambda x: x.id in quotas.keys(), m.recipients)
+        #m.recipients = m.recipients.difference(users))
+        for u in users:
+            m.recipients.remove(u)
+        if len(users) > 0:
+            errors.append(_('Following users reached their '
+                            'quota %d messages: %s') % \
+                  (CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES, ', '.join(
+                  [u.nickname for u in users]),))
+        if len(m.recipients) == 0:
+            errors.append(_('Message was not sent'))
+        else:
+            if (m.received_date is not None
+                and m.received_date > datetime.now()):
+
+                for um in m.sent_to_users:
+                    um.status = CFG_WEBMESSAGE_STATUS_CODE['REMINDER']
+            else:
+                m.received_date = datetime.now()
+            try:
+                db.session.add(m)
+                db.session.commit()
+            except:
+                db.session.rollback()
+                errors.append(_("Message was not sent"))
+
+    ret = {}
+    if errors or form.errors:
+        ret['status'] = 0
+        ret['errors'] = {}
+        for error in range(len(errors)):
+            ret['errors'][str(error)] = errors[error]
+        for error in form.errors:
+            ret['errors'][str(error)] = form.errors[error]
+    else:
+        hst_share = HstShare()
+        hst_share.id_msgMESSAGE = m.id
+        hst_share.type_history = history_type
+        hst_share.serialized = serialized
+
+        db.session.add(hst_share)
+        db.session.commit()
+
+        ret['status'] = 1
+
+    return jsonify(**ret)

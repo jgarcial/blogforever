@@ -24,7 +24,10 @@ pylib_DATA = webbasket.py \
              webbasket_templates.py \
              webbasket_user_settings.py \
              webbasket_webinterface.py \
-             webbasket_regression_tests.py
+             webbasket_regression_tests.py \
+             webbasket_creation_history.py \
+             webbasket_note_history.py \
+             webbasket_record_add_history.py
 
 noinst_DATA = webbasket_migration_kit.py
 

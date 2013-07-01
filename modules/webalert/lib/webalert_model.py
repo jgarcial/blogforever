@@ -47,7 +47,7 @@ class UserQueryBasket(db.Model):
                 index=True)
     frequency = db.Column(db.String(5), nullable=False, server_default='',
                 primary_key=True)
-    date_creation = db.Column(db.Date, nullable=True)
+    date_creation = db.Column(db.DateTime, nullable=True)
     date_lastrun = db.Column(db.Date, nullable=True,
                 server_default='1900-01-01')
     alert_name = db.Column(db.String(30), nullable=False,

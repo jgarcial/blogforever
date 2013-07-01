@@ -3244,7 +3244,7 @@ class Template:
         translate_script = ""
         translate_link_section = ""
         if CFG_TRANSLATE_BASKET_COMMENT and notes:
-            translate_section = construct_translate_section("basket_note")
+            translate_section = construct_translate_section()
             translate_script = """
               <!-- start translate script -->
                 <div id="translate_script">
@@ -4092,7 +4092,7 @@ class Template:
         translate_script = ""
         translate_link_section = ""
         if CFG_TRANSLATE_BASKET_COMMENT and notes:
-            translate_section = construct_translate_section("basket_note")
+            translate_section = construct_translate_section()
             translate_script = """
               <!-- start translate script -->
                 <div id="translate_script">

@@ -249,7 +249,9 @@ def index():
         order_middle = dashboard_settings.get('orderMiddle', []) or []
         order_right = dashboard_settings.get('orderRight', []) or []
 
-        extract_plugins = lambda x: [p for p in plugins if p.__class__.__name__ in x if p]
+        extract_plugins = lambda x: [p for p in plugins
+                                     if p.__class__.__name__ in x
+                                     if p]
 
         plugins_left = sorted(extract_plugins(order_left),
                               key=lambda w: plugin_sort(w, order_left))
@@ -261,7 +263,7 @@ def index():
                                                 not p in plugins_middle and
                                                 not p in plugins_right]
     else:
-        slc = len(plugins) / 3 + 1 if len(plugins) % 3 else len(plugins)
+        slc = len(plugins) / 3 + 1 if len(plugins) % 3 else len(plugins) / 3
         plugins = sorted(plugins, key=lambda w: plugin_sort(w, plugins))
         plugins_left = plugins[0:slc]
         plugins_middle = plugins[slc:slc * 2]

@@ -31,7 +31,8 @@ pylib_DATA = webmessage.py \
              webmessage_unit_tests.py \
              webmessage_user_settings.py \
              webmessage_web_tests.py \
-             webmessage_blueprint.py
+             webmessage_blueprint.py \
+             webmessage_history.py
 
 EXTRA_DIST = $(pylib_DATA)
 
