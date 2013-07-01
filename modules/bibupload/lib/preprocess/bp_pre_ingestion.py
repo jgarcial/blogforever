@@ -152,6 +152,17 @@ class MetsIngestion:
             self.marc_record.appendChild(new_node)
 
 
+    def insert_parent_blog_topics(self):
+        """ Inserts the topics of the parent blog. """
+        topics = get_fieldvalues(parent_blog_recid, "654__a")
+        for topic in topics:
+            new_node = self.create_new_field('datafield', tag='654', ind1='', ind2='')
+            sub_node1 = self.create_new_field('subfield', code='a', \
+                                              value=topic)
+            new_node.appendChild(sub_node1)
+            self.marc_record.appendChild(new_node)
+
+
     def insert_parent_blog_visibility(self):
         """ Inserts the visibility of the parent blog. """
 
@@ -371,6 +382,7 @@ class MetsIngestion:
         if self.record_type in ['BLOGPOST', 'COMMENT']:
             self.replace_empty_author()
             self.insert_parent_blog_visibility()
+            self.insert_parent_blog_topics()
 
             if self.record_type == 'BLOGPOST':
                 self.insert_parent_blog_recid()
