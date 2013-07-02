@@ -3,7 +3,7 @@
 include ../../config.mk
 
 bin_SCRIPTS = bloguploader
-EXTRA_DIST = bloguploader.in
+
 
 all:
 	$(foreach SUBDIR, $(SUBDIRS), cd $(SUBDIR) && make all && cd .. ;)
@@ -15,6 +15,6 @@ test:
 	@echo "Done.  Please run make install now."
 
 install:
-	$(INSTALL) $(bin_SCRIPTS) $(BINDIR)/
+	install -g www-data -m 755 $(bin_SCRIPTS) $(BINDIR)
 	$(foreach SUBDIR, $(SUBDIRS), cd $(SUBDIR) && make install && cd .. ;)
 	@echo "Done.  You may want to restart Apache now."

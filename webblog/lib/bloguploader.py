@@ -32,9 +32,9 @@ Blog uploader mode options:
 Examples:
     $ bloguploader -i list_new_blogs.csv
     An example of 'list_new_blogs.csv' is:
-    http://aida.jiscinvolve.org/,aida,topic1,license1
-    http://vibel.jiscinvolve.org/,vibel,topic1,license1
-    http://astrodabis.jiscinvolve.org/wp/,astrodabis,topic1,license2
+    http://aida.jiscinvolve.org/,aida,topic1,visibility1
+    http://vibel.jiscinvolve.org/,vibel,topic1-topic2,visibility1
+    http://astrodabis.jiscinvolve.org/wp/,,topic1,visibility2
 
     $ bloguploader -d list_blogs_to_delete.csv
     An example of 'list_blogs_to_delete.csv' is:
@@ -42,9 +42,10 @@ Examples:
     http://vibel.jiscinvolve.org/
 
     $ bloguploader -U list_blogs_to_update.csv
-    An example of 'list_blogs_to_update.csv' is:
-    http://aida.jiscinvolve.org/,Aida_update,topic3,license3
-    http://astrodabis.jiscinvolve.org/wp/,Astrodabis,trinity,topic3,license3
+    An example of 'list_blogs_to_update.csv' is (you need to specify all the fields, also
+    those that you do not want to update):
+    http://aida.jiscinvolve.org/,Aida_update,topic3,visibility3
+    http://astrodabis.jiscinvolve.org/wp/,Astrodabis,trinity,topic3,visibility3
 
 """
 
@@ -53,12 +54,13 @@ __revision__ = "$Id$"
 import csv
 import os
 import time
+from invenio.config import CFG_BLOG_TOPICS, CFG_BLOG_VISIBILITY, CFG_TMPDIR
 from invenio.bibtask import task_init, task_update_progress, write_message, \
     fix_argv_paths, task_low_level_submission, task_get_option, task_set_option
 from invenio.webblog_utils import get_blog_descendants
 from invenio.webbasket import url_is_valid
 from invenio.search_engine_utils import get_fieldvalues
-from invenio.search_engine import perform_request_search
+from invenio.search_engine import search_pattern
 
 
 def _write_xml_file(blogs_xml, mode):
@@ -72,7 +74,7 @@ def _write_xml_file(blogs_xml, mode):
     @rtype: xml file
     """
 
-    file_path = '/tmp/blogs_to_%s_%s.xml' % (mode, time.strftime("%Y%m%d_%H%M%S"))
+    file_path = CFG_TMPDIR + '/blogs_to_%s_%s.xml' % (mode, time.strftime("%Y%m%d_%H%M%S"))
     xml_file = open(file_path, 'w')
     xml_file.write(blogs_xml.encode('utf-8'))
     xml_file.close()
@@ -88,21 +90,38 @@ def _topic_is_valid(topic):
     @rtype: boolean
     """
     
-    valid_topics = ["topic1", "topic2", "topic3"]
+    valid_topics = CFG_BLOG_TOPICS.split(",")
     return topic in valid_topics
 
 
-def _license_is_valid(license):
+def _visibility_is_valid(visibility):
     """
-    @param license: blog license
-    @type license: string
-    @return: True if the given license is valid, otherwise
+    @param visibility: blog visibility
+    @type visibility: string
+    @return: True if the given visibility is valid, otherwise
     returns False
     @rtype: boolean
     """
 
-    valid_licenses = ["license1", "license2", "license3"]
-    return license in valid_licenses
+    valid_visibility = CFG_BLOG_VISIBILITY.split(",")
+    valid_visibility_names = [v.split(" -")[0] for v in valid_visibility]
+    return visibility in valid_visibility_names
+
+
+def _url_exists(url):
+    """
+    @param url: blog visibility
+    @type url: string
+    @return: True if the given url is already registered
+    in the database, otherwise returns False
+    @rtype: boolean
+    """
+
+    recid = search_pattern(p = '520__u:"%s"' % url)
+    if recid:
+        return True
+    else:
+        return False
 
 
 def _get_records_to_delete(blog_list):
@@ -119,7 +138,7 @@ def _get_records_to_delete(blog_list):
     for blog in blog_list:
         blog_url = blog[0]
         # search for the recid of the blog we want to delete
-        list_recid = perform_request_search(p='520__u:"%s"' % blog_url)
+        list_recid = search_pattern(p='520__u:"%s"' % blog_url)
         if list_recid:
             blog_recid = list_recid[0]
             # search for all the children recid's
@@ -155,10 +174,12 @@ def _create_marcxml_footer(marcxml_output):
     return marcxml_output
 
 
-def _create_marcxml_record_template(mode):
+def _create_marcxml_record_template(mode, topics=[]):
     """
     @param mode: insert, delete or update
     @type mode: string
+    @param topics: list of blog topics
+    @type topics: list
     @return: the marcxml template for a record which 
     will be different depending on the input mode
     @rtype: string
@@ -180,17 +201,20 @@ def _create_marcxml_record_template(mode):
         <datafield tag="980" ind1=" " ind2=" ">
             <subfield code="a">%(coll)s</subfield>
         </datafield>"""
-        
+
         record_template += """
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">%(title)s</subfield>
         </datafield>
         <datafield tag="542" ind1="" ind2="">
-            <subfield code="a">%(license)s</subfield>
-        </datafield>
-        <datafield tag="654" ind1="" ind2="">
-            <subfield code="a">%(topic)s</subfield>
+            <subfield code="a">%(visibility)s</subfield>
         </datafield>"""
+
+        for topic in topics:
+           record_template += """
+            <datafield tag="654" ind1="" ind2="">
+                <subfield code="a">%s</subfield>
+            </datafield>""" % topic
 
     elif mode == "delete":
         record_template += """
@@ -219,39 +243,39 @@ def _transform_bloglist_to_marcxml(blog_list, mode):
     """
 
     marcxml_output = _create_marcxml_header()
-    record_template = _create_marcxml_record_template(mode)
 
     if mode == "insert":
         for blog in blog_list:
             blog_url = blog[0]
             blog_title = blog[1]
-            blog_topic = blog[2]
-            blog_license = blog[3]
-            record = record_template % {'coll': 'INITIALBLOG',
+            blog_topics = blog[2].split("-")
+            blog_visibility = blog[3]
+            record_template = _create_marcxml_record_template("insert", blog_topics)
+            record = record_template % {'coll': 'BLOG',
                                         'title': blog_title,
                                         'url': blog_url,
-                                        'topic': blog_topic,
-                                        'license': blog_license}
+                                        'visibility': blog_visibility}
             marcxml_output += record
 
     elif mode == "update":
         for blog in blog_list:
             blog_url = blog[0]
             blog_title = blog[1]
-            blog_topic = blog[2]
-            blog_license = blog[3]
-            list_recid = perform_request_search(p='520__u:"%s"' % blog_url)
+            blog_topics = blog[2].split("-")
+            blog_visibility = blog[3]
+            record_template = _create_marcxml_record_template("update", blog_topics)
+            list_recid = search_pattern(p='520__u:"%s"' % blog_url)
             if list_recid:
                 blog_recid = list_recid[0]
                 record = record_template % {'recid': blog_recid,
                                             'title': blog_title,
-                                            'topic': blog_topic,
-                                            'license': blog_license}
+                                            'visibility': blog_visibility}
                 marcxml_output += record
             else:
                 raise Exception("Blog with the url '" + str(blog_url) + "' does not seem to exist in the archive")
 
     elif mode == "delete":
+        record_template = _create_marcxml_record_template("delete")
         for recid in blog_list:
             record = record_template % {'recid': recid}
             marcxml_output += record
@@ -278,17 +302,23 @@ def _check_input_blogs(blog_list, mode):
     if mode in ["insert", "update"]:
         for blog in blog_list:
             if len(blog) == 4:
+                # check if the given url is already in the database
+                if mode in ["insert"]:
+                    if _url_exists(blog[0]):
+                        result += "The given url '%s' already exists in the database. \n" % blog[0]
                 if not url_is_valid(blog[0])[0]:
                     result += "The given url '%s' is not valid. \n" % blog[0]
                 # blog[1] is not mandatory
-                if not _topic_is_valid(blog[2]):
-                    result += "The given topic '%s' is not valid. \n" % blog[2]
+                topics = blog[2].split("-")
+                for topic in topics:
+                    if not _topic_is_valid(topic):
+                        result += "The given topic '%s' is not valid. \n" % topic
 
-                if not _license_is_valid(blog[3]):
-                    result += "The given license '%s' is not valid. \n" % blog[3]
+                if not _visibility_is_valid(blog[3]):
+                    result += "The given visibility '%s' is not valid. \n" % blog[3]
             else:
-                write_message("Please check that the given file follows the established format: 'blog_url,[blog_name],blog_topic,blog_license'.")
-                raise Exception("Please check that the given file follows the established format: 'blog_url,[blog_name],blog_topic,blog_license'.")
+                write_message("Please check that the given file follows the established format: 'blog_url,[blog_name],blog_topic1[-blog_topic2],blog_visibility'.")
+                raise Exception("Please check that the given file follows the established format: 'blog_url,[blog_name],blog_topic1[-blog_topic2],blog_visibility'.")
 
     elif mode == "delete":
         for blog in blog_list:
@@ -316,8 +346,8 @@ def _get_blog_list(file_path):
     @rtype: list of lists
     E.g:
     if "insert" or "update":
-    blog_list = [['http://blogforever.eu', 'BlogForever', 'topic1', 'license1'], 
-                ['http://phys.org/', 'Phys', 'topic2', 'license2']]
+    blog_list = [['http://blogforever.eu', 'BlogForever', 'topic1-topic2', 'visibility1'], 
+                ['http://phys.org/', 'Phys', 'topic1', 'visibility2']]
     if "delete":
     blog_list = [['http://blogforever.eu'], [http://phys.org/]]
     """
@@ -333,10 +363,10 @@ def _update_blogs(file_path):
     """
     @param file_path: file containing the list of blogs to update
     in the archive. Each blog is represented by its url, [title],
-    topic and license.
+    topic and visibility.
     E.g: "blogs_to_update.csv"
-    http://blogforever.eu,BlogForever,topic2,license2
-    http://blogs.physicstoday.org/,Physicstoday,topic1,license2
+    http://blogforever.eu,BlogForever,topic2,visibility2
+    http://blogs.physicstoday.org/,Physicstoday,topic1,visibility2
     @type file_path: it is a csv file where the elements of
     each row (blog elements) are separated by commas.
     """
@@ -389,10 +419,11 @@ def _insert_blogs(file_path):
     """
     @param file_path: file containing the list of blogs to insert
     in the archive. Each blog is represented by its url, [title],
-    topic and license.
+    topic/s and visibility.
     E.g: "blogs_to_insert.csv"
-    http://blogforever.eu,BlogForever,topic1,license1
-    http://blogs.physicstoday.org/,Physicstoday,topic1,license3
+    http://blogforever.eu,BlogForever,topic1-topic2,visibility1
+    http://blogs.physicstoday.org/,Physicstoday,topic1,visibility3
+    http://www.chemweek.com/chem_ideas/,,topic1,visibility2
     @type file_path: it is a csv file where the elements of
     each row (blog elements) are separated by commas.
     """
