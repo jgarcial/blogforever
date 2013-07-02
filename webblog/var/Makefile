@@ -3,6 +3,7 @@
 include ../../config.mk
 
 JSFILES = *.js
+
 all:
 	@echo "Done."
 

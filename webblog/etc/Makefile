@@ -3,9 +3,9 @@
 include ../../config.mk
 
 BFTFILES = *.bft
-#XSLFILES = *.xsl
 BFTDIR = $(ETCDIR)/bibformat/format_templates
 SUBDIRS = output_formats templates
+
 all:
 	@echo "Done."
 
@@ -14,5 +14,4 @@ test:
 
 install:
 	$(INSTALL) -m 664 $(BFTFILES) $(BFTDIR)
-#        $(INSTALL) -m 664 $(XSLFILES) $(BFTDIR)
 	$(foreach SUBDIR, $(SUBDIRS), cd $(SUBDIR) && make install && cd .. ;)

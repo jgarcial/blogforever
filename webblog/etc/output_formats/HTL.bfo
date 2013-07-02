@@ -1,5 +1,7 @@
 tag 980.a:
-BLOG --- Blog_HTML_brief.bft
-COMMENT --- Comment_HTML_brief.bft
-BLOGPOST --- Post_HTML_brief.bft
+BLOG --- Blog_HTML_brief.tpl
+COMMENT --- Comment_HTML_brief.tpl
+BLOGPOST --- Post_HTML_brief.tpl
+PROVBLOG --- Blog_HTML_brief.tpl
+REJBLOG --- Blog_HTML_brief.tpl
 default: Default_HTML_brief.bft

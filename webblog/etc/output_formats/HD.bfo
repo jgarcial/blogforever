@@ -3,3 +3,4 @@ BLOG --- BlogHTML.tpl
 BLOGPOST --- PostHTML.tpl
 COMMENT --- CommentHTML.tpl
 PROVBLOG --- BlogHTML.tpl
+REJBLOG --- Blog_HTML.tpl
