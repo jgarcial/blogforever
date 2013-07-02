@@ -76,7 +76,7 @@ try:
     from invenio.websearch_webinterface import WebInterfaceSRUServicePages
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
-    WebInterfaceSRUServicePages = WebInterfaceDumpPages
+    WebInterfaceSRUServicePages = WebInterfaceDumbPages
 
 try:
     from invenio.websearch_webinterface import WebInterfaceUnAPIPages

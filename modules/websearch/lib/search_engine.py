@@ -120,6 +120,7 @@ from invenio.textutils import encode_for_xml, wash_for_utf8, strip_accents
 from invenio.htmlutils import get_mathjax_header
 from invenio.htmlutils import nmtoken_from_string
 
+
 import invenio.template
 webstyle_templates = invenio.template.load('webstyle')
 webcomment_templates = invenio.template.load('webcomment')
@@ -5585,6 +5586,61 @@ def prs_browse(kwargs=None, req=None, of=None, cc=None, aas=None, ln=None, uid=N
             print_records_epilogue(req, of)
         return page_end(req, of, ln, em)
 
+def blog_extend_bibrank(rank_method_code, rank_limit_relevance, hitset_global, pattern=[], verbose=0, field='', rg=None, jrec=None):
+    from invenio.webblog_utils import get_posts, get_parent_blog, get_post_tags
+    if pattern[0][0:6] == "recid:" and get_fieldvalues(pattern[0][6:], "980__a")[0] == "BLOG":
+	blog_recid = int(pattern[0][6:])
+	posts = get_posts(blog_recid)
+	sums = {}
+	if rank_method_code == 'tag':
+	    total = 0
+	    for post in posts:
+	        tags = get_post_tags(post)
+	        total = total + len(tags)
+	        for tag in tags:
+	    	    p = '653__1:"%s"' % tag
+		    results = perform_request_search(cc="Posts", p=p)
+		    #results = set(results) - set(posts)
+		    for recid in results:
+		        if recid in sums.keys():
+		            sums[recid] = sums[recid] + 1
+			else:
+			    sums[recid] = 1
+	    
+	else:
+	    hitset_global = get_collection_reclist("Posts")
+            for post in posts:
+		results = rank_records_bibrank('wrd', None, hitset_global, ['recid:%s' % post]) 
+		if results[0] is not None:
+	            for recid, score in zip(results[0], results[1]):
+		        if recid in sums.keys():
+		            sums[recid] = sums[recid] + score
+		        else:
+		            sums[recid] = score
+		
+	# group results
+	blogs = {}
+	for post, score in sums.items():
+	    b = get_parent_blog(post)
+	    if b is not None:
+	        if b in blogs.keys():
+		    blogs[b] = blogs[b] + score
+	        else:
+		    blogs[b] = score
+
+	if rank_method_code == 'wrd':
+	    total = blogs[blog_recid]
+
+        blogs = [ (recid, score*100/total) for recid, score in blogs.items()]
+	blogs.sort(key=lambda x: x[1])
+	
+	return ([x[0] for x in blogs], [min(x[1], 100) for x in blogs], '(', ')', "")
+	
+	
+    else:
+	return rank_records_bibrank(rank_method_code, rank_limit_relevance, hitset_global, pattern, verbose, field, rg, jrec)
+	
+
 
 def prs_search_similar_records(kwargs=None, req=None, of=None, cc=None, pl_in_url=None, ln=None, uid=None, _=None, p=None,
                     p1=None, p2=None, p3=None, colls_to_display=None, f=None, rg=None, sf=None,
@@ -5618,7 +5674,8 @@ def prs_search_similar_records(kwargs=None, req=None, of=None, cc=None, pl_in_ur
         # record well exists, so find similar ones to it
         t1 = os.times()[4]
         results_similar_recIDs, results_similar_relevances, results_similar_relevances_prologue, results_similar_relevances_epilogue, results_similar_comments = \
-                                rank_records_bibrank(rm, 0, get_collection_reclist(cc), string.split(p), verbose, f, rg, jrec)
+		blog_extend_bibrank(rm, 0, get_collection_reclist(cc), string.split(p), verbose, f, rg, jrec)
+                #rank_records_bibrank(rm, 0, get_collection_reclist(cc), string.split(p), verbose, f, rg, jrec)
         if results_similar_recIDs:
             t2 = os.times()[4]
             cpu_time = t2 - t1
