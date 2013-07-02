@@ -1,9 +1,35 @@
-{% extends "page.html" %} {% from "webpayment_packages.html" import
-webpayment_packages_body %} {% from "webpayment_packages.html" import
-webpayment_packages_css %} {% from "webpayment_packages.html" import
-webpayment_packages_javascript %} {% block css %} {{
-webpayment_packages_css() }} {% endblock %} {% block javascript %} {{
-webpayment_packages_javascript() }} {% endblock %} {% block body %}
+{#
+## This file is part of Invenio.
+## Copyright (C) 2013 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+{% extends "page.html" %}
+
+{% from "webpayment_packages.html" import webpayment_packages_body %}
+{% from "webpayment_packages.html" import webpayment_packages_css %}
+{% from "webpayment_packages.html" import webpayment_packages_javascript %}
+{% block css %}
+	{{ webpayment_packages_css() }}
+{% endblock %}
+
+{% block javascript %}
+	{{ webpayment_packages_javascript() }}
+{% endblock %}
+
+{% block body %}
 <div class="page-header">
 	<h1>{{_('Your Premium Memberships')}}</h1>
 </div>
@@ -21,28 +47,32 @@ webpayment_packages_javascript() }} {% endblock %} {% block body %}
 			{%- for id_collection in user_memberships.keys()-%}
 			<tr>
 				<td>{{user_memberships[id_collection]['collection_name']}}</td>
-				<td>{%- if user_memberships[id_collection]['has_purchased']-%}
-					{%- if user_memberships[id_collection]['is_expired'] -%} {{_('Your
-					membership is expired!')}} {%- elif
-					str(user_memberships[id_collection]['expiration_date']) !=
-					"9999-12-31 23:59:59" -%} {{_('Your membership will be expired
-					in')}} {{user_memberships[id_collection]['expiration_date']}} {%-
-					else -%} {{_('You have lifetime premium membership.')}} {%-endif-%}
-					{%- else -%} {{_('You don\'t have any premium membership to
-					display!')}} {%- endif -%}</td>
+				<td>
+				{%- if user_memberships[id_collection]['has_purchased']-%}
+					{%- if user_memberships[id_collection]['is_expired'] -%}
+						{{_('Your membership is expired!')}}
+					{%- elif str(user_memberships[id_collection]['expiration_date']) != "9999-12-31 23:59:59" -%}
+					{{_('Your membership will be expired in')}} {{user_memberships[id_collection]['expiration_date']}}
+					{%- else -%}
+						{{_('You have lifetime premium membership.')}}
+					{%-endif-%}
+				{%- else -%}
+					{{_('You don\'t have any premium membership to display!')}}
+				{%- endif -%}
+				</td>
 				<td><a
-					href="{{url_for('webpayment.display', collection_id=id_collection)}}">{%-
-						if user_memberships[id_collection]['has_purchased'] and
-						str(user_memberships[id_collection]['expiration_date']) !=
-						"9999-12-31 23:59:59" -%}{{_('Extend your membership!')}}{%-elif
-						not user_memberships[id_collection]['has_purchased']-%}{{_('Buy a
-						premium package')}}{%-endif-%}</a></td>
+					href="{{url_for('webpayment.display', collection_id=id_collection)}}">
+					{%- if user_memberships[id_collection]['has_purchased'] 
+						and str(user_memberships[id_collection]['expiration_date']) != "9999-12-31 23:59:59" -%}
+						{{_('Extend your membership!')}}
+					{%-elif not user_memberships[id_collection]['has_purchased']-%}
+						{{_('Buy a premium package')}}
+					{%-endif-%}</a></td>
 			</tr>
 			{%- endfor -%}
 		</tbody>
 	</table>
 	<legend>{{_('Available premium packages:')}}</legend>
-	{{ webpayment_packages_body(premium_packages, payment_methods,
-	package_collection_map, duration_formatter, _) }}
+	{{ webpayment_packages_body(premium_packages, payment_methods, package_collection_map, duration_formatter, _) }}
 </fieldset>
 {% endblock %}

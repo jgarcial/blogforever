@@ -49,6 +49,7 @@ from invenio.webpayment_query import get_premium_package
 from invenio.webpayment_query import get_premium_restricted_collections
 from invenio.websearch_model import Collection
 from invenio.webuser_flask import current_user
+from urllib2 import URLError
 
 blueprint = InvenioBlueprint('webpayment',
                              __name__,
@@ -57,9 +58,12 @@ blueprint = InvenioBlueprint('webpayment',
                                            'youraccount.display'),
                                           ('Your Premium Memberships',
                                            'webpayment.display')],
-                             menubuilder= CFG_PREMIUM_SERVICE and [('personalize.webpayment',
+                             menubuilder=(CFG_PREMIUM_SERVICE
+                                          and
+                                          [('personalize.webpayment',
                                           _('Your premium memberships'),
-                                          'webpayment.index', 20)] or None)
+                                          'webpayment.index', 20)]
+                                          or None))
 
 
 def duration_formatter(x):
@@ -199,23 +203,34 @@ def upgrade(payment_method, id_package):
         else:
             uid = current_user.get_id()
             payment_gateway = CFG_PAYMENT_METHODS['cc'](credit_card_form=form)
-            result = payment_gateway.process()
-            if result['success']:
-                payment_gateway.complete_payment(uid, "Credit Card")
-                flash(_(CFG_WEBPAYMENT_MSGS[1])
-                      % str(result['id_transaction']),
-                      "info")
+            try:
+                result = payment_gateway.process()
+                if result['success']:
+                    payment_gateway.complete_payment(uid, "Credit Card")
+                    flash(_(CFG_WEBPAYMENT_MSGS[1])
+                          % str(result['id_transaction']),
+                          "info")
+                    return redirect(url_for('webpayment.index'))
+                else:
+                    return dict(duration_formatter=duration_formatter,
+                                premium_package=premium_package,
+                                form=form,
+                                error_messages=result["error_messages"],
+                                restricted_collections=restricted_collections)
+            except URLError:
+                flash(_("Payment gateway cannot be reached at the moment, "
+                    "please try again later."), "error")
                 return redirect(url_for('webpayment.index'))
-            else:
-                return dict(duration_formatter=duration_formatter,
-                            premium_package=premium_package,
-                            form=form,
-                            error_messages=result["error_messages"],
-                            restricted_collections=restricted_collections)
     else:
         payment_gateway = CFG_PAYMENT_METHODS[payment_method](form=request
                                                               .values)
-        res = payment_gateway.construct_checkout_url()
+        try:
+            res = payment_gateway.construct_checkout_url()
+        except URLError:
+            flash(_("%s cannot be reached at the moment, "
+                    "please try again later.") % payment_method, "error")
+            return redirect(url_for('webpayment.index'))
+
         return redirect(res['data'])
 
 

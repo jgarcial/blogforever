@@ -35,37 +35,29 @@ class PayPal(PaymentGateway):
     """
     name = "Paypal"
 
+    #: The prefix of the error codes of the data returned from paypal api.
+    #:
+    #: @type: str
     ERRORCODE_PREFIX = "L_ERRORCODE"
-    """
-    The prefix of the error codes of the data returned from paypal api.
 
-    @type: str
-    """
-
+    #: The prefix of the error messages of the data returned from paypal api.
+    #:
+    #: @type: str
     MESSAGE_PREFIX = "L_LONGMESSAGE"
-    """
-    The prefix of the error messages of the data returned from paypal api.
-
-    @type: str
-    """
 
     TEST_SERVER = "https://api-3t.sandbox.paypal.com/nvp"
     SERVER = "https://api-3t.paypal.com/nvp"
 
+    #: The test url of express checkout api.
+    #:
+    #: @type: str
     PAYPAL_EXPRESS_CHECKOUT_TEST = ("https://www.sandbox.paypal.com/cgi-bin/"
                                     "webscr")
-    """
-    The test url of express checkout api.
 
-    @type: str
-    """
-
+    #: The url of express checkout api.
+    #:
+    #: @type: str
     PAYPAL_EXPRESS_CHECKOUT = "https://www.paypal.com/cgi-bin/webscr"
-    """
-    The url of express checkout api.
-
-    @type: str
-    """
 
     _button_img = CFG_SITE_SECURE_URL + "/img/paypal_checkout.gif"
 

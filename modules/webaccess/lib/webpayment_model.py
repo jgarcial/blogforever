@@ -41,68 +41,63 @@ class Premium(db.Model):
     """
 
     __table_name__ = 'premium'
-    """@type: str"""
 
+    #: @type: L{Column}
     id = db.Column(db.Integer(11, unsigned=False),
                    nullable=False,
                    primary_key=True)
-    """@type: L{Column}"""
 
+    #: @type: L{Column}
     name = db.Column(db.String(256),
                      nullable=False)
-    """@type: L{Column}"""
 
+    #: @type: L{Column}
     details = db.Column(db.Text,
                         nullable=False)
-    """@type: L{Column}"""
 
+    #: @type: L{Column}
     duration = db.Column(db.Integer(11, unsigned=True),
                          nullable=False)
-    """@type: L{Column}"""
 
+    #: @type: L{Column}
     unit_time = db.Column(db.Enum('HOUR', 'DAY', 'WEEK', 'MONTH', 'YEAR',
                                   'UNLIMITED'),
                           nullable=False)
-    """@type: L{Column}"""
 
+    #: @type: L{Column}
     price = db.Column(db.Float(2),
                       nullable=False)
-    """@type: L{Column}"""
 
+    #: The curreny of the price of the premium package.
+    #:
+    #: B{Supported currencies:}
+    #:     - CAD: Canadian Dollar
+    #:     - CZK: Czech Koruna
+    #:     - DKK: Danish Krone
+    #:     - EUR: Euro
+    #:     - HKD: Hong Kong Dollar
+    #:     - HUF: Hungarian Forint
+    #:     - JPY: Japanese Yen
+    #:     - NOK: Norwegian Krone
+    #:     - NZD: New Zealand Dollar
+    #:     - PLN: Polish Zloty
+    #:     - GBP: British Pound
+    #:     - SGD: Singapore Dollar
+    #:     - SEK: Swedish Krona
+    #:     - CHF: Swiss Franc
+    #:     - USD: US Dollar
+    #:
+    #: @type: L{Column}
     currency = db.Column(db.Enum('AUD', 'CAD', 'CZK', 'DKK', 'EUR', 'HKD',
                                  'HUF', 'JPY', 'NOK', 'NZD', 'PLN', 'GBP',
                                  'SGD', 'SEK', 'CHF', 'USD'),
                          nullable=False)
-    """
-    The curreny of the price of the premium package.
 
-    B{Supported currencies:}
-        - CAD: Canadian Dollar
-        - CZK: Czech Koruna
-        - DKK: Danish Krone
-        - EUR: Euro
-        - HKD: Hong Kong Dollar
-        - HUF: Hungarian Forint
-        - JPY: Japanese Yen
-        - NOK: Norwegian Krone
-        - NZD: New Zealand Dollar
-        - PLN: Polish Zloty
-        - GBP: British Pound
-        - SGD: Singapore Dollar
-        - SEK: Swedish Krona
-        - CHF: Swiss Franc
-        - USD: US Dollar
-
-    @type: L{Column}
-    """
-
+    #: The display order of the premium package in the web interface.
+    #:
+    #: @type: L{Column}
     ord = db.Column(db.Integer(11),
                     nullable=False)
-    """
-    The display order of the premium package in the web interface.
-
-    @type: L{Column}
-    """
 
 
 class HstPAYMENT(db.Model):
@@ -118,46 +113,45 @@ class HstPAYMENT(db.Model):
         - Transaction ID (token)
     """
     __table_name__ = 'hstPAYMENT'
+
+    #: @type: L{Column}
     id = db.Column(db.Integer(11, unsigned=False),
                    nullable=False,
                    primary_key=True)
-    """@type: L{Column}"""
 
+    #: @type: L{Column}
     id_user = db.Column(db.Integer(11, unsigned=True),
                         db.ForeignKey(User.id),
                         nullable=False)
-    """@type: L{Column}"""
 
+    #: @type: L{Column}
     id_package = db.Column(db.Integer(11, unsigned=True),
                            db.ForeignKey(Premium.id),
                            nullable=False)
-    """@type: L{Column}"""
 
+    #: @type: L{Column}
     price = db.Column(db.Float(2),
                       nullable=False)
-    """@type: L{Column}"""
 
+    #: @type: L{Column}
     currency = db.Column(db.Enum('AUD', 'CAD', 'CZK', 'DKK', 'EUR', 'HKD',
                                  'HUF', 'JPY', 'NOK', 'NZD', 'PLN', 'GBP',
                                  'SGD', 'SEK', 'CHF', 'USD'),
                          nullable=False)
-    """@type: L{Column}"""
 
+    #: @type: L{Column}
     transaction_time = db.Column(db.DateTime(),
                                  nullable=False)
-    """@type: L{Column}"""
 
+    #: @type: L{Column}
     payment_method = db.Column(db.String(256),
                                nullable=False)
-    """@type: L{Column}"""
 
+    #: The token returned from payment gateway.
+    #:
+    #: @type: L{Column}
     token = db.Column(db.String(256),
                       nullable=False)
-    """
-    The token returned from payment gateway.
-
-    @type: L{Column}
-    """
 
 
 class PremiumCollection(db.Model):
@@ -168,17 +162,18 @@ class PremiumCollection(db.Model):
     display which collections.
     """
     __table_name__ = 'premium_collection'
+
+    #: @type: L{Column}
     id_package = db.Column(db.Integer(11, unsigned=False),
                            db.ForeignKey(Premium.id),
                            nullable=False,
                            primary_key=True)
-    """@type: L{Column}"""
 
+    #: @type: L{Column}
     id_collection = db.Column(db.Integer(11, unsigned=False),
                               db.ForeignKey(Collection.id),
                               nullable=False,
                               primary_key=True)
-    """@type: L{Column}"""
 
 
 class CollectionAccROLE(db.Model):
@@ -189,20 +184,21 @@ class CollectionAccROLE(db.Model):
     user role.
     """
     __table_name__ = 'collection_accROLE'
+
+    #: @type: L{Column}
     id_collection = db.Column(db.Integer(11, unsigned=False),
                               db.ForeignKey(Collection.id),
                               nullable=False,
                               primary_key=True)
-    """@type: L{Column}"""
 
+    #: @type: L{Column}
     id_accROLE = db.Column(db.Integer(11, unsigned=False),
                            db.ForeignKey(AccROLE.id),
                            nullable=False,
                            primary_key=True)
-    """@type: L{Column}"""
 
+    #: @type: L{RelationshipProperty}
     role = db.relationship(AccROLE, backref='collections')
-    """@type: L{RelationshipProperty}"""
 
 
 __all__ = ['Premium',

@@ -229,43 +229,37 @@ class PremiumPackageForm(InvenioBaseForm):
     Form to manage premium packages.
     """
 
+    #: The name of the premium package.
+    #:
+    #: B{Validators:}
+    #:     - Max length is 256 characters.
+    #:
+    #: @type: L{TextField}
     name = TextField(label=_("Name"),
                      validators=(validate_length(256),
                                  Required(message=_(u'Please give a '
                                                     'valid name.'))))
-    """
-    The name of the premium package.
 
-    B{Validators:}
-        - Max length is 256 characters.
-
-    @type: L{TextField}
-    """
-
+    #: Details of the premium package.
+    #:
+    #: B{Validators:}
+    #:     - Max length is 65536 characters.
+    #:
+    #: @type: L{TextAreaField}
     details = TextAreaField(label=_("Details"),
                             validators=(validate_length(65536),
                                         Required(message=_(u'Please give a '
                                                            'valid description.'
                                                            ))))
-    """
-    Details of the premium package.
 
-    B{Validators:}
-        - Max length is 65536 characters.
-
-    @type: L{TextAreaField}
-    """
-
+    #: The duration of the premium package.
+    #:
+    #: B{Filters:}
+    #:     - L{integer_filter}
+    #:
+    #: @type: L{TextField}
     duration = TextField(label=_("Duration"),
                          filters=(integer_filter,))
-    """
-    The duration of the premium package.
-
-    B{Filters:}
-        - L{integer_filter}
-
-    @type: L{TextField}
-    """
 
     def validate_duration(self, field):
         """
@@ -277,38 +271,55 @@ class PremiumPackageForm(InvenioBaseForm):
         if not field.data and self.unit_time.data != 'Unlimited':
             raise ValidationError(_("Please give a valid number"))
 
+    #: The unit time of the duration of the premium package.
+    #:
+    #: B{Choices:}
+    #:     - Hour
+    #:     - Day
+    #:     - Week
+    #:     - Month
+    #:     - Year
+    #:     - Unlimited
+    #:
+    #: @type: L{SelectField}
     unit_time = SelectField(choices=(("Hour", _("Hour")),
                                      ("Day", _("Day")),
                                      ("Week", _("Week")),
                                      ("Month", _("Month")),
                                      ("Year", _("Year")),
                                      ("Unlimited", _("Unlimited"))))
-    """
-    The unit time of the duration of the premium package.
 
-    B{Choices:}
-        - Hour
-        - Day
-        - Week
-        - Month
-        - Year
-        - Unlimited
-
-    @type: L{SelectField}
-    """
-
+    #: The price of the premium package.
+    #:
+    #: B{Filters:}
+    #:     - L{float_filter}
+    #:
+    #: @type: L{TextField}
     price = TextField(label=_("Price"),
                       filters=(float_filter,),
                       validators=(Required(message=_(u'Please give a valid '
                                                      'number.')),))
-    """
-    The price of the premium package.
 
-    B{Filters:}
-        - L{float_filter}
-
-    @type: L{TextField}
-    """
+    #: The currency of the price of the premium package.
+    #:
+    #: B{Choices:}
+    #:     - CAD: Canadian Dollar
+    #:     - CZK: Czech Koruna
+    #:     - DKK: Danish Krone
+    #:     - EUR: Euro
+    #:     - HKD: Hong Kong Dollar
+    #:     - HUF: Hungarian Forint
+    #:     - JPY: Japanese Yen
+    #:     - NOK: Norwegian Krone
+    #:     - NZD: New Zealand Dollar
+    #:     - PLN: Polish Zloty
+    #:     - GBP: British Pound
+    #:     - SGD: Singapore Dollar
+    #:     - SEK: Swedish Krona
+    #:     - CHF: Swiss Franc
+    #:     - USD: US Dollar
+    #:
+    #: @type: L{SelectField}
     currency = SelectField(choices=(("CAD", _("CAD")),
                                     ("CZK", _("CZK")),
                                     ("DKK", _("DKK")),
@@ -325,58 +336,29 @@ class PremiumPackageForm(InvenioBaseForm):
                                     ("CHF", _("CHF")),
                                     ("USD", _("USD"))),
                            default="EUR")
-    """
-    The currency of the price of the premium package.
 
-    B{Choices:}
-        - CAD: Canadian Dollar
-        - CZK: Czech Koruna
-        - DKK: Danish Krone
-        - EUR: Euro
-        - HKD: Hong Kong Dollar
-        - HUF: Hungarian Forint
-        - JPY: Japanese Yen
-        - NOK: Norwegian Krone
-        - NZD: New Zealand Dollar
-        - PLN: Polish Zloty
-        - GBP: British Pound
-        - SGD: Singapore Dollar
-        - SEK: Swedish Krona
-        - CHF: Swiss Franc
-        - USD: US Dollar
-
-    @type: L{SelectField}
-    """
-
+    #: List of the collections that are able to be restricted.
+    #:
+    #: @type: L{CollectionListField}
     collection_list = CollectionListField(label=_("Collections"))
-    """
-    List of the collections that are able to be restricted.
 
-    @type: L{CollectionListField}
-    """
-
+    #: List of the IDs of the collections that are selected to be restricted.
+    #:
+    #: B{Filters:}
+    #:     - L{extract_list_values}
+    #:
+    #: B{Validators:}
+    #:     - L{validate_collections}
+    #:
+    #: @type: L{HiddenField}
     collections = HiddenField(filters=(extract_list_values,),
                               validators=(validate_collections,))
-    """
-    List of the IDs of the collections that are selected to be restricted.
 
-    B{Filters:}
-        - L{extract_list_values}
-
-    B{Validators:}
-        - L{validate_collections}
-
-    @type: L{HiddenField}
-    """
-
+    #: The ID of the existing premium package wanted to be edited.
+    #: If the form is used to create new one, the id is not required.
+    #:
+    #: @type: L{HiddenField}
     package_id = HiddenField()
-    """
-    The ID of the existing premium package wanted to be edited.
-
-    If the form is used to create new one, the id is not required.
-
-    @type: L{HiddenField}
-    """
 
 
 class GiftPremiumPackageForm(InvenioBaseForm):
@@ -384,26 +366,22 @@ class GiftPremiumPackageForm(InvenioBaseForm):
     Form to give a premium package to a user.
     """
 
+    #: The username of the lucky user.
+    #:
+    #: B{Validators:}
+    #:     - L{validate_username}
+    #:
+    #: @type: L{TextField}
     username = TextField(label=_("User Name"), validators=(validate_username,))
-    """
-    The username of the lucky user.
 
-    B{Validators:}
-        - L{validate_username}
-
-    @type: L{TextField}
-    """
-
+    #: The list of the premium packages.
+    #:
+    #: B{Choices:}
+    #:     - All of the premium packages
+    #:
+    #: @type: L{PremiumPackageListField}
     premium_package = PremiumPackageListField(label=_("Premium Package"),
                                               choices=tuple())
-    """
-    The list of the premium packages.
-
-    B{Choices:}
-        - All of the premium packages
-
-    @type: L{PremiumPackageListField}
-    """
 
 
 class PaypalCreditCardForm(InvenioBaseForm):
@@ -424,48 +402,46 @@ class PaypalCreditCardForm(InvenioBaseForm):
         - Country Code
     """
 
+    #: @type: L{TextField}
     first_name = TextField(label=_("First Name"),
                            validators=(Required(message=_(u'Please enter your '
                                                           'first name.')),))
-    """@type: L{TextField}"""
 
+    #: @type: L{TextField}
     last_name = TextField(label=_("Last Name"),
                           validators=(Required(message=_(u'Please enter your '
                                                          'last name.')),))
-    """@type: L{TextField}"""
 
+    #: @type: L{TextField}
     street = TextField(label=_("Street"),
                        validators=(Required(message=_(u'Please enter your '
                                                       'street.')),))
-    """@type: L{TextField}"""
 
+    #: @type: L{TextField}
     city = TextField(label=_('City'),
                      validators=(Required(message=_(u'Please enter your '
                                                     'city.')),))
-    """@type: L{TextField}"""
 
+    #: @type: L{TextField}
     state = TextField(label=_("State / Province"),
                       validators=(Required(message=_(u'Please enter your '
                                                      'state or province.')),))
-    """@type: L{TextField}"""
 
+    #: @type: L{TextField}
     postal_code = TextField(label=_("ZIP / Postal Code"),
                             validators=(Required(message=_(u'Please enter '
                                                            'your ZIP/Postal '
                                                            'Code.')),))
-    """@type: L{TextField}"""
 
+    #: The list of the countries.
+    #:
+    #: B{Choices:}
+    #:     - All countries from L{COUNTRY_ISO_CODES}
+    #:
+    #: @type: L{SelectField}
     country = SelectField(label=_("Country"),
                           choices=[(code, name) for (name, code)
                                    in COUNTRY_ISO_CODES])
-    """
-    The list of the countries.
-
-    B{Choices:}
-        - All countries from L{COUNTRY_ISO_CODES}
-
-    @type: L{SelectField}
-    """
 
 
 class OGoneCreditCardForm(InvenioBaseForm):
@@ -481,15 +457,16 @@ class OGoneCreditCardForm(InvenioBaseForm):
         - Last Name
 
     """
+
+    #: @type: L{TextField}
     first_name = TextField(label=_("First Name"),
                            validators=(Required(message=_(u'Please enter your '
                                                           'first name.')),))
-    """@type: L{TextField}"""
 
+    #: @type: L{TextField}
     last_name = TextField(label=_("Last Name"),
                           validators=(Required(message=_(u'Please enter your '
                                                          'last name.')),))
-    """@type: L{TextField}"""
 
 
 class CreditCardForm(InvenioBaseForm):
@@ -497,54 +474,48 @@ class CreditCardForm(InvenioBaseForm):
     Credit card form to purchase a premium package.
 
     """
+
+    #: @type: L{TextField}
     name_on_card = TextField(label=_("Name on Card"),
                              validators=(Required(message=_(u'Please enter '
                                                             'name on the '
                                                             'card.')),))
-    """@type: L{TextField}"""
 
+    #: @type: L{TextField}
     card_number = TextField(label=_("Card Number"),
                             validators=(Required(message=_(u'Please enter '
                                                            'your credit card '
                                                            'number.')),))
-    """@type: L{TextField}"""
 
+    #: The month of the expiration date of the credit card.
+    #:
+    #: @type: L{SelectField}
     expiration_month = SelectField(label=_("Expiration"),
                                    choices=[(month, month) for month
                                             in range(1, 13)])
-    """
-    The month of the expiration date of the credit card.
 
-    @type: L{SelectField}
-    """
-
+    #: The year of the expiration date of the credit card.
+    #:
+    #: @type: L{SelectField}
     expiration_year = SelectField(label=_("Expiration"),
                                   choices=[(date.today().year + year,
                                             date.today().year + year) for year
                                            in range(20)])
-    """
-    The year of the expiration date of the credit card.
 
-    @type: L{SelectField}
-    """
-
+    #: @type: L{TextField}
     cvv = TextField(label="Security Code",
                     validators=(Required(message=_(u'Please enter your '
                                                    'security code.')),))
-    """@type: L{TextField}"""
 
+    #: The ID of the package that is going to be purchased.
+    #:
+    #: @type: L{HiddenField}
     id_package = HiddenField()
-    """
-    The ID of the package that is going to be purchased.
 
-    @type: L{HiddenField}"""
-
+    #: Additional fields to use specific payment gateways.
+    #:
+    #: @see: L{PaypalCreditCardForm}
+    #: @see: L{OGoneCreditCardForm}
+    #:
+    #: @type: L{InvenioBaseForm}
     additional = None
-    """
-    Additional fields to use specific payment gateways.
-
-    @see: L{PaypalCreditCardForm}
-    @see: L{OGoneCreditCardForm}
-
-    @type: L{InvenioBaseForm}
-    """

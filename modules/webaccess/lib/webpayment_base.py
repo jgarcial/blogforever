@@ -34,114 +34,87 @@ class PaymentGateway:
            redirects the user to a 3rd party site to complete the payment
     """
 
+    #: The url of the api test server
+    #:
+    #: @type: str
     TEST_SERVER = None
-    """
-    The url of the api test server
 
-    @type: str
-    """
-
+    #: The url of the api server
+    #:
+    #: @type: str
     SERVER = None
-    """
-    The url of the api server
 
-    @type: str
-    """
-
+    #: Some gateways require additional inputs different than credit card
+    #: informations. The L{InvenioBaseForm} to take additional information
+    #: should be given with this variable.
+    #:
+    #: @type: L{InvenioBaseForm}
+    #:
+    #: @see: L{PaypalCreditCardForm}
+    #: @see: L{OGoneCreditCardForm}
     _additional_form = None
-    """
-    Some gateways require additional inputs different than credit card
-    informations. The L{InvenioBaseForm} to take additional information should
-    be given with this variable.
 
-    @type: L{InvenioBaseForm}
-
-    @see: L{PaypalCreditCardForm}
-    @see: L{OGoneCreditCardForm}
-    """
-
+    #: The name of the gateway
+    #:
+    #: @type: str
     name = None
-    """
-    The name of the gateway
 
-    @type: str
-    """
-
+    #: @ivar: Premium package on transaction.
+    #:
+    #: @type: L{Premium}
     premium_package = None
-    """
-    Premium package on transaction.
 
-    @type: L{Premium}
-    """
-
+    #: @ivar: Form returned from payment gateway after transaction is
+    #: completed.
+    #:
+    #: @type: dict or str
     form = None
-    """
-    Form returned from payment gateway after transaction is completed.
 
-    @type: dict or str
-    """
-
+    #: @ivar: Credit card form that contains information to but premium
+    #: package.
+    #:
+    #: @type: L{CreditCardForm}
     credit_card_form = None
-    """
-    Credit card form that contains information to but premium package.
 
-    @type: L{CreditCardForm}
-    """
-
+    #: @ivar: Response of the payment gateway
+    #:
+    #: @type: L{PaymentGatewayResponse}
     _response = None
-    """
-    Response of the payment gateway
 
-    @type: L{PaymentGatewayResponse}
-    """
-
+    #: The image of the "pay with" button
+    #:
+    #: @type: str
     _button_img = CFG_SITE_SECURE_URL + "/img/credit_card.png"
-    """
-    The image of the "pay with" button
 
-    @type: str
-    """
-
+    #: url of VISA icon
+    #:
+    #. @type: str
     VISA = CFG_SITE_SECURE_URL + "/img/visa.png"
-    """
-    url of VISA icon
-    @type: str
-    """
 
+    #:  url of MASTERCARD icon
+    #:
+    #: @type: str
     MASTERCARD = CFG_SITE_SECURE_URL + "/img/mastercard.png"
-    """
-    url of MASTERCARD icon
 
-    @type: str
-    """
-
+    #: url of DISCOVER icon
+    #:
+    #: @type: str
     DISCOVER = CFG_SITE_SECURE_URL + "/img/discover.png"
-    """
-    url of DISCOVER icon
 
-    @type: str
-    """
-
+    #: url of AMERICANEXPRESS icon
+    #:
+    #: @type: str
     AMERICANEXPRESS = CFG_SITE_SECURE_URL + "/img/americanexpress.png"
-    """
-    url of AMERICANEXPRESS icon
 
-    @type: str
-    """
-
+    #: url of MAESTRO icon
+    #:
+    #: @type: str
     MAESTRO = CFG_SITE_SECURE_URL + "/img/maestro.png"
-    """
-    url of MAESTRO icon
 
-    @type: str
-    """
-
+    #: The credit card types accepted.
+    #:
+    #: @type: list
     _accept_types = [VISA, MASTERCARD, DISCOVER, AMERICANEXPRESS, MAESTRO]
-    """
-    The credit card types accepted.
-
-    @type: list
-    """
 
     def __init__(self, form=None, credit_card_form=None):
         """
