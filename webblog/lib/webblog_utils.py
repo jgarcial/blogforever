@@ -115,6 +115,9 @@ def get_parent_post(comment_recid):
     else:
         return None
 
+def get_post_tags(post_recid):
+    return get_fieldvalues(post_recid, '653__1')
+
 ##### COMMENTS #####
 
 def get_comments(post_recid):
