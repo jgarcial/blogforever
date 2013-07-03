@@ -21,12 +21,33 @@ BlogForever local customization of Flask application
 """
 
 from flask import current_app
+from invenio.config import CFG_BLOG_TOPICS, CFG_SITE_SECURE_URL
 
 def customize_app(app):
 
     Menu = type(app.config['menubuilder_map']['main'])
+
+    # menu for submission
     submit = Menu('main.submit', 'Submit a Blog', 'submit', 2)
     app.config['menubuilder_map']['main'].children['submit'] = submit
+
+    # menu for collections
+    collections = Menu('main.collections', 'Collections', 'search.index', 3)
+    app.config['menubuilder_map']['main'].children['collections'] = collections
+    collections.children = {}
+    for i, c in enumerate(['Blogs', 'Posts', 'Comments', 'Pages']):
+        collections.children[c] = Menu('main.collections.'+c, c,
+                                       'collection.'+c, i)
+
+    # menu for topics
+    valid_topics = CFG_BLOG_TOPICS.split(",")
+    topics = Menu('main.collections', 'Topics', '', 11)
+    app.config['menubuilder_map']['main'].children['topics'] = topics
+    topics.children = {}
+    for i, t in enumerate(valid_topics):
+        search_topic_url = CFG_SITE_SECURE_URL + '/search?p=654__a:"%s"' % t
+        topics.children[t] = Menu('main.topics.'+t, t,
+                                  search_topic_url, i)
 
     @app.context_processor
     def record_context():
