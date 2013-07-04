@@ -154,13 +154,27 @@ class MetsIngestion:
 
     def insert_parent_blog_topics(self):
         """ Inserts the topics of the parent blog. """
-        topics = get_fieldvalues(parent_blog_recid, "654__a")
-        for topic in topics:
-            new_node = self.create_new_field('datafield', tag='654', ind1='', ind2='')
-            sub_node1 = self.create_new_field('subfield', code='a', \
-                                              value=topic)
-            new_node.appendChild(sub_node1)
-            self.marc_record.appendChild(new_node)
+
+        if self.record_type == 'BLOGPOST':
+            parent_blog_url = self.get_fieldvalue(tag='760', code='o')
+            if parent_blog_url:
+                parent_blog_recid = search_pattern(p='520__u:' + parent_blog_url)
+        elif self.record_type == 'COMMENT':
+            parent_post_url = self.get_fieldvalue(tag='773', code='o')
+            if parent_post_url:
+                parent_post_recid = search_pattern(p='520__u:' + parent_post_url)
+                parent_blog_recid = get_parent_blog(parent_post_recid)
+
+        try:
+            topics = get_fieldvalues(parent_blog_recid, "654__a")
+            for topic in topics:
+                new_node = self.create_new_field('datafield', tag='654', ind1='', ind2='')
+                sub_node1 = self.create_new_field('subfield', code='a', \
+                                                  value=topic)
+                new_node.appendChild(sub_node1)
+                self.marc_record.appendChild(new_node)
+        except:
+            pass
 
 
     def insert_parent_blog_visibility(self):
@@ -410,6 +424,7 @@ def bp_pre_ingestion(file_path):
     marc_file = open(m.file_path, 'w')
     marc_file.write(m.generate_marc_xml())
     marc_file.close()
+    # store the enriched MARC into the original METS file
     task_update_progress("Finished pre-processing record %s" % m.mets_file_name)
 
     return 1
