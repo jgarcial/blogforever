@@ -1564,7 +1564,7 @@ class BibDoc(object):
 
         except Exception, e:
             run_sql('DELETE FROM bibdoc WHERE id=%s', (doc_id, ))
-#            run_sql('DELETE FROM bibrec_bibdoc WHERE id_bibdoc=%s', (doc_id, ))
+            #run_sql('DELETE FROM bibrec_bibdoc WHERE id_bibdoc=%s', (doc_id, ))
 
             register_exception(alert_admin=True)
             raise InvenioBibDocFileError, e
@@ -2827,6 +2827,18 @@ class BibDoc(object):
         """
         return BibRelation.create(bibdoc1_id = bibdoc1.id, bibdoc2_id = self.id, rel_type = rel_type)
 
+    def __eq__(self, other):
+        if isinstance(other, BibDoc):
+
+            if not self.get_history() == other.get_history():
+                return False
+            return True
+
+        return NotImplemented
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
 def generic_path2bidocfile(fullpath):
     """
     Returns a BibDocFile objects that wraps the given fullpath.
@@ -3063,6 +3075,19 @@ class BibDocFile(object):
         else:
             req.status = apache.HTTP_NOT_FOUND
             raise InvenioBibDocFileError, "%s does not exists!" % self.fullpath
+
+    def __eq__(self, other):
+        if isinstance(other, BibDocFile):
+
+            if not self.__str__() == other.__str__():
+                return False
+            return True
+
+        return NotImplemented
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
 
 _RE_STATUS_PARSER = re.compile(r'^(?P<type>email|group|egroup|role|firerole|status):\s*(?P<value>.*)$', re.S + re.I)
 def check_bibdoc_authorization(user_info, status):

@@ -122,7 +122,7 @@ def store_last_spam_checking_date():
     f.close()
 
 
-def get_records_to_check(recids, colls):
+def get_records_to_check(recids, colls, last_checking_date):
     """
     Gets the recids of those records to be checked.
     @param recids: list of integer numbers (record ids)
@@ -131,9 +131,11 @@ def get_records_to_check(recids, colls):
     """
 
     if not recids and not colls:
-        last_spam_checking_date = get_last_spam_checking_date()
+        last_spam_checking_date = last_checking_date
         recids_to_check = run_sql("select id from bibrec where creation_date > %s", \
                                   (last_spam_checking_date, ))
+        recids_to_check = [ result[0] for result in recids_to_check ]
+
     elif recids and colls:
         raise Exception("Please introduce either a list of recids or a list of collections, not both of them")
     elif recids:
@@ -173,7 +175,7 @@ def bst_spam_detection(recids="", colls=""):
     # let's get the spam service we will use
     spamd = SpamDnsBase(spamd_host)
     # let's get the set of records to be checked out
-    recids_to_check = get_records_to_check(recids, colls)
+    recids_to_check = get_records_to_check(recids, colls, get_last_spam_checking_date())
 
     if recids_to_check:
         if len(recids_to_check) > set:

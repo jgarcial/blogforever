@@ -19,6 +19,7 @@
 
 """WebSearch Flask Blueprint"""
 
+import os
 from functools import wraps
 from invenio import webinterface_handler_config as apache
 
@@ -44,6 +45,8 @@ from invenio.websearchadminlib import get_detailed_page_tabs,\
                                       get_detailed_page_tabs_counts
 from invenio.search_engine_utils import get_fieldvalues
 from invenio.bibrank_downloads_similarity import register_page_view_event
+from invenio.bibarchive_archiver import get_record, archive_record
+from flask import send_file
 
 blueprint = InvenioBlueprint('record', __name__, url_prefix="/"+CFG_SITE_RECORD,
                              config='invenio.search_engine_config',
@@ -166,6 +169,14 @@ def references(recid):
 def files(recid):
     return render_template('record_files.html')
 
+@blueprint.route('/<int:recid>/bagit', methods=['GET', 'POST'])
+@request_record
+def bagit(recid):
+    path = get_record(recid)
+    if not path:
+        archive_record(recid)
+        path = get_record(recid)
+    return send_file(path, mimetype="application/zip", as_attachment=True, attachment_filename=os.path.basename(path))
 
 from invenio.bibrank_citation_searcher import calculate_cited_by_list,\
                                               get_self_cited_by, \
