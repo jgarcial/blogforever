@@ -26,6 +26,7 @@ import os
 from xml.dom.minidom import parseString
 from invenio.search_engine import search_pattern
 from invenio.search_engine_utils import get_fieldvalues
+from invenio.bibrecord import create_record, record_xml_output
 from invenio.webblog_utils import get_parent_blog
 from invenio.config import CFG_BATCHUPLOADER_DAEMON_DIR, \
                            CFG_PREFIX, CFG_TMPDIR
@@ -57,32 +58,22 @@ attr_white_list = {'*': ['title'],
 class MetsIngestion:
 
     def __init__(self, file_path):
+
         self.file_path = file_path
         self.file_name = os.path.basename(self.file_path)
         self.submission_id = self.file_name[:self.file_name.find(".xml")]
         self.attachments_dir = path_mets_attachedfiles + self.submission_id
         self.mets_file_name = os.path.join(self.attachments_dir, self.file_name + '_mets')
-        # check if coming record already exists
         self.recid = None
         self.marc_record = None
+        self.marc_record_xml = None
+        self.marc_in_mets_record = None
         self.record_type = None
+
         f = open(self.file_path, 'r')
         mets = f.read()
         f.close()
         self.dom = parseString(mets)
-
-
-    def generate_marc_xml(self):
-        """
-        Generates the final MARC xml.
-        """
-
-        marc_output = '<?xml version="1.0" encoding="UTF-8"?>\n'
-        marc_output += '<collection xmlns="http://www.loc.gov/MARC21/slim">\n'
-        if self.marc_record is not None:
-            marc_output += self.marc_record.toxml()
-        marc_output += '</collection>\n'
-        return marc_output.encode("utf-8")
 
 
     def create_fft_tag_node(self, file_name):
@@ -99,6 +90,28 @@ class MetsIngestion:
         FFT_node.appendChild(sub_node3)
 
         return FFT_node
+
+
+    def create_fft_nodes(self):
+        """ Creates a FFT node for each of the attached files
+        for the corresponding record (the original METS file is also
+        included as FFT).
+        """
+
+        attached_files_list = os.listdir(self.attachments_dir)
+        fft_nodes = [self.create_fft_tag_node(attached_file) \
+                     for attached_file in attached_files_list]
+        return fft_nodes
+
+
+    def create_controlfield_tags(self):
+        """
+        """
+
+        self.marc_record.appendChild(self.create_new_field('controlfield',
+                                                            tag='001', value=self.recid))
+        self.marc_record.appendChild(self.create_new_field('controlfield',
+                                                            tag='002', value=self.submission_id))
 
 
     def create_new_field(self, type, tag="", ind1="", ind2="", code="", value=""):
@@ -119,6 +132,21 @@ class MetsIngestion:
         return new_node
 
 
+    def find_marc_node(self):
+        """Returns the MARC record which is inside
+        the given METS file."""
+
+        for dmdSec in self.dom.firstChild.childNodes:
+            if dmdSec.localName == 'dmdSec':
+                for mdWrap in dmdSec.childNodes:
+                    if mdWrap.localName == 'mdWrap':
+                        for xmlData in mdWrap.childNodes:
+                            if xmlData.localName == 'xmlData':
+                                for record in xmlData.childNodes:
+                                    if record.localName == 'record':
+                                        return record
+
+
     def get_fieldvalue(self, tag, code):
         """ Gets the value contained in the given tag. """
 
@@ -129,6 +157,17 @@ class MetsIngestion:
                         return subfield.firstChild.data
                     else:
                         return None
+
+
+    def get_recid(self):
+        """ This function returns the recid of the coming record
+        in case it is already into the repository.
+        """
+
+        record_url = self.get_fieldvalue(tag='520', code='u')
+        if record_url:
+            recid = search_pattern(p='520__u:' + record_url)
+            return recid
 
 
     def replace_empty_author(self):
@@ -264,31 +303,8 @@ class MetsIngestion:
                                                               value=parent_post_recid[0]))
 
 
-    def create_fft_nodes(self):
-        """ Creates a FFT node for each of the attached files
-        for the corresponding record (the original METS file is also
-        included as FFT).
-        """
-
-        attached_files_list = os.listdir(self.attachments_dir)
-        fft_nodes = [self.create_fft_tag_node(attached_file) \
-                     for attached_file in attached_files_list]
-        return fft_nodes
-
-
-    def get_recid(self):
-        """ This function returns the recid of the coming record
-        in case it is already into the repository.
-        """
-
-        record_url = self.get_fieldvalue(tag='520', code='u')
-        if record_url:
-            recid = search_pattern(p='520__u:' + record_url)
-            return recid
-
-
     def clean_html(self, content):
-        """ This function cleans the HTML content
+        """ HTML cleaner.
         """
 
         # read content as BeautifulSoup object with utf-8 encoding
@@ -321,9 +337,63 @@ class MetsIngestion:
         return cleaned
 
 
-    def find_marc_node(self):
-        """Returns the MARC record which is inside
-        the given METS file."""
+    def clean_marc_record_content(self):
+        """ Cleans the HTML content (values of MARC tags 520__a
+        and 520__b) of the record.
+        """
+
+        for tag in self.marc_record.getElementsByTagName('datafield'):
+            if tag.getAttribute('tag')=='520':
+                for subfield in tag.getElementsByTagName('subfield'):
+                    if subfield.getAttribute('code')=='a':
+                        subfield.firstChild.data = self.clean_html(subfield.firstChild.data)
+                    if subfield.getAttribute('code')=='b':
+                        subfield.firstChild.data = self.clean_html(subfield.firstChild.data)
+
+
+    def transform_marc(self, node, schema=""):
+        """This function transforms the given MARC record
+        to get it compatible with Invenio if schema is empty, or
+        transforms the enriched MARC record
+        to get it compatible with METS."""
+
+        try:
+            new_node = self.dom.createElement(schema + node.localName)
+        except:
+            pass
+
+        if node.nodeType == 1:
+            for attr in node._attrs:
+                new_node.setAttribute(attr, node.getAttribute(attr))
+
+            for sub_node in node.childNodes:
+                new_node.appendChild(self.transform_marc(sub_node, schema))
+
+        elif node.nodeType == 3:
+            new_node = node.cloneNode(True)
+
+        return new_node
+
+
+    def transform_original_marc(self):
+        """This function transforms the given MARC record
+        to get it compatible with Invenio."""
+
+        self.marc_record = self.transform_marc(self.find_marc_node())
+
+
+    def transform_enriched_marc(self):
+        """This function transforms the enriched MARC record
+        to get it compatible with METS."""
+
+        self.marc_in_mets_record = self.transform_marc(self.marc_record, schema="marc:")
+
+
+    def generate_final_mets(self):
+        """
+        Updates the final METS with the MARC generated
+        at pre-ingestion time.
+        """
 
         for dmdSec in self.dom.firstChild.childNodes:
             if dmdSec.localName == 'dmdSec':
@@ -333,28 +403,10 @@ class MetsIngestion:
                             if xmlData.localName == 'xmlData':
                                 for record in xmlData.childNodes:
                                     if record.localName == 'record':
-                                        return record
+                                        xmlData.replaceChild(self.marc_in_mets_record, record)
 
 
-    def transform_marc(self, node):
-        """This function transforms the given MARC record
-        to get it compatible with Invenio."""
-
-        marc_node = self.dom.createElement(node.localName)
-        if node.nodeType == 1:
-            for attr in node._attrs:
-                marc_node.setAttribute(attr, node.getAttribute(attr))
-
-            for sub_node in node.childNodes:
-                marc_node.appendChild(self.transform_marc(sub_node))
-
-        elif node.nodeType == 3:
-            marc_node = node.cloneNode(True)
-
-        return marc_node
-
-
-    def transform_mets_to_marc(self):
+    def enrich_original_marc(self):
         """This function extracts the MARC record coming inside
         the given METS file and transforms it to get it compatible
         with Invenio. The record is enriched with the recid, submission_id,
@@ -362,32 +414,24 @@ class MetsIngestion:
         The HTML coming in tag 520__a is also cleaned."""
 
         # transforms MARC to MARC record compatible with Invenio
-        self.marc_record = self.transform_marc(self.find_marc_node())
-        # let's clean the HTML content of the record
-        for tag in self.marc_record.getElementsByTagName('datafield'):
-            if tag.getAttribute('tag')=='520':
-                for subfield in tag.getElementsByTagName('subfield'):
-                    if subfield.getAttribute('code')=='a':
-                        subfield.firstChild.data = self.clean_html(subfield.firstChild.data)
-                    if subfield.getAttribute('code')=='b':
-                        subfield.firstChild.data = self.clean_html(subfield.firstChild.data)
+        self.transform_original_marc()
+        # cleans HTML content
+        self.clean_marc_record_content()
         # before adding the recid, check if the coming
-        # record is already in the repository
+        # record is already into the repository
+        from invenio.bibupload import create_new_record
         recid = self.get_recid()
         if recid:
             self.recid = recid[0]
         else:
-            from invenio.bibupload import create_new_record
             self.recid = create_new_record()
-        # let's add thr recid
-        self.marc_record.appendChild(self.create_new_field('controlfield',
-                                                           tag='001', value=self.recid))
-        # lets' add the submission id
-        self.marc_record.appendChild(self.create_new_field('controlfield',
-                                                           tag='002', value=self.submission_id))
+
+        # let's add the controlfield tags: recid and submission id
+        self.create_controlfield_tags()
         # let's add the FFT tag with the attached files of the record
         for fft_node in self.create_fft_nodes():
             self.marc_record.appendChild(fft_node)
+
         # let's add the record type
         if self.record_type == None:
             self.record_type = self.get_fieldvalue(tag='980', code='a')
@@ -405,6 +449,11 @@ class MetsIngestion:
                 self.insert_parent_post_recid()
                 self.insert_parent_blog_info()
 
+        # let's organize the MARC structure
+        rec = create_record(self.marc_record.toxml())
+        self.marc_record_xml = record_xml_output(rec[0])
+        self.marc_record = parseString(self.marc_record_xml).firstChild
+
 
 def bp_pre_ingestion(file_path):
     """
@@ -417,14 +466,22 @@ def bp_pre_ingestion(file_path):
     m = MetsIngestion(file_path)
     task_update_progress("Started pre-processing record %s" % m.mets_file_name)
     # METS file will be stored as one of the attached files
-    # under /mets/file_name, while the extracted MARC will be
+    # under /files/file_name, while the extracted MARC will be
     # under /metadata/replace
     os.rename(file_path, m.mets_file_name)
-    m.transform_mets_to_marc()
+    m.enrich_original_marc()
+    # let's keep the final enriched MARC xml
     marc_file = open(m.file_path, 'w')
-    marc_file.write(m.generate_marc_xml())
+    marc_file.write(m.marc_record_xml)
     marc_file.close()
+    # transforms the enriched MARC to the METS schema
+    m.transform_enriched_marc()
     # store the enriched MARC into the original METS file
+    m.generate_final_mets()
+    # let's keep the final enriched METS xml
+    mets_file = open(m.mets_file_name, 'w')
+    mets_file.write(m.dom.toprettyxml().encode("utf-8"))
+    mets_file.close()
     task_update_progress("Finished pre-processing record %s" % m.mets_file_name)
 
     return 1
