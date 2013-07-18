@@ -22,6 +22,7 @@ BlogForever local customization of Flask application
 
 from flask import current_app
 from invenio.config import CFG_BLOG_TOPICS, CFG_SITE_SECURE_URL
+from invenio.search_engine import get_nicely_ordered_collection_list
 
 def customize_app(app):
 
@@ -35,7 +36,9 @@ def customize_app(app):
     collections = Menu('main.collections', 'Collections', 'search.index', 3)
     app.config['menubuilder_map']['main'].children['collections'] = collections
     collections.children = {}
-    for i, c in enumerate(['Blogs', 'Posts', 'Comments', 'Pages']):
+    coll_list = get_nicely_ordered_collection_list()
+    colls_nicely_ordered = [c[0] for c in reversed(coll_list)]
+    for i, c in enumerate(colls_nicely_ordered):
         collections.children[c] = Menu('main.collections.'+c, c,
                                        'collection.'+c, i)
 
