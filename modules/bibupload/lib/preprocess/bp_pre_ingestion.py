@@ -77,7 +77,9 @@ class MetsIngestion:
 
 
     def create_fft_tag_node(self, file_name):
-        """Creates FFT node inside the MARC record."""
+        """
+        Creates FFT node inside the MARC record.
+        """
 
         FFT_node = self.create_new_field('datafield', tag='FFT', ind1='', ind2='')
         sub_node1 = self.create_new_field('subfield', code='a', \
@@ -92,31 +94,11 @@ class MetsIngestion:
         return FFT_node
 
 
-    def create_fft_nodes(self):
-        """ Creates a FFT node for each of the attached files
-        for the corresponding record (the original METS file is also
-        included as FFT).
-        """
-
-        attached_files_list = os.listdir(self.attachments_dir)
-        fft_nodes = [self.create_fft_tag_node(attached_file) \
-                     for attached_file in attached_files_list]
-        return fft_nodes
-
-
-    def create_controlfield_tags(self):
-        """
-        """
-
-        self.marc_record.appendChild(self.create_new_field('controlfield',
-                                                            tag='001', value=self.recid))
-        self.marc_record.appendChild(self.create_new_field('controlfield',
-                                                            tag='002', value=self.submission_id))
-
-
     def create_new_field(self, type, tag="", ind1="", ind2="", code="", value=""):
-        """Creates a new field (controlfield, datafield, subfield) inside
-        the MARC record."""
+        """
+        Creates a new field (controlfield, datafield, subfield) inside
+        the MARC record.
+        """
 
         new_node = self.dom.createElement(type)
         if tag: # controlfield, datafield
@@ -133,8 +115,10 @@ class MetsIngestion:
 
 
     def find_marc_node(self):
-        """Returns the MARC record which is inside
-        the given METS file."""
+        """
+        Returns the MARC record which is inside
+        the given METS file.
+        """
 
         for dmdSec in self.dom.firstChild.childNodes:
             if dmdSec.localName == 'dmdSec':
@@ -148,7 +132,9 @@ class MetsIngestion:
 
 
     def get_fieldvalue(self, tag, code):
-        """ Gets the value contained in the given tag. """
+        """
+        Gets the value contained in the given tag.
+        """
 
         for elem in self.marc_record.getElementsByTagName('datafield'):
             if elem.getAttribute('tag') == tag:
@@ -159,8 +145,18 @@ class MetsIngestion:
                         return None
 
 
+    def get_record_type(self):
+        """
+        Gets the record type.
+        """
+
+        if self.record_type == None:
+            self.record_type = self.get_fieldvalue(tag='980', code='a')
+
+
     def get_recid(self):
-        """ This function returns the recid of the coming record
+        """
+        This function returns the recid of the coming record
         in case it is already into the repository.
         """
 
@@ -170,8 +166,22 @@ class MetsIngestion:
             return recid
 
 
+    def create_fft_nodes(self):
+        """
+        Creates a FFT node for each of the attached files
+        for the corresponding record (the original METS file is also
+        included as FFT).
+        """
+
+        attached_files_list = os.listdir(self.attachments_dir)
+        fft_nodes = [self.create_fft_tag_node(attached_file) \
+                     for attached_file in attached_files_list]
+        return fft_nodes
+
+
     def replace_empty_author(self):
-        """ Replaces the empty author value with (unknown). If the
+        """
+        Replaces the empty author value with (unknown). If the
         author MARC tag is not provided, then creates it with value
         (unknown)
         """
@@ -191,8 +201,38 @@ class MetsIngestion:
             self.marc_record.appendChild(new_node)
 
 
-    def insert_parent_blog_topics(self):
-        """ Inserts the topics of the parent blog. """
+    def add_fft_nodes(self):
+        """
+        Adds the FFT tags for attached files.
+        """
+
+        for fft_node in self.create_fft_nodes():
+            self.marc_record.appendChild(fft_node)
+
+
+    def add_controlfield_tags(self):
+        """
+         Adds the controlfield tags for record and submission id's.
+        """
+
+        # before adding the recid, check if the coming
+        # record is already into the repository
+        from invenio.bibupload import create_new_record
+        recid = self.get_recid()
+        if recid:
+            self.recid = recid[0]
+        else:
+            self.recid = create_new_record()
+        self.marc_record.appendChild(self.create_new_field('controlfield',
+                                                            tag='001', value=self.recid))
+        self.marc_record.appendChild(self.create_new_field('controlfield',
+                                                            tag='002', value=self.submission_id))
+
+
+    def add_parent_blog_topics(self):
+        """
+        Adds the topics of the parent blog.
+        """
 
         if self.record_type == 'BLOGPOST':
             parent_blog_url = self.get_fieldvalue(tag='760', code='o')
@@ -216,8 +256,10 @@ class MetsIngestion:
             pass
 
 
-    def insert_parent_blog_visibility(self):
-        """ Inserts the visibility of the parent blog. """
+    def add_parent_blog_visibility(self):
+        """
+        Adds the visibility of the parent blog.
+        """
 
         if self.record_type == 'BLOGPOST':
             parent_blog_url = self.get_fieldvalue(tag='760', code='o')
@@ -240,8 +282,10 @@ class MetsIngestion:
             pass
 
 
-    def insert_parent_blog_recid(self):
-        """ Inserts the recid of the parent blog of a post. """
+    def add_parent_blog_recid(self):
+        """
+        Adds the recid of the parent blog of a post.
+        """
 
         try:
             parent_blog_url = self.get_fieldvalue(tag='760', code='o')
@@ -261,8 +305,10 @@ class MetsIngestion:
                                                               value=parent_blog_recid[0]))
 
 
-    def insert_parent_blog_info(self):
-        """ Inserts the recid and url of the parent blog of a comment. """
+    def add_parent_blog_info(self):
+        """
+        Adds the recid and url of the parent blog of a comment.
+        """
 
         parent_post_url = self.get_fieldvalue(tag='773', code='o')
         if parent_post_url:
@@ -282,8 +328,10 @@ class MetsIngestion:
                     self.marc_record.appendChild(new_node)
 
 
-    def insert_parent_post_recid(self):
-        """ Inserts the recid of the parent post of a comment. """
+    def add_parent_post_recid(self):
+        """
+        Adds the recid of the parent post of a comment.
+        """
 
         try:
             parent_post_url = self.get_fieldvalue(tag='773', code='o')
@@ -304,7 +352,8 @@ class MetsIngestion:
 
 
     def clean_html(self, content):
-        """ HTML cleaner.
+        """
+        HTML cleaner.
         """
 
         # read content as BeautifulSoup object with utf-8 encoding
@@ -338,24 +387,29 @@ class MetsIngestion:
 
 
     def clean_marc_record_content(self):
-        """ Cleans the HTML content (values of MARC tags 520__a
+        """
+        Cleans the HTML content (values of MARC tags 520__a
         and 520__b) of the record.
         """
 
         for tag in self.marc_record.getElementsByTagName('datafield'):
             if tag.getAttribute('tag')=='520':
                 for subfield in tag.getElementsByTagName('subfield'):
-                    if subfield.getAttribute('code')=='a':
-                        subfield.firstChild.data = self.clean_html(subfield.firstChild.data)
-                    if subfield.getAttribute('code')=='b':
-                        subfield.firstChild.data = self.clean_html(subfield.firstChild.data)
+                    if subfield.getAttribute('code')=='a' or \
+                        subfield.getAttribute('code')=='b':
+                        try:
+                            subfield.firstChild.data = self.clean_html(subfield.firstChild.data)
+                        except:
+                            pass
 
 
     def transform_marc(self, node, schema=""):
-        """This function transforms the given MARC record
+        """
+        This function transforms the given MARC record
         to get it compatible with Invenio if schema is empty, or
         transforms the enriched MARC record
-        to get it compatible with METS."""
+        to get it compatible with METS.
+        """
 
         try:
             new_node = self.dom.createElement(schema + node.localName)
@@ -376,15 +430,19 @@ class MetsIngestion:
 
 
     def transform_original_marc(self):
-        """This function transforms the given MARC record
-        to get it compatible with Invenio."""
+        """
+        This function transforms the given MARC record
+        to get it compatible with Invenio.
+        """
 
         self.marc_record = self.transform_marc(self.find_marc_node())
 
 
     def transform_enriched_marc(self):
-        """This function transforms the enriched MARC record
-        to get it compatible with METS."""
+        """
+        This function transforms the enriched MARC record
+        to get it compatible with METS.
+        """
 
         self.marc_in_mets_record = self.transform_marc(self.marc_record, schema="marc:")
 
@@ -407,47 +465,36 @@ class MetsIngestion:
 
 
     def enrich_original_marc(self):
-        """This function extracts the MARC record coming inside
+        """
+        This function extracts the MARC record coming inside
         the given METS file and transforms it to get it compatible
         with Invenio. The record is enriched with the recid, submission_id,
         parent recid and parent visibility.
-        The HTML coming in tag 520__a is also cleaned."""
+        The HTML coming in tag 520__a is also cleaned.
+        """
 
         # transforms MARC to MARC record compatible with Invenio
         self.transform_original_marc()
-        # cleans HTML content
-        self.clean_marc_record_content()
-        # before adding the recid, check if the coming
-        # record is already into the repository
-        from invenio.bibupload import create_new_record
-        recid = self.get_recid()
-        if recid:
-            self.recid = recid[0]
-        else:
-            self.recid = create_new_record()
-
         # let's add the controlfield tags: recid and submission id
-        self.create_controlfield_tags()
-        # let's add the FFT tag with the attached files of the record
-        for fft_node in self.create_fft_nodes():
-            self.marc_record.appendChild(fft_node)
-
-        # let's add the record type
-        if self.record_type == None:
-            self.record_type = self.get_fieldvalue(tag='980', code='a')
-
+        self.add_controlfield_tags()
+        # let's add the FFT tags with the attached files of the record
+        self.add_fft_nodes()
+        # let's get the record type
+        self.get_record_type()
         # let's add the parent recid depending on the record type
         if self.record_type in ['BLOGPOST', 'COMMENT']:
+            # cleans HTML content
+            self.clean_marc_record_content()
             self.replace_empty_author()
-            self.insert_parent_blog_visibility()
-            self.insert_parent_blog_topics()
+            self.add_parent_blog_visibility()
+            self.add_parent_blog_topics()
 
             if self.record_type == 'BLOGPOST':
-                self.insert_parent_blog_recid()
+                self.add_parent_blog_recid()
 
             if self.record_type == 'COMMENT':
-                self.insert_parent_post_recid()
-                self.insert_parent_blog_info()
+                self.add_parent_post_recid()
+                self.add_parent_blog_info()
 
         # let's organize the MARC structure
         rec = create_record(self.marc_record.toxml())
