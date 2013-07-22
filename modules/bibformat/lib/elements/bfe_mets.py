@@ -38,7 +38,7 @@ def format_element(bfo):
     document = l(ingestion_pack.get_many(recid = recid))
     if document:
         formatted_record = document[0]['content']
-        xml_tree = etree.XML(formatted_record)
+        xml_tree = etree.XML(formatted_record.encode('utf-8'))
         final_formatted_record = etree.tostring(xml_tree, pretty_print=True)
 
     return final_formatted_record
