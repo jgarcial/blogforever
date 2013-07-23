@@ -20,6 +20,8 @@
 """WebAccount Flask Blueprint"""
 
 import os
+import re
+import urllib
 from pprint import pformat
 from werkzeug import CombinedMultiDict, ImmutableMultiDict
 from flask import render_template, request, flash, redirect, url_for, g, \
@@ -35,9 +37,20 @@ from invenio.config import \
     CFG_ACCESS_CONTROL_LEVEL_SITE, \
     CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT, \
     CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
-    CFG_SITE_RECORD
+    CFG_SITE_RECORD, \
+    CFG_VERSION
 from invenio.websession_webinterface import wash_login_method
 
+from invenio.access_control_config import \
+    CFG_EXTERNAL_AUTH_USING_SSO, \
+    CFG_EXTERNAL_AUTH_LOGOUT_SSO
+from invenio import webuser
+from invenio.access_control_mailcookie import \
+    InvenioWebAccessMailCookieError, \
+    mail_cookie_check_authorize_action
+
+from invenio.webaccount_forms import LoginForm, RegisterForm
+from invenio.webuser_flask import login_user, logout_user, current_user
 from invenio.webaccount_query import set_user_bibrec_highlights, \
     get_user_bibrec_highlights, \
     get_user_bibrec_annotation, \
@@ -268,6 +281,52 @@ def index():
         plugins_left = plugins[0:slc]
         plugins_middle = plugins[slc:slc * 2]
         plugins_right = plugins[slc * 2:]
+
+    if current_user.is_super_admin:
+        # Check for a new release of Invenio
+        try:
+            find = re.compile('Invenio v[0-9]+.[0-9]+.[0-9]+(\-rc[0-9])?'
+                              ' is released')
+
+            webFile = urllib.urlopen("http://invenio-software.org/repo"
+                                     "/invenio/tree/RELEASE-NOTES")
+
+            temp = ""
+            version = ""
+            version1 = ""
+            while 1:
+                temp = webFile.readline()
+                match1 = find.match(temp)
+                try:
+                    version = match1.group()
+                    break
+                except:
+                    pass
+                if not temp:
+                    break
+
+            webFile.close()
+            submatch = re.compile('[0-9]+.[0-9]+.[0-9]+(\-rc[0-9])?')
+            version1 = submatch.search(version)
+            web_version = version1.group().split(".")
+
+            local_version = CFG_VERSION.split(".")
+
+            if (web_version[0] > local_version[0] or
+                web_version[0] == local_version[0] and
+                web_version[1] > local_version[1] or
+                web_version[0] == local_version[0] and
+                web_version[1] == local_version[1] and
+                web_version[2] > local_version[2]):
+                flash(_('A newer version of Invenio is available for '
+                        'download. You may want to visit %s') %
+                      ('<a href=\"http://invenio-software.org/wiki'
+                       '/Installation/Download\">http://invenio-software.org'
+                       '/wiki/Installation/Download</a>'), 'warning')
+        except:
+            flash(_('Cannot download or parse release notes from http://'
+                    'invenio-software.org/repo/invenio/tree/RELEASE-NOTES'),
+                  'error')
 
     return render_template('webaccount_display.html',
                            plugins=[plugins_left,
