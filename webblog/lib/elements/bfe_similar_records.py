@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,7 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""BibFormat element - Offers action to delete a blog or a post
+
+"""BibFormat element - Offers the similar records link
 """
 
 __revision__ = "$Id$"
@@ -25,9 +26,8 @@ __revision__ = "$Id$"
 
 from invenio.urlutils import create_html_link
 from invenio.messages import gettext_set_language
-from invenio.config import CFG_SITE_URL
-from invenio.access_control_config import SUPERADMINROLE
-from invenio.access_control_admin import acc_is_user_in_role, acc_get_role_id
+from invenio.config import CFG_SITE_SECURE_URL
+
 
 def format_element(bfo, style):
     """
@@ -50,28 +50,27 @@ def format_element(bfo, style):
 
 
     if coll == 'BLOG':
-        label = _("Similiar blogs")
+        label = _("Similiar Blogs")
 
     elif coll == 'BLOGPOST':
-        label = _("Similiar posts")
+        label = _("Similiar Posts")
 
     elif coll == 'COMMENT':
-        label = _("Similiar comments")
+        label = _("Similiar Comments")
     
     elif coll == 'PAGE':
-        label = _("Similiar pages")
+        label = _("Similiar Pages")
 
     else:
-        label = _("Similiar records")
+        label = _("Similiar Records")
 
-    out += create_html_link(CFG_SITE_URL + "/search",
+    out += create_html_link(CFG_SITE_SECURE_URL + "/search",
                               {'ln': bfo.lang,
-			       'rm': 'wrd',
-			       'p': 'recid:%s' % bfo.control_field('001')
-			      },
+                               'rm': 'wrd',
+                               'p': 'recid:%s' % bfo.control_field('001')
+                               },
                               link_label = label,
-			      linkattrd = linkattrd
-                           )
+                              linkattrd = linkattrd)
 
     return out
 
