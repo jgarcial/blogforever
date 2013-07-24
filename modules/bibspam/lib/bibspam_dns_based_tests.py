@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -27,20 +27,20 @@ import unittest
 from invenio.config import CFG_ETCDIR
 from invenio.testutils import make_test_suite, run_test_suite
 
-from blogspam_dns_based import SpamDnsBase
+from invenio.bibspam_dns_based import SpamDnsBase
 
-class BlogSpamTest(unittest.TestCase):
-    """ Check if BlogSpam is classifying spam correctly """
+class BibSpamTest(unittest.TestCase):
+    """ Check if BibSpam is classifying spam correctly """
 
     def test_spam_classification(self):
         """ check if a site is spam """
         config = ConfigParser.ConfigParser()
-        filename = CFG_ETCDIR + "/blogspam/blogspam.cfg"
+        filename = CFG_ETCDIR + "/bibspam/bibspam.cfg"
         try:
             config.readfp(open(filename))
         except StandardError:
             raise StandardError
-        spamd_host = config.get("blogspam", "CFG_SPAM_DETECTION_HOST")
+        spamd_host = config.get("bibspam", "CFG_SPAM_DETECTION_HOST")
         check = SpamDnsBase(spamd_host)
         self.assertEqual(check.is_spam("69.173.208.0"), True)
         return
@@ -48,18 +48,18 @@ class BlogSpamTest(unittest.TestCase):
     def test_ham_classification(self):
         """ check if a site is not spam """
         config = ConfigParser.ConfigParser()
-        filename = CFG_ETCDIR + "/blogspam/blogspam.cfg"
+        filename = CFG_ETCDIR + "/bibspam/bibspam.cfg"
         try:
             config.readfp(open(filename))
         except StandardError:
             raise StandardError
-        spamd_host = config.get("blogspam", "CFG_SPAM_DETECTION_HOST")
+        spamd_host = config.get("bibspam", "CFG_SPAM_DETECTION_HOST")
 
         check = SpamDnsBase(spamd_host)
         self.assertEqual(check.is_spam("http://blogforever.eu"), False)
         return
 
-TEST_SUITE = make_test_suite(BlogSpamTest)
+TEST_SUITE = make_test_suite(BibSpamTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)

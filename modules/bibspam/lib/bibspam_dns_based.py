@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -53,7 +53,7 @@ class SpamDnsBase():
     def __init__(self, host):
         """ host can be one of three services
             http://www.spamhaus.org/, SURBL or URIBL,
-            setting is imported from etc/blogspam/blogspam.cfg """
+            setting is imported from etc/bibspam/bibspam.cfg """
         self.host = host.strip()
 
     def is_spam(self, item):

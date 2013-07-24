@@ -667,10 +667,9 @@ AC_CONFIG_FILES([config.nice  \
      modules/bibformat/lib/elements/Makefile \
      modules/bibformat/web/Makefile \
      modules/bibformat/web/admin/Makefile \
-     modules/blogspam/Makefile \
-     modules/blogspam/bin/Makefile \
-     modules/blogspam/etc/Makefile \
-     modules/blogspam/lib/Makefile \
+     modules/bibspam/Makefile \
+     modules/bibspam/etc/Makefile \
+     modules/bibspam/lib/Makefile \
      modules/oaiharvest/Makefile \
      modules/oaiharvest/bin/Makefile \
      modules/oaiharvest/bin/oaiharvest \
