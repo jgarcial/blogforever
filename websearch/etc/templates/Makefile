@@ -6,7 +6,7 @@ templatesdir = $(ETCLOCALDIR)/templates
 templates_DATA = websearch_collection.html websearch_index.html \
 	 websearch_helpers.html websearch_search.html \
 	 websearch_results.html record.html record_metadata.html \
-	 record_files.html record_usage.html
+	 record_files.html 
 
 EXTRA_DIST = $(templates_DATA)
 CLEANFILES = *~ *.tmp
