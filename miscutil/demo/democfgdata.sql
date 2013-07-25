@@ -380,5 +380,11 @@ INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) 
 INSERT INTO bibrank_portalbox (id_bibrank, id_portalbox) VALUES (4, 2);
 INSERT INTO bibrank_portalbox (id_bibrank, id_portalbox) VALUES (5, 1);
 
+-- modifications on 'format' tables
+UPDATE format SET visibility='0' WHERE code='xn';
+UPDATE format SET visibility='0' WHERE code='xtl';
+UPDATE format SET visibility='0' WHERE code='xw';
+UPDATE format SET visibility='0' WHERE code='xe';
+UPDATE format SET visibility='0' WHERE code='xe8x';
 
 -- end of file
