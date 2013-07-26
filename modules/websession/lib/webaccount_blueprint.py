@@ -343,6 +343,8 @@ def edit(name):
         flash(_('Invalid plugin name'), 'error')
         return redirect(url_for('.index'))
 
+    needDisplay = name != 'dashboard_user_settings'
+
     plugin = _USER_SETTINGS[name]()
     form = None
 
@@ -353,18 +355,24 @@ def edit(name):
         if not form or form.validate():
             plugin.store(request.form)
             plugin.save()
-            flash(_('Data has been saved.'), 'success')
-            return redirect(url_for('.index'))
+            if needDisplay:
+                flash(_('Data has been saved.'), 'success')
+                return redirect(url_for('.index'))
 
-        flash(_('Please, corrent errors.'), 'error')
+        if needDisplay:
+            flash(_('Please, corrent errors.'), 'error')
 
     # get post data or load data from settings
     if not form and plugin.form_builder:
         from werkzeug.datastructures import MultiDict
         form = plugin.form_builder(MultiDict(plugin.load()))
 
-    return render_template(getattr(plugin, 'edit_template', '') or
-                           'webaccount_edit.html', plugin=plugin, form=form)
+    if needDisplay:
+        return render_template(getattr(plugin, 'edit_template', '') or \
+                               'webaccount_edit.html', plugin=plugin, form=form)
+    else:
+        return ""
+
 
 @blueprint.route('/loadhighlights', methods=['POST'])
 @blueprint.invenio_force_https
@@ -464,7 +472,7 @@ def removeannotation():
 @blueprint.invenio_wash_urlargd({'widget_name': (unicode, "")})
 def loadwidget(widget_name):
     if not widget_name:
-        return "1"
+        return ""
 
     # @todo: get plugin more effectively
     widget = [a for a in [s() for (dummy, s) in _USER_SETTINGS.items() if s] if a.is_authorized and a.widget and a.__class__.__name__ == widget_name]
@@ -472,4 +480,4 @@ def loadwidget(widget_name):
     if widget:
         return render_template('webaccount_widget.html', widget=widget[0])
     else:
-        return "2"
+        return ""
