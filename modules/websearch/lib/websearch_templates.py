@@ -3589,6 +3589,26 @@ class Template:
         out = """<mets xmlns="http://www.loc.gov/mets/">\n"""
         return out
 
+    def tmpl_xml_cmx_epilogue(self):
+        """Creates XML CMX epilogue."""
+        out = """ """
+        return out
+
+    def tmpl_xml_cmx_prologue(self):
+        """Creates XML CMX prologue."""
+        out = """ """
+        return out
+
+    def tmpl_xml_gexf_epilogue(self):
+        """Creates XML GEXF epilogue."""
+        out = """ """
+        return out
+
+    def tmpl_xml_gexf_prologue(self):
+        """Creates XML GEXF prologue."""
+        out = """ """
+        return out
+
     def tmpl_xml_mets_epilogue(self):
         """Creates XML METS epilogue."""
         out = """\n</mets>"""
