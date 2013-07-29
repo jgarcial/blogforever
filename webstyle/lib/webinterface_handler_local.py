@@ -56,4 +56,20 @@ def customize_app(app):
     def record_context():
     	from invenio.bibedit_utils import get_bibrecord
     	from invenio.bibrecord import record_get_field_value
-        return dict(get_bibrecord=get_bibrecord, record_get_field_value=record_get_field_value)   
+        from invenio.search_engine import get_record
+        from invenio.bibrecord import record_xml_output
+        from invenio.blog_network_generator import get_blog_citation_network, \
+                                                    write_CMXXML, write_GEXF, \
+                                                    get_author_citation_network, \
+                                                    get_author_cocitation_network
+
+        return dict(get_bibrecord=get_bibrecord,
+                    record_get_field_value=record_get_field_value,
+                    get_record=get_record,
+                    record_xml_output=record_xml_output,
+                    get_blog_citation_network=get_blog_citation_network,
+                    get_author_citation_network=get_author_citation_network,
+                    get_author_cocitation_network=get_author_cocitation_network,
+                    write_CMXXML=write_CMXXML,
+                    write_GEXF=write_GEXF
+                    )

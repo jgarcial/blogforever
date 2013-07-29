@@ -387,4 +387,7 @@ UPDATE format SET visibility='0' WHERE code='xw';
 UPDATE format SET visibility='0' WHERE code='xe';
 UPDATE format SET visibility='0' WHERE code='xe8x';
 
+INSERT INTO format (id,name,code,description,content_type,visibility) VALUES (28,'timeline', 'xtl', 'XML for the timeline slider', 'text/xml', 0);
+INSERT INTO format (id,name,code,description,content_type,visibility) VALUES (29,'CMX', 'cmx', 'CMX-XML', 'text/xml', 1);
+INSERT INTO format (id,name,code,description,content_type,visibility) VALUES (30,'GEXF', 'gexf', 'GEXF-XML', 'text/xml', 1);
 -- end of file
