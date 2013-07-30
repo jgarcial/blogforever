@@ -295,8 +295,11 @@ def search(collection, p, of, so, rm):
     if 'action_browse' in request.args:
         return browse()
 
+    argd = {'c': current_user.get('c', [])}
+
     from invenio.websearch_webinterface import wash_search_urlargd
-    argd = argd_orig = wash_search_urlargd(request.args)
+    argd_orig = wash_search_urlargd(request.args)
+    argd.update(argd_orig)
     argd['of'] = 'id'
 
     # update search arguments with the search user preferences
