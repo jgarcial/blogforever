@@ -24,8 +24,9 @@
 
 import os
 from xml.dom.minidom import parseString
-from invenio.search_engine import search_pattern
-from invenio.search_engine_utils import get_fieldvalues
+from invenio.search_engine import \
+    search_pattern, get_fieldvalues, \
+    get_creation_date
 from invenio.bibrecord import create_record, record_xml_output
 from invenio.webblog_utils import get_parent_blog
 from invenio.config import CFG_BATCHUPLOADER_DAEMON_DIR, \
@@ -33,6 +34,7 @@ from invenio.config import CFG_BATCHUPLOADER_DAEMON_DIR, \
 from invenio.bibtask import  task_update_progress
 from bs4 import BeautifulSoup
 import bleach
+import datetime
 
 batchupload_dir = CFG_BATCHUPLOADER_DAEMON_DIR[0] == '/' and CFG_BATCHUPLOADER_DAEMON_DIR \
                           or CFG_PREFIX + '/' + CFG_BATCHUPLOADER_DAEMON_DIR
@@ -103,7 +105,7 @@ class MetsIngestion:
         new_node = self.dom.createElement(type)
         if tag: # controlfield, datafield
             new_node.setAttribute('tag', tag)
-            if tag == "datafield":
+            if type == "datafield":
                 new_node.setAttribute('ind1', ind1)
                 new_node.setAttribute('ind2', ind2)
         if code: # subfield
@@ -227,6 +229,27 @@ class MetsIngestion:
                                                             tag='001', value=self.recid))
         self.marc_record.appendChild(self.create_new_field('controlfield',
                                                             tag='002', value=self.submission_id))
+
+
+    def add_posted_year(self):
+        """
+        Adds the year in which the post or comment was posted.
+        """
+
+        posted_date = self.get_fieldvalue(tag='269', code='c')
+        if posted_date.find("ERROR") > -1:
+            creation_date = get_creation_date(self.recid)
+            date_datetime = datetime.datetime.strptime(creation_date, "%Y-%m-%d")
+        else:
+            date_datetime = datetime.datetime.strptime(posted_date, "%m/%d/%Y %I:%M:%S %p")
+
+        posted_year = date_datetime.year
+
+        new_node = self.create_new_field('datafield', tag='909', ind1='C', ind2='0')
+        sub_node1 = self.create_new_field('subfield', code='y', \
+                                          value=str(posted_year))
+        new_node.appendChild(sub_node1)
+        self.marc_record.appendChild(new_node)
 
 
     def add_parent_blog_topics(self):
@@ -488,6 +511,7 @@ class MetsIngestion:
             self.replace_empty_author()
             self.add_parent_blog_visibility()
             self.add_parent_blog_topics()
+            self.add_posted_year()
 
             if self.record_type == 'BLOGPOST':
                 self.add_parent_blog_recid()
