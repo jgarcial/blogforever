@@ -27,8 +27,12 @@ from invenio.wtforms_utils import InvenioBaseForm, AutocompleteField, \
 from wtforms import TextField
 from wtforms import FormField, SelectField
 from wtforms import Form as WTFormDefault
+<<<<<<< HEAD
 from wtforms.ext.sqlalchemy.fields import QuerySelectField, \
     QuerySelectMultipleField
+=======
+from wtforms.ext.sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
+>>>>>>> d8760c9... WebSearch: enrich user settings with collections
 
 
 class JournalForm(WTFormDefault):
@@ -60,7 +64,6 @@ def get_collection():
     from invenio.websearch_model import Collection
     collections = Collection.query.all()
     return [coll for coll in collections if not coll.is_restricted]
-
 
 class WebSearchUserSettingsForm(InvenioBaseForm):
     rg = SelectField(_('Results per page'),
