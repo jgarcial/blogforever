@@ -27,6 +27,7 @@ import sys
 from invenio.bibtask import task_low_level_submission, task_update_progress
 from invenio.bibupload_preprocess import bp_pre_ingestion
 from invenio.config import CFG_TMPDIR
+from invenio.webblog_utils import prepare_path
 
 # Parameters CS 1, 2
 # url = 'http://bf.cyberwatcher.com/System3/SpiderService.svc?wsdl'
@@ -83,10 +84,11 @@ def process_record(client, api_key, match):
         error_file.close()
         return
     if validate_content(content=metadata.MetsXml.encode('utf-8'), md5_hash=metadata.MD5):
+        prefix = match.Object.Type + "_" + time.strftime("%Y-%m-%d_%H:%M:%S")
+        basedir = prepare_path(path_metadata, prefix)
         fd, path_metadata_file = tempfile.mkstemp(suffix=".xml", \
-                                                  prefix= match.Object.Type + "_" + \
-                                                  time.strftime("%Y-%m-%d_%H:%M:%S"), \
-                                                  dir=path_metadata)
+                                                  prefix= prefix, \
+                                                  dir=basedir)
         metadata_file = os.path.basename(path_metadata_file)
         metadata_file_name, extension = os.path.splitext(metadata_file)
         task_update_progress("Preparing record %s to upload" % metadata_file_name)
@@ -95,7 +97,9 @@ def process_record(client, api_key, match):
         # Let's create a subdirectory for each document fetched
         # to store in it all the files, images... within the METS
         # document
-        path_mets_attachedfiles_doc = path_mets_attachedfiles + metadata_file_name + "/"
+
+        ### path_mets_attachedfiles_doc = path_mets_attachedfiles + metadata_file_name + "/"
+	path_mets_attachedfiles_doc = os.path.join(prepare_path(path_mets_attachedfiles, prefix),metadata_file_name)
         if not os.path.isdir(path_mets_attachedfiles_doc):
             os.mkdir(path_mets_attachedfiles_doc)
 
@@ -113,7 +117,7 @@ def process_record(client, api_key, match):
                 try:
                     attach = client.service.GetDocument(api_key, match.Object.DocumentId, file.Filename)
                     if validate_content(content=decodestring(attach), md5_hash=file.MD5):
-                        f = open(path_mets_attachedfiles_doc + file.Type + "_" + file.Filename, 'w')
+                        f = open(os.path.join(path_mets_attachedfiles_doc, file.Type + "_" + file.Filename), 'w')
                         f.write(decodestring(attach))
                         f.close()
                     else:

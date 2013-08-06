@@ -30,6 +30,7 @@ from invenio.bibtask import task_update_progress
 from lxml import etree
 from invenio.bibupload_preprocess import bp_pre_ingestion
 from invenio.config import CFG_TMPDIR
+from invenio.webblog_utils import calculate_path
 
 
 path_mets_attachedfiles = bp_pre_ingestion.path_mets_attachedfiles
@@ -47,8 +48,10 @@ def bp_post_ingestion(file_path):
     file_name = os.path.basename(file_path)
     task_update_progress("Started post-processing record %s" % file_name)
     submission_id = file_name[:file_name.find(".xml")]
+    ### files_dir_path = path_mets_attachedfiles + submission_id
+    files_dir_path = os.path.join(calculate_path(path_mets_attachedfiles, submission_id[:-6]), submission_id)
     # let's build the path where the corresponding METS is stored
-    mets_file_path = path_mets_attachedfiles + submission_id + "/" + file_name + "_mets"
+    mets_file_path = os.path.join(files_dir_path, file_name + "_mets")
     # let's open the mets xml file from the filesystem
     try:
         f = open(mets_file_path, 'r')
@@ -99,24 +102,23 @@ def bp_post_ingestion(file_path):
 
     # once the original METS file and the attached files have been stored in mongoDB for preservation reasons,
     # let's remove them from the corresponding temporary folders created under /batchupload/files and /batchupload/metadata
-    metadata_file_path = file_path
-    if os.path.exists(metadata_file_path):
-        os.remove(metadata_file_path)
-    else:
-        error_file = open(CFG_TMPDIR + "/error_file", "a")
-        error_file.write("Could not find the file %s" % metadata_file_path +"\n")
-        error_file.close()
+    #metadata_file_path = file_path
+    #if os.path.exists(metadata_file_path):
+    #    os.remove(metadata_file_path)
+    #else:
+    #    error_file = open(CFG_TMPDIR + "/error_file", "a")
+    #    error_file.write("Could not find the file %s" % metadata_file_path +"\n")
+    #    error_file.close()
 
-    files_dir_path = path_mets_attachedfiles + submission_id
-    if os.path.exists(files_dir_path):
-        file_list = os.listdir(files_dir_path)
-        for file_name in file_list:
-            os.remove(files_dir_path + "/" + file_name)
-        os.rmdir(files_dir_path)
-    else:
-        error_file = open(CFG_TMPDIR + "/error_file", "a")
-        error_file.write("Could not find the directory %s" % files_dir_path +"\n")
-        error_file.close()
+    #if os.path.exists(files_dir_path):
+    #    file_list = os.listdir(files_dir_path)
+    #    for file_name in file_list:
+    #        os.remove(files_dir_path + "/" + file_name)
+    #    os.rmdir(files_dir_path)
+    #else:
+    #    error_file = open(CFG_TMPDIR + "/error_file", "a")
+    #    error_file.write("Could not find the directory %s" % files_dir_path +"\n")
+    #    error_file.close()
 
 
     return 1

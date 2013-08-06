@@ -28,7 +28,7 @@ from invenio.search_engine import \
     search_pattern, get_fieldvalues, \
     get_creation_date
 from invenio.bibrecord import create_record, record_xml_output
-from invenio.webblog_utils import get_parent_blog
+from invenio.webblog_utils import get_parent_blog, calculate_path
 from invenio.config import CFG_BATCHUPLOADER_DAEMON_DIR, \
                            CFG_PREFIX, CFG_TMPDIR
 from invenio.bibtask import  task_update_progress
@@ -64,7 +64,8 @@ class MetsIngestion:
         self.file_path = file_path
         self.file_name = os.path.basename(self.file_path)
         self.submission_id = self.file_name[:self.file_name.find(".xml")]
-        self.attachments_dir = path_mets_attachedfiles + self.submission_id
+        ### self.attachments_dir = path_mets_attachedfiles + self.submission_id
+        self.attachments_dir = os.path.join(calculate_path(path_mets_attachedfiles, self.submission_id[:-6]), self.submission_id) 
         self.mets_file_name = os.path.join(self.attachments_dir, self.file_name + '_mets')
         self.recid = None
         self.marc_record = None
