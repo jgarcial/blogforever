@@ -154,3 +154,19 @@ def transform_format_date(date, format="%Y/%m/%d"):
         formated_date = "Unknown date"
     return formated_date
 
+def calculate_path(base_dir, file_name):
+    """Given a file name it returns the complete path that should host its files."""
+    h = hash(file_name)
+    group1 = str(h % 100)
+    group2 = str(h % 99)
+    return os.path.join(base_dir, group1, group2)
+
+def prepare_path(base_dir, file_name):
+    """Prepares the directory serving as root"""
+    path = calculate_path(base_dir, file_name)
+    # we create the corresponding storage directory
+    if not os.path.exists(path):
+        old_umask = os.umask(022)
+        os.makedirs(path)
+        os.umask(old_umask)
+    return path
