@@ -238,19 +238,20 @@ class MetsIngestion:
         """
 
         posted_date = self.get_fieldvalue(tag='269', code='c')
-        if posted_date.find("ERROR") > -1:
-            creation_date = get_creation_date(self.recid)
-            date_datetime = datetime.datetime.strptime(creation_date, "%Y-%m-%d")
-        else:
-            date_datetime = datetime.datetime.strptime(posted_date, "%m/%d/%Y %I:%M:%S %p")
+        if posted_date:
+            if posted_date.find("ERROR") > -1:
+                creation_date = get_creation_date(self.recid)
+                date_datetime = datetime.datetime.strptime(creation_date, "%Y-%m-%d")
+            else:
+                date_datetime = datetime.datetime.strptime(posted_date, "%m/%d/%Y %I:%M:%S %p")
 
-        posted_year = date_datetime.year
+            posted_year = date_datetime.year
 
-        new_node = self.create_new_field('datafield', tag='909', ind1='C', ind2='0')
-        sub_node1 = self.create_new_field('subfield', code='y', \
-                                          value=str(posted_year))
-        new_node.appendChild(sub_node1)
-        self.marc_record.appendChild(new_node)
+            new_node = self.create_new_field('datafield', tag='909', ind1='C', ind2='0')
+            sub_node1 = self.create_new_field('subfield', code='y', \
+                                              value=str(posted_year))
+            new_node.appendChild(sub_node1)
+            self.marc_record.appendChild(new_node)
 
 
     def add_parent_blog_topics(self):
