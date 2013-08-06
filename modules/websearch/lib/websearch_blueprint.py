@@ -322,11 +322,8 @@ def search(collection, p, of, so, rm):
     if 'action_browse' in request.args:
         return browse()
 
-    argd = {'c': current_user.get('c', [])}
-
     from invenio.websearch_webinterface import wash_search_urlargd
-    argd_orig = wash_search_urlargd(request.args)
-    argd.update(argd_orig)
+    argd = argd_orig = wash_search_urlargd(request.args)
     argd['of'] = 'id'
 
     # update search arguments with the search user preferences
@@ -340,6 +337,11 @@ def search(collection, p, of, so, rm):
 
     qid = get_search_query_id(**argd)
 
+    # update search arguments with the search user preferences
+    user_preferences_argd = {'c': current_user.get('c', []), 'rg': current_user.get('rg', 10)}
+    argd.update(user_preferences_argd)
+
+    # update search arguments with the latest additions preferences
     if CFG_WEBSEARCH_INSTANT_BROWSE_AND_SEARCH_SAME_SORTING:
         # Container of latest additions plugins
         instantbrowse_plugins_container = PluginContainer\
