@@ -1700,8 +1700,8 @@ class BibDoc(object):
         def plugin_bldr(dummy, plugin_code):
             """Preparing the plugin dictionary structure"""
             ret = {}
-            ret['create_instance'] = getattr(plugin_code, "create_instance", None)
-            ret['supports'] = getattr(plugin_code, "supports", None)
+            ret['create_instance'] = getattr(plugin_code, "create_instance", lambda *args,**kargs: False)
+            ret['supports'] = getattr(plugin_code, "supports", lambda *args,**kargs: False)
             return ret
 
 
