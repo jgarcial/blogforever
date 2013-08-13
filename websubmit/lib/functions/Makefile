@@ -15,7 +15,7 @@ LIBFILES = Check_URL.py Get_Recid.py Get_Recid_Number.py Make_Delete_Records.py 
 		   APP_Print_Success.py APS_Print_Success.py APO_Print_Success.py APM_Print_Success.py \
 		   Update_Approval_DB.py DBI_Mail_Blog_Deleted_to_User.py DPI_Mail_Post_Deleted_to_User.py \
 		   SBI_Mail_Blog_Submitted_to_User.py MBI_Mail_Blog_Modified_to_User.py \
-		   Make_Modify_Record.py Insert_Modify_Record.py
+		   Make_Modify_Record.py Insert_Modify_Record.py Send_Submitted_Blog_Urls.py
 
 all:
 	$(foreach SUBDIR, $(SUBDIRS), cd $(SUBDIR) && make all && cd .. ;)

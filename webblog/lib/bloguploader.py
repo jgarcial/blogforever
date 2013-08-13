@@ -57,7 +57,7 @@ import time
 from invenio.config import CFG_BLOG_TOPICS, CFG_BLOG_VISIBILITY, CFG_TMPDIR
 from invenio.bibtask import task_init, task_update_progress, write_message, \
     fix_argv_paths, task_low_level_submission, task_get_option, task_set_option
-from invenio.webblog_utils import get_blog_descendants
+from invenio.webblog_utils import get_blog_descendants, send_submitted_blog_urls
 from invenio.webbasket import url_is_valid
 from invenio.search_engine_utils import get_fieldvalues
 from invenio.search_engine import search_pattern
@@ -251,7 +251,7 @@ def _transform_bloglist_to_marcxml(blog_list, mode):
             blog_topics = blog[2].split("-")
             blog_visibility = blog[3]
             record_template = _create_marcxml_record_template("insert", blog_topics)
-            record = record_template % {'coll': 'BLOG',
+            record = record_template % {'coll': 'PROVBLOG',
                                         'title': blog_title,
                                         'url': blog_url,
                                         'visibility': blog_visibility}
@@ -439,6 +439,9 @@ def _insert_blogs(file_path):
         else:
             write_message(str(res[1]))
             raise Exception(res[1])
+
+        submitted_urls = [blog[0] for blog in blog_list]
+        send_submitted_blog_urls(submitted_urls)
     else:
         write_message("There are not blogs to "+ str(mode))
         raise Exception("There are not blogs to "+ str(mode))
