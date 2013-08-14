@@ -464,13 +464,14 @@ def registerUser(req, email, passw, nickname, register_without_nickname=False,
                 ip_address = req.remote_host or req.remote_ip
             except KeyError:
                 ip_address = req.remote_ip
-            try:
-                if not send_email(CFG_SITE_SUPPORT_EMAIL, email, _("Account registration at %s") % CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME),
+            #try:
+            #    if not
+            send_email(CFG_SITE_SUPPORT_EMAIL, email, _("Account registration at %s") % CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME),
                                   tmpl.tmpl_account_address_activation_email_body(email,
-                                                  address_activation_key, ip_address, ln)):
-                    return 1
-            except (smtplib.SMTPException, socket.error):
-                return 6
+                                                  address_activation_key, ip_address, ln))
+            #        return 1
+            #except (smtplib.SMTPException, socket.error):
+            #    return 6
 
     # okay, go on and register the user:
     user_preference = get_default_user_preferences()
