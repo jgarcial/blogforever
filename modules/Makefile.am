@@ -38,6 +38,7 @@ SUBDIRS = bibauthorid \
           bibsort \
           bibsword \
           bibupload \
+          bibspam \
           bibworkflow \
           elmsubmit \
           miscutil \
