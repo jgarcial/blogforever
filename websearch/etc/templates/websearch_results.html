@@ -156,8 +156,8 @@
                 </label>
               </div>
               <div class="span11">
-                {{ format_record(recid, of, ln=g.ln)|safe }}
-                {{ record_brief_links(recid, loop.index+(pagination.page-1)*rg) }}
+                {{ format_record(recid, of, ln=g.ln, brief_links=False)|safe }}
+                {{ '<hr/>'|safe if not loop.last }}
               </div>
             </div>
           {%- else -%}

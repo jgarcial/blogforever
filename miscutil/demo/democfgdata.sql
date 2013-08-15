@@ -387,10 +387,4 @@ UPDATE format SET visibility='0' WHERE code='xw';
 UPDATE format SET visibility='0' WHERE code='xe';
 UPDATE format SET visibility='0' WHERE code='xe8x';
 
-INSERT INTO format (id,name,code,description,content_type,visibility) VALUES (28,'timeline', 'xtl', 'XML for the timeline slider', 'text/xml', 0);
-INSERT INTO format (id,name,code,description,content_type,visibility) VALUES (29,'CMX', 'xcmx', 'CMX-XML', 'text/xml', 1);
-INSERT INTO format (id,name,code,description,content_type,visibility) VALUES (30,'GEXF', 'xgexf', 'GEXF-XML', 'text/xml', 1);
-INSERT INTO format (id,name,code,description,content_type,visibility) VALUES (31,'JPEG', 'jpeg', 'Used for taking snapshot of the records', 'image/jpeg', 1);
-INSERT INTO format (id,name,code,description,content_type,visibility) VALUES (32,'JPEGPageConstructer', 'jpegpc', 'Record page for taking a snapshot of the content', 'text/html', 1);
-INSERT INTO format (id,name,code,description,content_type,visibility) VALUES (33,'PDF', 'pdf', 'PDF of the records in latex template', 'application/pdf', 1);
 -- end of file

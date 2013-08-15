@@ -20,8 +20,7 @@
 __revision__ = \
     "$Id$"
 
-# pylint: disable=C0301
-
+from invenio import config
 from invenio.config import CFG_SITE_NAME, CFG_SITE_URL, CFG_SITE_LANG, \
      CFG_SITE_SECURE_URL, CFG_SITE_SUPPORT_EMAIL, CFG_CERN_SITE, \
      CFG_OPENAIRE_SITE, CFG_SITE_RECORD, CFG_INSPIRE_SITE
@@ -128,6 +127,243 @@ else:
     "Robot": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=False),
     "ZRobot": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=True)
     }
+
+# CFG_TEMP_EMAIL_ADDRESS
+# Temporary email address for logging in with an OpenID/OAuth provider which
+# doesn't supply email address
+CFG_TEMP_EMAIL_ADDRESS = "%s@NOEMAIL"
+
+# CFG_OPENID_PROVIDERS
+# CFG_OAUTH1_PROVIDERS
+# CFG_OAUTH2_PROVIDERS
+# Choose which providers you want to use. Some providers don't supply e mail
+# address, if you choose them, the users will be registered with an temporary
+# email address like CFG_TEMP_EMAIL_ADDRESS % randomstring
+#
+# Order of the login buttons can be changed by CFG_EXTERNAL_LOGIN_BUTTON_ORDER
+# in invenio.websession_config
+CFG_OPENID_PROVIDERS = [
+    'google',
+    'yahoo',
+    'aol',
+    'wordpress',
+    'myvidoop',
+    'openid',
+    'verisign',
+    'myopenid',
+    'myspace',
+    'livejournal',
+    'blogger'
+]
+
+CFG_OAUTH1_PROVIDERS = [
+    'twitter',
+    'linkedin',
+    'flickr'
+]
+
+CFG_OAUTH2_PROVIDERS = [
+    'facebook',
+    'yammer',
+    'foursquare',
+    'googleoauth2',
+    'instagram',
+    'orcid'
+]
+
+# CFG_OPENID_CONFIGURATIONS
+# identifier: (required) identifier url. {0} will be replaced by username (an
+#       input).
+# trust_email: (optional, default: False) Some providers let their users
+#       change their emails on login page. If the provider doesn't let the user,
+#       set it True.
+CFG_OPENID_CONFIGURATIONS = {
+    'openid': {
+        'identifier': '{0}'
+    },
+    'myvidoop': {
+        'identifier': '{0}.myvidoop.com'
+    },
+    'google': {
+        'identifier': 'https://www.google.com/accounts/o8/id',
+        'trust_email': True
+    },
+    'wordpress': {
+        'identifier': '{0}.wordpress.com'
+    },
+    'aol': {
+        'identifier': 'openid.aol.com/{0}',
+        'trust_email': True
+    },
+    'myopenid': {
+        'identifier': '{0}.myopenid.com'
+    },
+    'yahoo': {
+        'identifier': 'yahoo.com',
+        'trust_email': True
+    },
+    'verisign': {
+        'identifier': '{0}.pip.verisignlabs.com'
+    },
+    'myspace': {
+        'identifier': 'www.myspace.com/{0}'
+    },
+    'livejournal': {
+        'identifier': '{0}.livejournal.com'
+    },
+    'blogger': {
+        'identifier': '{0}'
+    }
+}
+
+CFG_OAUTH1_CONFIGURATIONS = {
+    'twitter': {
+        'consumer_key' : '',
+        'consumer_secret' : '',
+        'request_token_url' : 'https://api.twitter.com/oauth/request_token',
+        'access_token_url' : 'https://api.twitter.com/oauth/access_token',
+        'authorize_url' : 'https://api.twitter.com/oauth/authorize',
+        'id': ['user_id'],
+        'nickname': ['screen_name']
+    },
+    'flickr': {
+        'consumer_key' : '',
+        'consumer_secret' : '',
+        'request_token_url' : 'http://www.flickr.com/services/oauth/request_token',
+        'access_token_url' : 'http://www.flickr.com/services/oauth/access_token',
+        'authorize_url' : 'http://www.flickr.com/services/oauth/authorize',
+        'authorize_parameters': {
+            'perms': 'read'
+        },
+        'nickname': ['username'],
+        'id': ['user_nsid']
+    },
+    'linkedin': {
+        'consumer_key' : '',
+        'consumer_secret' : '',
+        'request_token_url' : 'https://api.linkedin.com/uas/oauth/requestToken',
+        'access_token_url' : 'https://api.linkedin.com/uas/oauth/accessToken',
+        'authorize_url' : 'https://www.linkedin.com/uas/oauth/authorize',
+        'request_url': 'http://api.linkedin.com/v1/people/~:(id)',
+        'request_parameters': {
+            'format': 'json'
+        },
+        'id': ['id']
+    }
+}
+
+CFG_OAUTH2_CONFIGURATIONS =  {
+    'facebook': {
+        'consumer_key': '118319526393',
+        'consumer_secret': '8d675eb0ef89f2f8fbbe4ee56ab473c6',
+        'access_token_url': 'https://graph.facebook.com/oauth/access_token',
+        'authorize_url': 'https://www.facebook.com/dialog/oauth',
+        'authorize_parameters': {
+            'scope': 'email'
+        },
+        'request_url' : 'https://graph.facebook.com/me?access_token={access_token}',
+        'email': ['email'],
+        'id': ['id'],
+        'nickname': ['username']
+    },
+    'foursquare': {
+        'consumer_key': '',
+        'consumer_secret': '',
+        'access_token_url': 'https://foursquare.com/oauth2/access_token',
+        'authorize_url': 'https://foursquare.com/oauth2/authorize',
+        'request_url': 'https://api.foursquare.com/v2/users/self?oauth_token={access_token}',
+        'id': ['response', 'user', 'id'],
+        'email': ['response', 'user', 'contact' ,'email']
+    },
+    'yammer': {
+        'consumer_key': '',
+        'consumer_secret': '',
+        'access_token_url': 'https://www.yammer.com/oauth2/access_token.json',
+        'authorize_url': 'https://www.yammer.com/dialog/oauth',
+        'request_url': 'https://www.yammer.com/oauth2/access_token.json?access_token={access_token}',
+        'email':['user', 'contact', 'email_addresses', 0, 'address'],
+        'id': ['user', 'id'],
+        'nickname': ['user', 'name']
+    },
+    'googleoauth2': {
+        'consumer_key': '',
+        'consumer_secret': '',
+        'access_token_url': 'https://accounts.google.com/o/oauth2/token',
+        'authorize_url': 'https://accounts.google.com/o/oauth2/auth',
+        'authorize_parameters': {
+            'scope': 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email'
+        },
+        'request_url': 'https://www.googleapis.com/oauth2/v1/userinfo?access_token={access_token}',
+        'email':['email'],
+        'id': ['id']
+    },
+    'instagram': {
+        'consumer_key': '',
+        'consumer_secret': '',
+        'access_token_url': 'https://api.instagram.com/oauth/access_token',
+        'authorize_url': 'https://api.instagram.com/oauth/authorize/',
+        'authorize_parameters': {
+            'scope': 'basic'
+        },
+        'id': ['user', 'id'],
+        'nickname': ['user', 'username']
+    },
+    'orcid': {
+        'consumer_key': '',
+        'consumer_secret': '',
+        'authorize_url': 'http://sandbox-1.orcid.org/oauth/authorize',
+        'access_token_url': 'http://api.sandbox-1.orcid.org/oauth/token',
+        'request_url': 'http://api.sandbox-1.orcid.org/{id}/orcid-profile',
+        'authorize_parameters': {
+            'scope': '/orcid-profile/read-limited',
+            'response_type': 'code',
+            'access_type': 'offline',
+        },
+        'id': ['orcid'],
+    }
+}
+
+## Let's override OpenID/OAuth1/OAuth2 configuration from invenio(-local).conf
+CFG_OPENID_PROVIDERS = config.CFG_OPENID_PROVIDERS
+CFG_OAUTH1_PROVIDERS = config.CFG_OAUTH1_PROVIDERS
+CFG_OAUTH2_PROVIDERS = config.CFG_OAUTH2_PROVIDERS
+if config.CFG_OPENID_CONFIGURATIONS:
+    for provider, configuration in config.CFG_OPENID_CONFIGURATIONS.items():
+        if provider in CFG_OPENID_CONFIGURATIONS:
+            CFG_OPENID_CONFIGURATIONS[provider].update(configuration)
+        else:
+            CFG_OPENID_CONFIGURATIONS[provider] = configuration
+if config.CFG_OAUTH1_CONFIGURATIONS:
+    for provider, configuration in config.CFG_OAUTH1_CONFIGURATIONS.items():
+        if provider in CFG_OAUTH1_CONFIGURATIONS:
+            CFG_OAUTH1_CONFIGURATIONS[provider].update(configuration)
+        else:
+            CFG_OAUTH1_CONFIGURATIONS[provider] = configuration
+if config.CFG_OAUTH2_CONFIGURATIONS:
+    for provider, configuration in config.CFG_OAUTH2_CONFIGURATIONS.items():
+        if provider in CFG_OAUTH2_CONFIGURATIONS:
+            CFG_OAUTH2_CONFIGURATIONS[provider].update(configuration)
+        else:
+            CFG_OAUTH2_CONFIGURATIONS[provider] = configuration
+
+# If OpenID authentication is enabled, add 'openid' to login methods
+CFG_OPENID_AUTHENTICATION = bool(CFG_OPENID_PROVIDERS)
+if CFG_OPENID_AUTHENTICATION:
+    from invenio.external_authentication_openid import ExternalOpenID
+    CFG_EXTERNAL_AUTHENTICATION['openid'] = ExternalOpenID(enforce_external_nicknames=True)
+
+# If OAuth1 authentication is enabled, add 'oauth1' to login methods.
+CFG_OAUTH1_AUTHENTICATION = bool(CFG_OAUTH1_PROVIDERS)
+if CFG_OAUTH1_PROVIDERS:
+    from invenio.external_authentication_oauth1 import ExternalOAuth1
+    CFG_EXTERNAL_AUTHENTICATION['oauth1'] = ExternalOAuth1(enforce_external_nicknames=True)
+
+# If OAuth2 authentication is enabled, add 'oauth2' to login methods.
+CFG_OAUTH2_AUTHENTICATION = bool(CFG_OAUTH2_PROVIDERS)
+if CFG_OAUTH2_AUTHENTICATION:
+    from invenio.external_authentication_oauth2 import ExternalOAuth2
+    CFG_EXTERNAL_AUTHENTICATION['oauth2'] = ExternalOAuth2(enforce_external_nicknames=True)
+
 
 ## If using SSO, this is the number of seconds after which the keep-alive
 ## SSO handler is pinged again to provide fresh SSO information.

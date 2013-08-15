@@ -17,12 +17,13 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
 
-{% macro record_brief_links(recID, i) %}
-  {%- set rinfo = RecordInfo(recID) -%}
+{% macro record_brief_links(record) %}
   <p>
-    {%- set similar = "recid:%d" % recID -%}
+    {%- set recID = record['recid'] -%}
+    {%- set i = recID %}
+    {%- set similar = "recid:%s" % recID -%}
     {%- if config.CFG_WEBSEARCH_USE_ALEPH_SYSNOS -%}
-      {%- set alephsysnos = rinfo.get_fieldvalues("970__a") -%}
+      {%- set alephsysnos = record['system_number'] -%}
       {%- if len(alephsysnos) > 0 -%}
         {%- set recID = alephsysnos[0] -%}
         {%- set similar = "sysno:%d" % recID -%}
@@ -67,12 +68,7 @@
     </a>
     {%- endif -%}
   {%- endif -%} -->
-
-
   </p>
-
-
-
 {% endmacro %}
 
 
