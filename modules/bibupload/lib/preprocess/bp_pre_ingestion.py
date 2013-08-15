@@ -237,7 +237,11 @@ class MetsIngestion:
         Adds the year in which the post or comment was posted.
         """
 
-        posted_date = self.get_fieldvalue(tag='269', code='c')
+        try:
+            posted_date = self.get_fieldvalue(tag='269', code='c')
+        except:
+            posted_date = ""
+
         if posted_date:
             if posted_date.find("ERROR") > -1:
                 creation_date = get_creation_date(self.recid)
@@ -260,11 +264,30 @@ class MetsIngestion:
         """
 
         if self.record_type == 'BLOGPOST':
-            parent_blog_url = self.get_fieldvalue(tag='760', code='o')
+            try:
+                parent_blog_url = self.get_fieldvalue(tag='760', code='o')
+            except Exception, e: # post coming without parent blog url
+                wp = self.get_fieldvalue(tag='99999', code='watchpointid')
+                log_file = open(CFG_TMPDIR + "/log_file", "a")
+                log_file.write("Not parent blog url present in file %s, wp: %s. Error: %s\n" %
+                                (self.file_name, wp, str(e)))
+                log_file.close()
+                raise Exception(str(e))
+
             if parent_blog_url:
                 parent_blog_recid = search_pattern(p='520__u:' + parent_blog_url)
+
         elif self.record_type == 'COMMENT':
-            parent_post_url = self.get_fieldvalue(tag='773', code='o')
+            try:
+                parent_post_url = self.get_fieldvalue(tag='773', code='o')
+            except Exception, e: # comment coming without parent post url
+                wp = self.get_fieldvalue(tag='99999', code='watchpointid')
+                log_file = open(CFG_TMPDIR + "/log_file", "a")
+                log_file.write("Not parent post url present in file %s, wp: %s. Error: %s\n" %
+                                (self.file_name, wp, str(e)))
+                log_file.close()
+                raise Exception(str(e))
+
             if parent_post_url:
                 parent_post_recid = search_pattern(p='520__u:' + parent_post_url)
                 parent_blog_recid = get_parent_blog(parent_post_recid)
@@ -287,11 +310,30 @@ class MetsIngestion:
         """
 
         if self.record_type == 'BLOGPOST':
-            parent_blog_url = self.get_fieldvalue(tag='760', code='o')
+            try:
+                parent_blog_url = self.get_fieldvalue(tag='760', code='o')
+            except Exception, e: # post coming without parent blog url
+                wp = self.get_fieldvalue(tag='99999', code='watchpointid')
+                log_file = open(CFG_TMPDIR + "/log_file", "a")
+                log_file.write("Not parent blog url present in file %s, wp: %s. Error: %s\n" %
+                                (self.file_name, wp, str(e)))
+                log_file.close()
+                raise Exception(str(e))
+
             if parent_blog_url:
                 parent_blog_recid = search_pattern(p='520__u:' + parent_blog_url)
+
         elif self.record_type == 'COMMENT':
-            parent_post_url = self.get_fieldvalue(tag='773', code='o')
+            try:
+                parent_post_url = self.get_fieldvalue(tag='773', code='o')
+            except Exception, e: # comment coming without parent post url
+                wp = self.get_fieldvalue(tag='99999', code='watchpointid')
+                log_file = open(CFG_TMPDIR + "/log_file", "a")
+                log_file.write("Not parent post url present in file %s, wp: %s. Error: %s\n" %
+                                (self.file_name, wp, str(e)))
+                log_file.close()
+                raise Exception(str(e))
+
             if parent_post_url:
                 parent_post_recid = search_pattern(p='520__u:' + parent_post_url)
                 parent_blog_recid = get_parent_blog(parent_post_recid)
@@ -316,11 +358,12 @@ class MetsIngestion:
             parent_blog_url = self.get_fieldvalue(tag='760', code='o')
         except Exception, e: # post coming without parent blog url
             wp = self.get_fieldvalue(tag='99999', code='watchpointid')
-            error_file = open(CFG_TMPDIR + "/error_file", "a")
-            error_file.write("Not parent blog url present in file %s, wp: %s. Error: %s\n" %
+            log_file = open(CFG_TMPDIR + "/log_file", "a")
+            log_file.write("Not parent blog url present in file %s, wp: %s. Error: %s\n" %
                             (self.file_name, wp, str(e)))
-            error_file.close()
+            log_file.close()
             raise Exception(str(e))
+
         if parent_blog_url:
             parent_blog_recid = search_pattern(p='520__u:' + parent_blog_url)
             if parent_blog_recid:
@@ -335,7 +378,16 @@ class MetsIngestion:
         Adds the recid and url of the parent blog of a comment.
         """
 
-        parent_post_url = self.get_fieldvalue(tag='773', code='o')
+        try:
+            parent_post_url = self.get_fieldvalue(tag='773', code='o')
+        except Exception, e: # comment coming without parent post url
+            wp = self.get_fieldvalue(tag='99999', code='watchpointid')
+            log_file = open(CFG_TMPDIR + "/log_file", "a")
+            log_file.write("Not parent post url present in file %s, wp: %s. Error: %s\n" %
+                            (self.file_name, wp, str(e)))
+            log_file.close()
+            raise Exception(str(e))
+
         if parent_post_url:
             parent_post_recid = search_pattern(p='520__u:' + parent_post_url)
             if parent_post_recid:
@@ -362,11 +414,12 @@ class MetsIngestion:
             parent_post_url = self.get_fieldvalue(tag='773', code='o')
         except Exception, e: # comment coming without parent post url
             wp = self.get_fieldvalue(tag='99999', code='watchpointid')
-            error_file = open(CFG_TMPDIR + "/error_file", "a")
-            error_file.write("Not parent post url present in file %s, wp: %s. Error: %s\n" %
+            log_file = open(CFG_TMPDIR + "/log_file", "a")
+            log_file.write("Not parent post url present in file %s, wp: %s. Error: %s\n" %
                             (self.file_name, wp, str(e)))
-            error_file.close()
+            log_file.close()
             raise Exception(str(e))
+
         if parent_post_url:
             parent_post_recid = search_pattern(p='520__u:' + parent_post_url)
             if parent_post_recid:
@@ -400,10 +453,10 @@ class MetsIngestion:
             wrong_html_file.write(content.encode('utf8'))
             wrong_html_file.close()
             wp = self.get_fieldvalue(tag='99999', code='watchpointid')
-            error_file = open(CFG_TMPDIR + "/error_file", "a")
-            error_file.write("AttributeError in file %s, wp: %s. Error: %s\n" %
+            log_file = open(CFG_TMPDIR + "/log_file", "a")
+            log_file.write("AttributeError in file %s, wp: %s. Error: %s\n" %
                             (self.file_name, wp, str(e)))
-            error_file.close()
+            log_file.close()
             # something is wrong with the HTML of the record, so let's stop this bibupload task
             # and notified this to the spider
             raise Exception(str(e))

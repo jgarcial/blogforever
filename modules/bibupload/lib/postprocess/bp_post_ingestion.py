@@ -58,9 +58,9 @@ def bp_post_ingestion(file_path):
         mets_file = f.read()
         f.close()
     except:
-        error_file = open(CFG_TMPDIR + "/error_file", "a")
-        error_file.write("Could not find the METS file %s" % mets_file_path +"\n")
-        error_file.close()
+        log_file = open(CFG_TMPDIR + "/log_file", "a")
+        log_file.write("Could not find the METS file %s" % mets_file_path +"\n")
+        log_file.close()
 
     # let's get the METS file with the enriched MARC embedded (created at pre-ingestion time)
     # let's get the attached files
@@ -75,9 +75,9 @@ def bp_post_ingestion(file_path):
         record_collection = xml_tree.xpath("mets:dmdSec/mets:mdWrap/mets:xmlData/marc:record/marc:datafield[@tag='980']/marc:subfield[@code='a']/text()", \
                                             namespaces=namespaces)[0].strip()
     except:
-        error_file = open(CFG_TMPDIR + "/error_file", "a")
-        error_file.write("Could not find the METS file %s" % mets_file_path +"\n")
-        error_file.close()
+        log_file = open(CFG_TMPDIR + "/log_file", "a")
+        log_file.write("Could not find the METS file %s" % mets_file_path +"\n")
+        log_file.close()
         record_collection = "DEFAULT"
 
     # to get the final XML without the xml declaration header

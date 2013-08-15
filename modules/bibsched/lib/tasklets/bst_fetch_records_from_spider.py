@@ -56,10 +56,10 @@ def process_record(client, api_key, match):
     try:
         metadata = client.service.GetDocumentAsMets(api_key, match.Object.Id)
     except Exception:
-        error_file = open("/tmp/error_file", "a")
-        error_file.write("Error fetching METS document for %s, %s \n" % \
+        log_file = open("/tmp/log_file", "a")
+        log_file.write("Error fetching METS document for %s, %s \n" % \
                          (match.Object.Id, match.Object.WatchPointId))
-        error_file.close()
+        log_file.close()
         return
     if validate_content(content=metadata.MetsXml.encode('utf-8'), md5_hash=metadata.MD5):
         prefix = match.Object.Type + "_" + time.strftime("%Y-%m-%d_%H:%M:%S")
@@ -85,10 +85,10 @@ def process_record(client, api_key, match):
         try:
             docstorage = client.service.GetDocumentStorage(api_key, match.Object.DocumentId)
         except Exception:
-            error_file = open(CFG_TMPDIR + "/error_file", "a")
-            error_file.write("There are not attached files for %s, %s \n" % \
+            log_file = open(CFG_TMPDIR + "/log_file", "a")
+            log_file.write("There are not attached files for %s, %s \n" % \
                              (metadata_file_name, match.Object.WatchPointId))
-            error_file.close()
+            log_file.close()
 
         if docstorage:
             for file in docstorage.FileInfos.StorageFileInfo:
@@ -99,20 +99,28 @@ def process_record(client, api_key, match):
                         f.write(decodestring(attach))
                         f.close()
                     else:
-                        error_file = open(CFG_TMPDIR + "/error_file", "a")
-                        error_file.write("Attached file %s validation failed in %s \n" % \
+                        log_file = open(CFG_TMPDIR + "/log_file", "a")
+                        log_file.write("Attached file %s validation failed in %s \n" % \
                                          (file.Type + "_" + file.Filename, metadata_file_name))
-                        error_file.close()
+                        log_file.close()
                 except Exception:
-                    error_file = open(CFG_TMPDIR + "/error_file", "a")
-                    error_file.write("Fail retrieving attached files for %s, %s \n" % \
+                    log_file = open(CFG_TMPDIR + "/log_file", "a")
+                    log_file.write("Fail retrieving attached files for %s, %s \n" % \
                                      (metadata_file_name, match.Object.WatchPointId))
-                    error_file.close()
+                    log_file.close()
 
         # Let's save the last record id it was retrieved
         last_id_file = open(CFG_TMPDIR + "/last_id", "w")
         last_id_file.write(repr(match.Object.Id))
         last_id_file.close()
+
+        # Let's stop the fetcher for a while in order
+        # to clear the bibsched queue
+        query = 'SELECT COUNT(*) FROM schTASK WHERE STATUS="WAITING"'
+        queue_size = run_sql(query)[0][0]
+        while queue_size > 1000:
+            time.sleep(20)
+            queue_size = run_sql(query)[0][0]
 
         # Double check if the file exists
         if os.path.exists(path_metadata_file):
@@ -121,14 +129,14 @@ def process_record(client, api_key, match):
                                       '--pre-plugin=bp_pre_ingestion', \
                                       '--post-plugin=bp_post_ingestion')
         else:
-            error_file = open(CFG_TMPDIR + "/error_file", "a")
-            error_file.write("No such as file %s \n" % metadata_file_name)
-            error_file.close()
+            log_file = open(CFG_TMPDIR + "/log_file", "a")
+            log_file.write("No such as file %s \n" % metadata_file_name)
+            log_file.close()
     else:
         # TODO: write down this url to fetch this record again
-        error_file = open(CFG_TMPDIR + "/error_file", "a")
-        error_file.write("METS validation failed in %s, %s \n" % metadata_file_name, match.Object.WatchPointId)
-        error_file.close()
+        log_file = open(CFG_TMPDIR + "/log_file", "a")
+        log_file.write("METS validation failed in %s, %s \n" % metadata_file_name, match.Object.WatchPointId)
+        log_file.close()
 
 
 def connect_to_webservice(url):
@@ -144,14 +152,14 @@ def connect_to_webservice(url):
     return client
 
 
-def create_error_file():
+def create_log_file():
     """
     Create an error logging file
     """
 
-    error_file = open(CFG_TMPDIR + "/error_file", "a")
-    error_file.write("----- Start error file -----\n")
-    error_file.close()
+    log_file = open(CFG_TMPDIR + "/log_file", "a")
+    log_file.write("----- Start error file -----\n")
+    log_file.close()
 
 
 def create_metadata_dirs():
@@ -294,9 +302,9 @@ def bst_fetch_records_from_spider(api_key=CFG_SPIDER_API_KEY, url=CFG_SPIDER_WEB
                 result = client.service.SearchEntities(api_key, sr)
                 matches = result.Matches.BlogSearchMatch
             except Exception: # no more results were found
-                error_file = open(CFG_TMPDIR + "/error_file", "a")
-                error_file.write("No more results were found \n")
-                error_file.close()
+                log_file = open(CFG_TMPDIR + "/log_file", "a")
+                log_file.write("No more results were found \n")
+                log_file.close()
                 break
             # Let's go to the next page
             sr.PageNumber = sr.PageNumber + 1
@@ -340,6 +348,9 @@ def bst_fetch_records_from_spider(api_key=CFG_SPIDER_API_KEY, url=CFG_SPIDER_WEB
             task_low_level_submission('webcoll', 'admin', '-p1')
 
     task_update_progress("Finish fetching blog records")
-    error_file = open(CFG_TMPDIR + "/error_file", "a")
-    error_file.write("Finished fetching blog records\n")
-    error_file.close()
+    last_id_file = open(CFG_TMPDIR + "/last_id", "r")
+    last_id = int(last_id_file.read())
+    last_id_file.close()
+    log_file = open(CFG_TMPDIR + "/log_file", "a")
+    log_file.write("Finished fetching blog records. The last blog record retrieved was %s \n" % last_id)
+    log_file.close()
