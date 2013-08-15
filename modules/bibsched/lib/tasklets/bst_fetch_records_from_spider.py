@@ -22,6 +22,7 @@ from base64 import decodestring
 from hashlib import md5
 import os
 import time
+from datetime import datetime
 import tempfile
 import sys
 from invenio.bibtask import task_low_level_submission, task_update_progress
@@ -152,13 +153,13 @@ def connect_to_webservice(url):
     return client
 
 
-def create_log_file():
+def create_log_file(last_id):
     """
     Create an error logging file
     """
 
     log_file = open(CFG_TMPDIR + "/log_file", "a")
-    log_file.write("----- Start error file -----\n")
+    log_file.write("Started fetching blog records from %s blog record id. Timestamp: %s \n" % (last_id, datetime.now()))
     log_file.close()
 
 
@@ -264,7 +265,9 @@ def bst_fetch_records_from_spider(api_key=CFG_SPIDER_API_KEY, url=CFG_SPIDER_WEB
     """
 
     client = connect_to_webservice(url)
-    create_log_file()
+    create_metadata_dirs()
+    last_id = get_last_id()
+    create_log_file(last_id)
 
     # Let's check which is the status of the URLs that
     # have been submitted and clean up the PROVISIONAL BLOGS
@@ -273,8 +276,6 @@ def bst_fetch_records_from_spider(api_key=CFG_SPIDER_API_KEY, url=CFG_SPIDER_WEB
     check_submitted_blog_urls_status(client)
     task_update_progress("Finished checking submitted urls status")
 
-    create_metadata_dirs()
-    last_id = get_last_id()
     # Set limits to get the total of results to retrieve
     id_start = last_id
     sr = create_search_request(client, page_size = 1, page_number = 0, \
@@ -303,7 +304,7 @@ def bst_fetch_records_from_spider(api_key=CFG_SPIDER_API_KEY, url=CFG_SPIDER_WEB
                 matches = result.Matches.BlogSearchMatch
             except Exception: # no more results were found
                 log_file = open(CFG_TMPDIR + "/log_file", "a")
-                log_file.write("No more results were found \n")
+                log_file.write("No more results were found. Timestamp: %s\n" % datetime.now())
                 log_file.close()
                 break
             # Let's go to the next page
@@ -352,5 +353,5 @@ def bst_fetch_records_from_spider(api_key=CFG_SPIDER_API_KEY, url=CFG_SPIDER_WEB
     last_id = int(last_id_file.read())
     last_id_file.close()
     log_file = open(CFG_TMPDIR + "/log_file", "a")
-    log_file.write("Finished fetching blog records. The last blog record retrieved was %s \n" % last_id)
+    log_file.write("Finished fetching blog records. The last blog record retrieved was %s.  Timestamp: %s \n" % (last_id, datetime.now()))
     log_file.close()

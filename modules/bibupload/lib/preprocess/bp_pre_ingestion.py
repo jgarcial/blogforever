@@ -35,6 +35,9 @@ from invenio.bibtask import  task_update_progress
 from bs4 import BeautifulSoup
 import bleach
 import datetime
+from invenio.langid import classify
+from invenio.htmlutils import remove_html_markup
+
 
 batchupload_dir = CFG_BATCHUPLOADER_DAEMON_DIR[0] == '/' and CFG_BATCHUPLOADER_DAEMON_DIR \
                           or CFG_PREFIX + '/' + CFG_BATCHUPLOADER_DAEMON_DIR
@@ -180,6 +183,42 @@ class MetsIngestion:
         fft_nodes = [self.create_fft_tag_node(attached_file) \
                      for attached_file in attached_files_list]
         return fft_nodes
+
+
+    def detect_language(self):
+        """
+        Detects the language in which the post or comment is written
+        and adds it into the MARC tag '041__a'.
+        """
+
+        for tag in self.marc_record.getElementsByTagName('datafield'):
+            if tag.getAttribute('tag')=='520':
+                for subfield in tag.getElementsByTagName('subfield'):
+                    if subfield.getAttribute('code')=='a':
+                        try:
+                            content_a = subfield.firstChild.data
+                        except:
+                            content_a = ""
+                    elif subfield.getAttribute('code')=='b':
+                        try:
+                            content_b = subfield.firstChild.data
+                        except:
+                            content_b = ""
+
+        if content_a:
+            content = content_a
+        elif content_b:
+            content = content_b
+        else:
+            content = ""
+
+        cleaned_content = remove_html_markup(content)
+        ln = classify(cleaned_content)[0]
+        new_node = self.create_new_field('datafield', tag='041', ind1='', ind2='')
+        sub_node1 = self.create_new_field('subfield', code='a', \
+                                          value=str(ln))
+        new_node.appendChild(sub_node1)
+        self.marc_record.appendChild(new_node)
 
 
     def replace_empty_author(self):
@@ -563,6 +602,7 @@ class MetsIngestion:
         if self.record_type in ['BLOGPOST', 'COMMENT']:
             # cleans HTML content
             self.clean_marc_record_content()
+            self.detect_language()
             self.replace_empty_author()
             self.add_parent_blog_visibility()
             self.add_parent_blog_topics()
