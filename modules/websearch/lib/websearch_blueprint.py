@@ -449,8 +449,60 @@ def export(collection, of):
     It uses following request values:
         * of (string): output format
         * recid ([int]): list of record IDs
-
     """
-    # Get list of integers with record IDs.
+
+    of = request.values.get('of', 'xm')
     recids = request.values.getlist('recid', type=int)
-    return response_formated_records(recids, collection, of)
+    rg = request.args.get('rg', len(recids), type=int)
+    page = request.args.get('jrec', 1, type=int)
+    pages = int(ceil(page / float(rg))) if rg > 0 else 1
+    try:
+        content_type = Format.query.filter(Format.code == of).one().content_type
+    except:
+        register_exception()
+        content_type = 'text/xml'
+
+    name = request.args.get('cc')
+    if name:
+        collection = Collection.query.filter(Collection.name == name).\
+            first_or_404()
+    else:
+        collection = Collection.query.get_or_404(1)
+
+    @register_template_context_processor
+    def index_context():
+        return dict(
+            collection=collection,
+            RecordInfo=RecordInfo,
+            rg=rg,
+            pagination=Pagination(pages, rg, len(recids)))
+
+    filename = None
+    if of == 'pdf':
+        from invenio.bibformat import create_pdf
+        result = create_pdf(recids)
+        if len(recids) == 1:
+            filename = 'record%s.pdf' % recids[0]
+        else:
+            content_type = 'application/zip'
+            filename = 'records.zip'
+    elif of == 'jpeg':
+        from invenio.bibformat import create_jpeg
+        result = create_jpeg(recids)
+        if len(recids) == 1:
+            filename = 'record%s.jpeg' % recids[0]
+        else:
+            content_type = 'application/zip'
+            filename = 'records.zip'
+    else:
+        from invenio.bibformat import print_records
+        result = print_records(recids, of=of, ln=g.ln)
+
+    response = make_response(result)
+    response.content_type = content_type
+
+    if filename:
+        filename = 'inline; filename=%s' % (filename, )
+        response.headers.add_header('Content-Disposition', filename)
+
+    return response

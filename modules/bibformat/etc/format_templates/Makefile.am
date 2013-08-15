@@ -33,7 +33,7 @@ etc_DATA = Default_HTML_captions.bft Picture_HTML_brief.bft \
            Basket_Search_Result.bft Default_HTML_meta.bft \
            WebAuthorProfile_affiliations_helper.bft DataCite.xsl \
            Default_Mobile_brief.bft Default_Mobile_detailed.bft \
-           METS.bft
+           METS.bft LaTeX.bft JPEGSnapshotPage.bft
 
 tmpdir = $(prefix)/var/tmp
 

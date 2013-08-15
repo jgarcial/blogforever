@@ -29,7 +29,9 @@ templates_DATA = format_records_text_html.tpl \
 		 format_records_xo.tpl \
 		 format_records_xp.tpl \
 		 format_records_xr.tpl \
-		 format_records_xw.tpl
+		 format_records_xw.tpl \
+		 format_records_jpeg.tpl \
+		 format_records_pdf.tpl
 
 EXTRA_DIST = $(templates_DATA)
 

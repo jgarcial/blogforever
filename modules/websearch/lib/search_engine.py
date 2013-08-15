@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 ## This file is part of Invenio.
 ## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 ##
@@ -84,7 +85,8 @@ from invenio.config import \
      CFG_WEBSEARCH_VIEWRESTRCOLL_POLICY, \
      CFG_BIBSORT_BUCKETS, \
      CFG_XAPIAN_ENABLED, \
-     CFG_BIBINDEX_CHARS_PUNCTUATION
+     CFG_BIBINDEX_CHARS_PUNCTUATION, \
+     CFG_TRANSLATE_RECORD_PREVIEW
 
 from invenio.search_engine_config import \
      InvenioWebSearchUnknownCollectionError, \
@@ -101,7 +103,7 @@ from invenio.bibindex_engine_tokenizer import wash_author_name, author_name_requ
      BibIndexPairTokenizer
 from invenio.bibindex_engine_washer import wash_index_term, lower_index_term, wash_author_name
 from invenio.bibindexadminlib import get_idx_indexer
-from invenio.bibformat import format_record, format_records, get_output_format_content_type, create_excel
+from invenio.bibformat import format_record, format_records, get_output_format_content_type, create_excel, create_pdf, create_jpeg
 from invenio.bibformat_config import CFG_BIBFORMAT_USE_OLD_BIBFORMAT
 from invenio.bibrank_downloads_grapher import create_download_history_graph_and_box
 from invenio.bibknowledge import get_kbr_values
@@ -119,7 +121,6 @@ from invenio.errorlib import register_exception
 from invenio.textutils import encode_for_xml, wash_for_utf8, strip_accents
 from invenio.htmlutils import get_mathjax_header
 from invenio.htmlutils import nmtoken_from_string
-
 
 import invenio.template
 webstyle_templates = invenio.template.load('webstyle')
@@ -876,7 +877,7 @@ def page_start(req, of, cc, aas, ln, uid, title_message=None,
             req.write("""<?xml version="1.0" encoding="UTF-8"?>\n""")
         else:
             # we are doing XML output:
-            req.content_type = get_output_format_content_type(of, 'text/xml')
+            req.content_type = get_output_format_content_type(of)
             req.send_http_header()
             req.write("""<?xml version="1.0" encoding="UTF-8"?>\n""")
     elif of.startswith('t') or str(of[0:3]).isdigit():
@@ -962,17 +963,17 @@ def page_start(req, of, cc, aas, ln, uid, title_message=None,
 
         ## finally, print page header:
         if em == '' or EM_REPOSITORY["header"] in em:
-            req.write(pageheaderonly(req=req, title=title_message,
-                                 navtrail=navtrail,
-                                 description=description,
-                                 keywords=keywords,
-                                 metaheaderadd=metaheaderadd,
-                                 uid=uid,
-                                 language=ln,
-                                 navmenuid='search',
-                                 navtrail_append_title_p=0,
-                                 rssurl=rssurl,
-                                 body_css_classes=body_css_classes))
+                req.write(pageheaderonly(req=req, title=title_message,
+                                     navtrail=navtrail,
+                                     description=description,
+                                     keywords=keywords,
+                                     metaheaderadd=metaheaderadd,
+                                     uid=uid,
+                                     language=ln,
+                                     navmenuid='search',
+                                     navtrail_append_title_p=0,
+                                     rssurl=rssurl,
+                                     body_css_classes=body_css_classes))
         req.write(websearch_templates.tmpl_search_pagestart(ln=ln))
     else:
         req.content_type = content_type
@@ -1453,12 +1454,12 @@ def wash_colls(cc, c, split_colls=0, verbose=0):
     #colls_to_be_removed = []
     # first calculate the collections that can safely be removed
     #for coll in colls_out_for_display:
-    #    for ancestor in get_coll_ancestors(coll):
-    #        #if ancestor in colls_out_for_display: colls_to_be_removed.append(coll)
-    #        if ancestor in colls_out_for_display and not is_hosted_collection(coll): colls_to_be_removed.append(coll)
+    #   for ancestor in get_coll_ancestors(coll):
+    #       #if ancestor in colls_out_for_display: colls_to_be_removed.append(coll)
+    #       if ancestor in colls_out_for_display and not is_hosted_collection(coll): colls_to_be_removed.append(coll)
     # secondly remove the collections
     #for coll in colls_to_be_removed:
-    #    colls_out_for_display.remove(coll)
+    #   colls_out_for_display.remove(coll)
 
     if verbose:
         debug += "<br />6) --- remove collections that have ancestors about to be search, unless they are hosted ---"
@@ -1498,7 +1499,7 @@ def wash_colls(cc, c, split_colls=0, verbose=0):
                     if not is_hosted_collection(coll_son):
                         colls_out.append(coll_son)
             #else:
-            #    colls_out = colls_out + coll_sons
+            #   colls_out = colls_out + coll_sons
 
     # remove duplicates:
     #colls_out_nondups=filter(lambda x, colls_out=colls_out: colls_out[x-1] not in colls_out[x:], range(1, len(colls_out)+1))
@@ -2179,8 +2180,8 @@ def search_pattern_parenthesised(req=None, p=None, f=None, m=None, ap=0, of="id"
                 # setting ap=0 to turn off approximate matching for 0 results.
                 # Doesn't work well in combinations.
                 # FIXME: The right fix involves collecting statuses for each
-                #        hitset, then showing a nearest terms box exactly once,
-                #        outside this loop.
+                #       hitset, then showing a nearest terms box exactly once,
+                #       outside this loop.
                 ap = 0
                 display_nearest_terms_box = False
              # obtain a hitset for the current pattern
@@ -2309,9 +2310,9 @@ def search_unit(p, f=None, m=None, wl=0, ignore_synonyms=None):
         else:
             hitset = search_unit_in_bibxxx(p, f, m, wl)
             # if not hitset and m == 'a' and (p[0] != '%' and p[-1] != '%'):
-            #     #if we have no results by doing exact matching, do partial matching
-            #     #for removing the distinction between simple and double quotes
-            #     hitset = search_unit_in_bibxxx('%' + p + '%', f, m, wl)
+            #    #if we have no results by doing exact matching, do partial matching
+            #    #for removing the distinction between simple and double quotes
+            #    hitset = search_unit_in_bibxxx('%' + p + '%', f, m, wl)
     elif p.startswith("cited:"):
         # we are doing search by the citation count
         hitset = search_unit_by_times_cited(p[6:])
@@ -3576,7 +3577,7 @@ def get_fieldvalues_alephseq_like(recID, tags_in, can_see_hidden=False):
         tags_in = [tags_in,]
     if len(tags_in) == 1 and len(tags_in[0]) == 6:
         ## case A: one concrete subfield asked, so print its value if found
-        ##         (use with care: can mislead if field has multiple occurrences)
+        ##       (use with care: can mislead if field has multiple occurrences)
         out += string.join(get_fieldvalues(recID, tags_in[0]),"\n")
     else:
         ## case B: print our "text MARC" format; works safely all the time
@@ -4203,7 +4204,7 @@ def sort_records_bibxxx(req, recIDs, tags, sort_field='', sort_order='d', sort_p
                         val = v
                         break
                 if not bingo: # sort_pattern not present, so add other vals after spaces
-                    val = sort_pattern + "          " + string.join(vals)
+                    val = sort_pattern + "        " + string.join(vals)
             else:
                 # no sort pattern defined, so join them all together
                 val = string.join(vals)
@@ -4358,6 +4359,26 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
         elif format == 'excel':
             recIDs_to_print = [recIDs[x] for x in range(irec_max, irec_min, -1)]
             create_excel(recIDs=recIDs_to_print, req=req, ln=ln, ot=ot, user_info=user_info)
+        elif format == 'pdf':
+            recIDs_to_print = [recIDs[x] for x in range(irec_max, irec_min, -1)]
+            req.write(create_pdf(recIDs=recIDs_to_print))
+            if len(recIDs) == 1:
+                req.content_type = "application/pdf"
+                req.headers_out["Content-Disposition"] = "inline; filename=record" + str(recIDs[0]) + ".pdf"
+            else:  # In case the request asks for multiple records.
+                req.content_type = "application/zip"
+                req.headers_out["Content-Disposition"] = "inline; filename=records.zip"
+            req.send_http_header()
+        elif format == 'jpeg':
+            recIDs_to_print = [recIDs[x] for x in range(irec_max, irec_min, -1)]
+            req.write(create_jpeg(recIDs=recIDs_to_print))
+            if len(recIDs) == 1:
+                req.content_type = "image/jpeg"
+                req.headers_out["Content-Disposition"] = "inline; filename=record" + str(recIDs[0]) + ".jpeg"
+            else:  # In case the request asks for multiple records.
+                req.content_type = "application/zip"
+                req.headers_out["Content-Disposition"] = "inline; filename=records.zip"
+            req.send_http_header()
         else:
             # we are doing HTML output:
             if format == 'hp' or format.startswith("hb_") or format.startswith("hd_"):
@@ -4458,7 +4479,7 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                         downloadsimilarity = None
                         downloadhistory = None
                         #if r:
-                        #    downloadsimilarity = r
+                        #   downloadsimilarity = r
                         if CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS:
                             downloadhistory = create_download_history_graph_and_box(recIDs[irec], ln)
 
@@ -4576,6 +4597,43 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                         content += websearch_templates.tmpl_display_back_to_search(req,
                                                                                    recIDs[irec],
                                                                                    ln)
+                        #begin - constructs the script for translating record.
+                        show_translate = 0
+                        if CFG_TRANSLATE_RECORD_PREVIEW:
+                            from invenio.search_engine import get_record
+                            from invenio.translate_utils import get_lang_name_from_code, is_in_lang_codes
+                            
+                            show_translate = 1
+                            record = get_record(recid)
+                            record_lang = ""
+                            if record.has_key('041'):
+                                record_lang = record['041'][0][0][0][1]
+
+                            if record_lang != "":
+                                if record_lang == ln:
+                                    show_translate = 0
+                                else:
+                                    site_lang = get_lang_name_from_code(ln)
+                                    if(is_in_lang_codes(site_lang, record_lang) != ""):
+                                        show_translate = 0
+
+                        translate_section = ""
+                        if show_translate:
+                            translate_section = """
+                                        <script>
+                                function googleSectionalElementInit() {
+                                  new google.translate.SectionalElement({
+                                    sectionalNodeClassName: 'to-be-translated',
+                                    controlNodeClassName: 'translate-link',
+                                    background: '#ffffff'
+                                  }, 'google_sectional_element');
+                                }
+                            </script>
+                            <script src="//translate.google.com/translate_a/element.js?cb=googleSectionalElementInit&ug=section&hl=%(ln)s"></script>
+                            """ % {'ln':ln}
+                        #end - constructs the script for translating record.
+                        
+                        req.write(translate_section)
                         req.write(content)
                         req.write(webstyle_templates.detailed_record_container_bottom(recIDs[irec],
                                                                                       tabs,
@@ -4784,10 +4842,10 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
         else:
             # record 'recID' is not formatted in 'format' -- they are not in "bibfmt" table; so fetch all the data from "bibXXx" tables:
             if format == "marcxml":
-                out += """    <record xmlns="http://www.loc.gov/MARC21/slim">\n"""
+                out += """  <record xmlns="http://www.loc.gov/MARC21/slim">\n"""
                 out += "        <controlfield tag=\"001\">%d</controlfield>\n" % int(recID)
             elif format.startswith("xm"):
-                out += """    <record>\n"""
+                out += """  <record>\n"""
                 out += "        <controlfield tag=\"001\">%d</controlfield>\n" % int(recID)
             if record_exist_p == -1:
                 # deleted record, so display only OAI ID and 980:
@@ -4805,7 +4863,7 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
                 for row in res:
                     field, value = row[0], row[1]
                     value = encode_for_xml(value)
-                    out += """        <controlfield tag="%s" >%s</controlfield>\n""" % \
+                    out += """      <controlfield tag="%s" >%s</controlfield>\n""" % \
                            (encode_for_xml(field[0:3]), value)
                 # datafields
                 i = 1 # Do not process bib00x and bibrec_bib00x, as
@@ -4841,26 +4899,26 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
                             if printme:
                                 if field_number != field_number_old or field[:-1] != field_old[:-1]:
                                     if field_number_old != -999:
-                                        out += """        </datafield>\n"""
-                                    out += """        <datafield tag="%s" ind1="%s" ind2="%s">\n""" % \
+                                        out += """      </datafield>\n"""
+                                    out += """      <datafield tag="%s" ind1="%s" ind2="%s">\n""" % \
                                                (encode_for_xml(field[0:3]), encode_for_xml(ind1), encode_for_xml(ind2))
                                     field_number_old = field_number
                                     field_old = field
                                 # print subfield value
                                 value = encode_for_xml(value)
-                                out += """            <subfield code="%s">%s</subfield>\n""" % \
+                                out += """          <subfield code="%s">%s</subfield>\n""" % \
                                    (encode_for_xml(field[-1:]), value)
 
                         # all fields/subfields printed in this run, so close the tag:
                         if field_number_old != -999:
-                            out += """        </datafield>\n"""
+                            out += """      </datafield>\n"""
                     i = 0 # Next loop should start looking at bib%0 and bibrec_bib00x
             # we are at the end of printing the record:
             out += "    </record>\n"
 
     elif format == "xd" or format == "oai_dc":
         # XML Dublin Core format, possibly OAI -- select only some bibXXx fields:
-        out += """    <dc xmlns="http://purl.org/dc/elements/1.1/"
+        out += """  <dc xmlns="http://purl.org/dc/elements/1.1/"
                          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                          xsi:schemaLocation="http://purl.org/dc/elements/1.1/
                                              http://www.openarchives.org/OAI/1.1/dc.xsd">\n"""
@@ -5594,61 +5652,6 @@ def prs_browse(kwargs=None, req=None, of=None, cc=None, aas=None, ln=None, uid=N
             print_records_epilogue(req, of)
         return page_end(req, of, ln, em)
 
-def blog_extend_bibrank(rank_method_code, rank_limit_relevance, hitset_global, pattern=[], verbose=0, field='', rg=None, jrec=None):
-    from invenio.webblog_utils import get_posts, get_parent_blog, get_post_tags
-    if pattern[0][0:6] == "recid:" and get_fieldvalues(pattern[0][6:], "980__a")[0] == "BLOG":
-	blog_recid = int(pattern[0][6:])
-	posts = get_posts(blog_recid)
-	sums = {}
-	if rank_method_code == 'tag':
-	    total = 0
-	    for post in posts:
-	        tags = get_post_tags(post)
-	        total = total + len(tags)
-	        for tag in tags:
-	    	    p = '653__1:"%s"' % tag
-		    results = perform_request_search(cc="Posts", p=p)
-		    #results = set(results) - set(posts)
-		    for recid in results:
-		        if recid in sums.keys():
-		            sums[recid] = sums[recid] + 1
-			else:
-			    sums[recid] = 1
-	    
-	else:
-	    hitset_global = get_collection_reclist("Posts")
-            for post in posts:
-		results = rank_records_bibrank('wrd', None, hitset_global, ['recid:%s' % post]) 
-		if results[0] is not None:
-	            for recid, score in zip(results[0], results[1]):
-		        if recid in sums.keys():
-		            sums[recid] = sums[recid] + score
-		        else:
-		            sums[recid] = score
-		
-	# group results
-	blogs = {}
-	for post, score in sums.items():
-	    b = get_parent_blog(post)
-	    if b is not None:
-	        if b in blogs.keys():
-		    blogs[b] = blogs[b] + score
-	        else:
-		    blogs[b] = score
-
-	if rank_method_code == 'wrd':
-	    total = blogs[blog_recid]
-
-        blogs = [ (recid, score*100/total) for recid, score in blogs.items()]
-	blogs.sort(key=lambda x: x[1])
-	
-	return ([x[0] for x in blogs], [min(x[1], 100) for x in blogs], '(', ')', "")
-	
-	
-    else:
-	return rank_records_bibrank(rank_method_code, rank_limit_relevance, hitset_global, pattern, verbose, field, rg, jrec)
-	
-
 
 def prs_search_similar_records(kwargs=None, req=None, of=None, cc=None, pl_in_url=None, ln=None, uid=None, _=None, p=None,
                     p1=None, p2=None, p3=None, colls_to_display=None, f=None, rg=None, sf=None,
@@ -5682,8 +5685,7 @@ def prs_search_similar_records(kwargs=None, req=None, of=None, cc=None, pl_in_ur
         # record well exists, so find similar ones to it
         t1 = os.times()[4]
         results_similar_recIDs, results_similar_relevances, results_similar_relevances_prologue, results_similar_relevances_epilogue, results_similar_comments = \
-		blog_extend_bibrank(rm, 0, get_collection_reclist(cc), string.split(p), verbose, f, rg, jrec)
-                #rank_records_bibrank(rm, 0, get_collection_reclist(cc), string.split(p), verbose, f, rg, jrec)
+                                rank_records_bibrank(rm, 0, get_collection_reclist(cc), string.split(p), verbose, f, rg, jrec)
         if results_similar_recIDs:
             t2 = os.times()[4]
             cpu_time = t2 - t1
@@ -6013,9 +6015,9 @@ def prs_apply_search_limits(results_final, kwargs=None, req=None, of=None, cc=No
                 perform_external_collection_search_with_em(req, cc, [p, p1, p2, p3], f, ec, verbose,
                                                    ln, selected_external_collections_infos, em=em)
             #if of.startswith("x"):
-            #    # Print empty, but valid XML
-            #    print_records_prologue(req, of)
-            #    print_records_epilogue(req, of)
+            #   # Print empty, but valid XML
+            #   print_records_prologue(req, of)
+            #   print_records_epilogue(req, of)
             return page_end(req, of, ln, em)
 
     if pl and results_final != {}:
@@ -6110,10 +6112,10 @@ def prs_summarize_records(kwargs=None, req=None, p=None, f=None, aas=None,
         triples = ziplist([f1, f2, f3], [p1, p2, p3], [op1, op2, ''])
         triples_len = len(triples)
         for i in range(triples_len):
-            fi, pi, oi = triples[i]                       # e.g.:
+            fi, pi, oi = triples[i]                    # e.g.:
             if i < triples_len-1 and not triples[i+1][1]: # if p2 empty
                 triples[i+1][0] = ''                      #   f2 must be too
-                oi = ''                                   #   and o1
+                oi = ''                                #   and o1
             if ' ' in pi:
                 pi = '"'+pi+'"'
             if fi:
@@ -6277,10 +6279,6 @@ def prs_log_query(kwargs=None, req=None, uid=None, of=None, ln=None, p=None, f=N
         id_query = log_query(req.host,
             '&'.join(map(lambda (k,v): k+'='+v, req.args.to_dict().items())),
             uid)
-        log_query_terms([req.args.get('p', None),
-                         req.args.get('p1', None),
-                         req.args.get('p2', None),
-                         req.args.get('p3', None)])
         #id_query = log_query(req.remote_host, req.args, uid)
         if of.startswith("h") and id_query and (em == '' or EM_REPOSITORY["alert"] in em):
             if not of in ['hcs', 'hcs2']:
@@ -6698,68 +6696,3 @@ def perform_external_collection_search_with_em(req, current_collection, pattern_
                             print_search_info=em == "" or EM_REPOSITORY["search_info"] in em,
                             print_see_also_box=em == "" or EM_REPOSITORY["see_also_box"] in em,
                             print_body=em == "" or EM_REPOSITORY["body"] in em)
-
-
-def log_query_terms(terms=None):
-    """
-    Saves the query terms into database.
-
-    @param terms: the tuple of terms
-    @type terms: (str, str, str, str)
-
-    @param uid: the ID of the user
-    @type uid: int
-    """
-
-    if not terms:
-        return
-
-    from invenio.webuser_flask import current_user
-    uid = current_user.get_id()
-
-    if not uid:
-        return
-
-    from invenio.sqlalchemyutils import db
-    from invenio.websearch_model import QueryTerm
-    from invenio.websearch_model import UserQueryTerm
-    from datetime import datetime
-
-    if type(terms) != type([]):
-        terms = [terms]
-
-    for term in terms:
-        if not term:
-            continue
-
-        try:
-            query_term = QueryTerm()
-            query_term.term = term
-            db.session.add(query_term)
-            db.session.commit()
-        except:
-            db.session.rollback()
-            register_exception()
-            query_term = QueryTerm.query.filter(QueryTerm.term == term).one()
-
-        try:
-            user_query_term = (UserQueryTerm
-                               .query
-                               .filter(UserQueryTerm.id_term == query_term.id)
-                               .filter(UserQueryTerm.id_user == uid)
-                               .one())
-            user_query_term.count = user_query_term.count + 1
-            db.session.commit()
-        except Exception, e:
-            db.session.rollback()
-            register_exception()
-            try:
-                new_user_query_term = UserQueryTerm()
-                new_user_query_term.id_term = query_term.id
-                new_user_query_term.id_user = uid
-                new_user_query_term.count = 1
-                db.session.add(new_user_query_term)
-                db.session.commit()
-            except Exception, e:
-                db.session.rollback()
-                register_exception()

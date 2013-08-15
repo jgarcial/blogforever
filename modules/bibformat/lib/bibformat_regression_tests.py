@@ -99,7 +99,56 @@ class BibFormatBibTeXTest(InvenioTestCase):
                                        expected_text=self.record_74_hx)
         self.assertEqual([], result)
 
-class BibFormatDetailedHTMLTest(InvenioTestCase):
+
+class BibFormatExportAsPdfWithLatexTemplateTest(unittest.TestCase):
+    """
+    Checks produced TeX file's content and availability of the export as
+    pdf option for various records.
+    """
+    
+    def setUp(self):
+        """Prepare some ideal outputs"""
+        # Record 8 (Preprint)
+        self.record_8_pdf_tex_source = """\n\\documentclass[10pt]{article}\n\n\\usepackage{a4wide}\n\\usepackage{ulem}\n\\usepackage[dvipsnames,svgnames]{xcolor}\n\\usepackage{multirow}\n\\usepackage{wasysym}\n\\usepackage{amssymb}\n\\usepackage{hyperref}\n\\usepackage{graphicx}\n\\usepackage{seqsplit}\n\\usepackage{fontspec}\n\\setmainfont[Ligatures=TeX]{Linux Libertine O}\n\\usepackage{xeCJK}\n\\setCJKmainfont{WenQuanYi Micro Hei Mono}\n\n\\begin{document}\n\n\\title{Constraints on $\\Omega_{\\Lambda}$ and $\\Omega_{m}$from Distant Type 1a Supernovae and Cosmic Microwave Background Anisotropies}\n\\author{Efstathiou\\\\ G P and Lasenby\\\\ A N and Hobson\\\\ M P and Ellis\\\\ R S and Bridle\\\\ S L}\n\\date{Dec, 1998}\n\\maketitle\n\nWe perform a combined likelihood analysis of the latest cosmic microwave background anisotropy data and distant Type 1a Supernova data of Perlmutter etal (1998a). Our analysis is restricted tocosmological models where structure forms from adiabatic initial fluctuations characterised by a power-law spectrum with negligible tensor component. Marginalizing over other parameters, our bestfit solution gives Omega\\_m = 0.25 (+0.18, -0.12) and Omega\\_Lambda = 0.63 (+0.17, -0.23) (95 \\% confidence errors) for the cosmic densities contributed by matter and a cosmological \\seqsplit{constantrespectively.} The results therefore strongly favour a nearly spatially flat Universe with a non-zero cosmological constant.\n\\end{document}\n\n"""
+        
+    def test_tex_output(self):
+        """Test tex file content"""
+        formatted_record = format_record(8, 'pdf', None)
+        self.assertEqual(self.record_8_pdf_tex_source, formatted_record)
+           
+    def test_export_as_pdf_availability(self):
+        """Test availability of the feature"""
+        url = CFG_SITE_URL + "/record/8/export/pdf?ln=en"
+        error_message = test_web_page_content(url, 
+                                              username='guest',
+                                              expected_text='500 Internal Server Error')
+        if not error_message:
+            self.fail(error_message)
+
+class BibFormatExportAsJpegTest(unittest.TestCase):
+    """
+    """
+    
+    def test_recordcontent_method(self):
+        """Test whether the users from outside can access restricted records."""
+        # Test with restricted record 105.
+        url = CFG_SITE_URL + "/record/105/export/recordcontent?ln=en"
+        error_message = test_web_page_content(url, 
+                                              username='guest',
+                                              expected_text='Authorization failure')
+        if error_message:
+            self.fail(error_message)
+            
+    def test_export_as_jpeg_availability(self):
+        """Test availability of the feature"""
+        url = CFG_SITE_URL + "/record/8/export/jpeg?ln=en"
+        error_message = test_web_page_content(url, 
+                                              username='guest',
+                                              expected_text='The server encountered an error while dealing with your request.')
+        if not error_message:
+            self.fail(error_message)
+
+class BibFormatDetailedHTMLTest(unittest.TestCase):
     """Check output produced by BibFormat for detailed HTML ouput for
     various records"""
 
@@ -477,7 +526,9 @@ TEST_SUITE = make_test_suite(BibFormatBibTeXTest,
                              BibFormatObjectAPITest,
                              BibFormatTitleFormattingTest,
                              BibFormatISBNFormattingTest,
-                             BibFormatPublInfoFormattingTest)
+                             BibFormatPublInfoFormattingTest,
+                             BibFormatExportAsPdfWithLatexTemplateTest,
+                             BibFormatExportAsJpegTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)

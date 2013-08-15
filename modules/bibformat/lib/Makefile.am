@@ -26,8 +26,15 @@ pylib_DATA = bibformat_config.py bibformat_templates.py \
              bibformatadmin_regression_tests.py bibformat_engine_unit_tests.py \
              bibformat_bfx_engine.py bibformat_bfx_engine_config.py \
              bibformat_regression_tests.py bibformat_xslt_engine.py bibreformat.py \
-             bibformat_web_tests.py bibformat_utils_unit_tests.py
+             bibformat_web_tests.py bibformat_utils_unit_tests.py \
+             bibformat_pdf_with_latex_template.py bibformat_pdf_with_latex_template_config.py
+
+jsdir=$(localstatedir)/www/js
+
+js_DATA = jpeg_render_script.js
 
 EXTRA_DIST = $(pylib_DATA)
+
+
 
 CLEANFILES = *~ *.tmp *.pyc

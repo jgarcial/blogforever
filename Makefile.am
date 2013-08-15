@@ -129,7 +129,7 @@ install-jstimeline-plugin:
         wget 'https://launchpad.net/ubuntu/+archive/primary/+files/simile-timeline_2.3.0%2Bdfsg.orig.tar.gz' && \
 	tar -xvf simile-timeline_2.3.0+dfsg.orig.tar.gz && \
         mkdir -p ${prefix}/var/www/js/simile-timeline_2.3.0/ && \
-        cp -r simile-timeline-2.3.0/* ${prefix}/var/www/js/simile-timeline_2.3.0) 
+        cp -r simile-timeline-2.3.0/* ${prefix}/var/www/js/simile-timeline_2.3.0)
 	rm -fr /tmp/invenio-jstimeline-plugin
 	@echo "***********************************************************"
 	@echo "** The jsTimeline plugin was successfully installed.     **"
@@ -486,6 +486,76 @@ install-solrutils:
 	javac -classpath $(CLASSPATH) -d $(solrdir)/contrib @$(solrutils_dir)/java_sources.txt && \
 	cd $(solrdir)/contrib/ && \
 	jar -cf invenio-solr.jar org/invenio_software/solr/*class
+
+texlive_release_year = 2013
+install-texlive:
+	@echo "***********************************************************"
+	@echo "** Installing LaTeX TeX Live distribution and essential  **"
+	@echo "** packages, please wait...                              **"
+	@echo "***********************************************************"
+	sudo mkdir -p ${prefix}/var/www/export	  #Create working directory.
+	sudo chown -R www-data.www-data ${prefix}/var/www/export
+	sudo rm -rf /usr/local/texlive/$(texlive_release_year)
+	sudo rm -rf ~/.texlive$(texlive_release_year)
+	mkdir -p texlive_install_dir; \
+	cd texlive_install_dir; \
+	sudo rm -rf *; \
+	sudo aptitude install texlive-binaries; \
+	sudo aptitude install ttf-linux-libertine; \
+	sudo aptitude install ttf-wqy-microhei; \
+	sudo aptitude install texlive-fonts-extra; \
+	sudo fc-cache ;\
+	wget http://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz; \
+	tar xvf install-tl-unx.tar.gz; \
+	cd install-tl-*; \
+	./install-tl	#For direct installation enter command i.
+	sudo rm -rf texlive_install_dir
+	@echo "***********************************************************"
+	@echo "** TeX Live was successfully installed.                  **"
+	@echo "***********************************************************"
+
+uninstall-texlive:
+	sudo rm -rf /usr/local/texlive/$(texlive_release_year)
+	sudo rm -rf ~/.texlive$(texlive_release_year)
+	@echo "***********************************************************"
+	@echo "** TeX Live was successfully uninstalled.                **"
+	@echo "***********************************************************"
+
+install-phantomjs-64bits:
+	@echo "***********************************************************"
+	@echo "** Installing PhantomJS                                  **"
+	@echo "***********************************************************"
+	sudo rm -rf /usr/lib/phantomjs
+	sudo rm -rf /usr/bin/phantomjs
+	sudo mkdir -p ${prefix}/var/www/export	  #Create working directory.
+	sudo chown -R www-data.www-data ${prefix}/var/www/export
+	wget http://phantomjs.googlecode.com/files/phantomjs-1.6.1-linux-x86_64-dynamic.tar.bz2
+	tar -xvf phantomjs-1.6.1-linux-x86_64-dynamic.tar.bz2
+	mv phantomjs-1.6.1-linux-x86_64-dynamic phantomjs
+	sudo mv phantomjs /usr/lib
+	sudo ln -s /usr/lib/phantomjs/bin/phantomjs /usr/bin/phantomjs
+	rm -rf phantomjs*
+	@echo "***********************************************************"
+	@echo "** PhantomJS installed.                                  **"
+	@echo "***********************************************************"
+
+install-phantomjs-32bits:
+	@echo "***********************************************************"
+	@echo "** Installing PhantomJS                                  **"
+	@echo "***********************************************************"
+	sudo rm -rf /usr/lib/phantomjs
+	sudo rm -rf /usr/bin/phantomjs
+	sudo mkdir -p ${prefix}/var/www/export	  #Create working directory.
+	sudo chown -R www-data.www-data ${prefix}/var/www/export
+	wget http://phantomjs.googlecode.com/files/phantomjs-1.6.1-linux-i686-dynamic.tar.bz2
+	tar -xvf phantomjs-1.6.1-linux-i686-dynamic.tar.bz2
+	mv phantomjs-1.6.1-linux-i686-dynamic phantomjs
+	sudo mv phantomjs /usr/lib
+	sudo ln -s /usr/lib/phantomjs/bin/phantomjs /usr/bin/phantomjs
+	rm -rf phantomjs*
+	@echo "***********************************************************"
+	@echo "** PhantomJS installed.                                  **"
+	@echo "***********************************************************"
 
 update-v0.99.0-tables:
 	cat $(top_srcdir)/modules/miscutil/sql/tabcreate.sql | grep -v 'INSERT INTO upgrade' | ${prefix}/bin/dbexec

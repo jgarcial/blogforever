@@ -332,6 +332,8 @@ Contents
       $ make install
       $ make install-bootstrap
       $ make install-hogan-plugin
+      $ make install-phantomjs-<64bits or 32bits> 	## For export as JPEG feature.
+      $ make install-texlive    			## For export as PDF feature.
       $ make install-mathjax-plugin    ## optional
       $ make install-jquery-plugins    ## optional
       $ make install-jquery-tokeninput ## optional
@@ -531,6 +533,21 @@ Contents
 
           This will automatically download and install Twitter
           Bootstrap prerequisite.
+
+      $ make install-phantomjs-<64bits or 32bits> ## (Export as JPEG feature)
+
+          This will install the phantomjs webkit used for taking
+          snapshots of the records.
+          Select the install command according to your os architecture.
+          Possible options are:
+              make install-phantomjs-64bits
+              make install-phantomjs-32bits
+
+      $ make install-texlive ## (Export as PDF feature)
+
+          This will install up-to-date TeX Live distribution of LaTeX.
+          To install new packages visit:
+              http://tug.org/texlive/pkginstall.html
 
       $ make install-mathjax-plugin  ## optional
 

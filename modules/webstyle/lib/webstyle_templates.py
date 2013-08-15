@@ -733,3 +733,84 @@ URI: http://%(host)s%(page)s
             out += '%s: ' % type
         out += '%s</span>%s' % (msg, epilogue)
         return out
+        
+    def tmpl_simple_page_header(self, ln=CFG_SITE_LANG, headertitle="",
+                    description="", keywords="", secure_page_p=0, 
+                    metaheaderadd="", rssurl=CFG_SITE_URL+"/rss", 
+                    body_css_classes=None):
+        """
+            Creates a simple page header without any menu. 
+            Parameters:
+                - 'ln' *string* - The language to display
+
+                - 'headertitle' *string* - the title of the HTML page, not yet escaped for HTML
+
+                - 'description' *string* - description goes to the metadata in the header of the HTML page,
+                                         not yet escaped for HTML
+
+                - 'keywords' *string* - keywords goes to the metadata in the header of the HTML page,
+                                      not yet escaped for HTML
+
+                - 'secure_page_p' *int* (0 or 1) - are we to use HTTPS friendly page elements or not?
+
+                - 'metaheaderadd' *string* - list of further tags to add to the <HEAD></HEAD> part of the page
+
+                - 'rssurl' *string* - the url of the RSS feed for this page
+
+                - 'body_css_classes' *list* - list of classes to add to the body tag
+        """
+        if body_css_classes is None:
+            body_css_classes = []
+
+        sitename = CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME)
+        if headertitle == sitename:
+            pageheadertitle = headertitle
+        else:
+            pageheadertitle = headertitle + ' - ' + sitename
+
+        out = """
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="%(ln_iso_639_a)s" xml:lang="%(ln_iso_639_a)s" xmlns:og="http://opengraphprotocol.org/schema/" >
+    <head>
+        <title>%(pageheadertitle)s</title>
+        <link rev="made" href="mailto:%(sitesupportemail)s" />
+        <link rel="stylesheet" href="%(cssurl)s/img/invenio%(cssskin)s.css" type="text/css" />
+        <!--[if lt IE 8]>
+           <link rel="stylesheet" type="text/css" href="%(cssurl)s/img/invenio%(cssskin)s-ie7.css" />
+        <![endif]-->
+        <link rel="alternate" type="application/rss+xml" title="%(sitename)s RSS" href="%(rssurl)s" />
+        <link rel="search" type="application/opensearchdescription+xml" href="%(siteurl)s/opensearchdescription" title="%(sitename)s" />
+        <link rel="unapi-server" type="application/xml" title="unAPI" href="%(unAPIurl)s" />
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta http-equiv="Content-Language" content="%(ln)s" />
+        <meta name="description" content="%(description)s" />
+        <meta name="keywords" content="%(keywords)s" />
+        <script type="text/javascript" src="%(cssurl)s/js/jquery.min.js"></script>
+        %(metaheaderadd)s
+</head>
+<body%(body_css_classes)s lang="%(ln_iso_639_a)s"%(rtl_direction)s>
+        """ % {
+          'rtl_direction': is_language_rtl(ln) and ' dir="rtl"' or '',
+          'siteurl' : CFG_SITE_URL,
+          'cssurl' : secure_page_p and CFG_SITE_SECURE_URL or CFG_SITE_URL,
+          'cssskin' : CFG_WEBSTYLE_TEMPLATE_SKIN != 'default' and '_' + CFG_WEBSTYLE_TEMPLATE_SKIN or '',
+          'rssurl': rssurl,
+          'ln' : ln,
+          'ln_iso_639_a' : ln.split('_', 1)[0],
+
+          'sitename' : CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME),
+          'pageheadertitle': cgi.escape(pageheadertitle),
+
+          'sitesupportemail' : CFG_SITE_SUPPORT_EMAIL,
+
+          'description' : cgi.escape(description, True),
+          'keywords' : cgi.escape(keywords, True),
+          'metaheaderadd' : metaheaderadd,
+
+          'body_css_classes' : body_css_classes and ' class="%s"' % ' '.join(body_css_classes) or '',
+
+          'unAPIurl' : cgi.escape('%s/unapi' % CFG_SITE_URL),
+        }
+        return out
+
