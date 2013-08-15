@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 
-"""BibFormat element - Offers the similar records link
+"""BibFormat element - Offers a link to download BagIt version of a record
 """
 
 __revision__ = "$Id$"
@@ -27,18 +27,17 @@ __revision__ = "$Id$"
 from invenio.urlutils import create_html_link
 from invenio.messages import gettext_set_language
 from invenio.config import CFG_SITE_SECURE_URL
-
+from invenio.bibarchive_archiver import get_record
 
 def format_element(bfo, style):
     """
-    Offers link to search similar records
+    Offers link to download the Bagit preservation file
     @param style: the CSS style to be applied to the link.
     """
 
     _ = gettext_set_language(bfo.lang)
 
     out = ""
-    coll = bfo.fields("980__a")[0]
     try:
         recid = bfo.control_field('001')
     except:
@@ -48,27 +47,14 @@ def format_element(bfo, style):
     if style != '':
         linkattrd['style'] = style
 
-
-    if coll == 'BLOG':
-        label = _("Similar Blogs")
-
-    elif coll == 'BLOGPOST':
-        label = _("Similar Posts")
-
-    elif coll == 'COMMENT':
-        label = _("Similar Comments")
+    path = get_record(recid)['data']
     
-    elif coll == 'PAGE':
-        label = _("Similar Pages")
+    label = _("Download BagIt")
 
-    else:
-        label = _("Similar Records")
-
-    out += create_html_link(CFG_SITE_SECURE_URL + "/search",
-                              {'ln': bfo.lang,
-                               'rm': 'wrd',
-                               'p': 'recid:%s' % bfo.control_field('001')
-                               },
+    
+    
+    out += create_html_link(CFG_SITE_SECURE_URL + "/record/"+str(recid)+"/bagit",
+                              {},
                               link_label = label,
                               linkattrd = linkattrd)
 

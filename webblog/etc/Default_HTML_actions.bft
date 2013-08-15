@@ -25,6 +25,9 @@
 		<BFE_EDIT_FILES />
 	</div>
 	<div>
+		<BFE_DOWNLOAD_BAGIT />
+	</div>
+	<div>
 		<BFE_SIMILAR_RECORDS />
 	</div>
 </div>
