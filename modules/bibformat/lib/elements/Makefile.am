@@ -18,7 +18,6 @@
 pylibdir=$(libdir)/python/invenio/bibformat_elements
 
 pylib_DATA = bfe_field.py bfe_title.py bfe_authors.py bfe_abstract.py bfe_affiliation.py \
-<<<<<<< HEAD
              bfe_imprint.py bfe_fulltext.py bfe_place.py bfe_publisher.py bfe_topbanner.py \
              bfe_date_rec.py bfe_keywords.py bfe_notes.py bfe_reprints.py bfe_publi_info.py \
              bfe_cited_by.py bfe_references.py bfe_title_brief.py \
@@ -38,10 +37,7 @@ pylib_DATA = bfe_field.py bfe_title.py bfe_authors.py bfe_abstract.py bfe_affili
              bfe_video_platform_sources.py bfe_sciencewise.py bfe_bookmark.py \
              bfe_oai_marcxml.py bfe_copyright.py bfe_meta.py bfe_meta_opengraph_image.py \
              bfe_meta_opengraph_video.py bfe_webauthorpage_affiliations.py \
-             bfe_qrcode.py \
-             bfe_mets.py \
-             bfe_translate.py
-             bfe_latex_main_template.py
+             bfe_qrcode.py bfe_mets.py bfe_translate.py bfe_latex_main_template.py
 
 tmpdir = $(prefix)/var/tmp/tests_bibformat_elements
 
