@@ -1169,6 +1169,15 @@ class FormatData(DataSet):
         visibility = 0
         name = u'Mobile detailed'
 
+    class Format_29:
+        code = u'xmets'
+        last_updated = None
+        description = u'Metadata Encoding & Transmission Standard.'
+        content_type = u'text/xml'
+        id = 29
+        visibility = 1
+        name = u'METS'
+
 
 class FieldTagData(DataSet):
 
