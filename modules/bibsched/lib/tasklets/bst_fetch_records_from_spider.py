@@ -26,31 +26,9 @@ import tempfile
 import sys
 from invenio.bibtask import task_low_level_submission, task_update_progress
 from invenio.bibupload_preprocess import bp_pre_ingestion
-from invenio.config import CFG_TMPDIR
-from invenio.webblog_utils import prepare_path
-
-# Parameters CS 1, 2
-# url = 'http://bf.cyberwatcher.com/System3/SpiderService.svc?wsdl'
-# api_key = "0GTCnOVdR2sF8hwo/wWr/lsUxKYHogdX2OzlV1PTHBU="
-
-# Parameters CS 3
-# url = 'http://bf.cyberwatcher.com/System3/SpiderService.svc?wsdl'
-# api_key = 'nJ/QRIBl6GsPXZyLfEndQvjyMgIHtO/gE0/CoFt13sw='
-
-# Parameters CS 4
-# url='http://bf4.itc.auth.gr/Spider/SpiderService.svc?wsdl'
-# Instance 1
-# api_key = 'YeNN9sP3ww+QEOpyz2pz2liyixkzaplAM/dhky72OGI='
-# Instance 2
-# api_key = 'nXkTqQdj/o2d2BL2r+ZEAg7vgtXhRZqB4UhpkiXWxiE='
-# Instance 3
-# api_key = 'WdQJ5CppFpA0n7cBDV8QNILBwrb4mINQ5nY4viofrUI='
-# Instance 4
-# api_key = '0I72nbVFdrDbclOX83/WJe1WLu6cHLb6LF2Rb7FEY0c='
-
-# Parameters CS 5
-# url='http://bf4.itc.auth.gr/Spider/SpiderService.svc?wsdl'
-# api_key='nXkTqQdj/o2d2BL2r+ZEAg7vgtXhRZqB4UhpkiXWxiE='
+from invenio.config import CFG_TMPDIR, CFG_SPIDER_API_KEY, CFG_SPIDER_WEBSERVICE_URL
+from invenio.webblog_utils import prepare_path, check_submitted_blog_urls_status
+from invenio.dbquery import run_sql
 
 
 batchupload_dir = bp_pre_ingestion.batchupload_dir
@@ -138,7 +116,7 @@ def process_record(client, api_key, match):
 
         # Double check if the file exists
         if os.path.exists(path_metadata_file):
-            task_low_level_submission('bibupload', 'batchupload', '-r', \
+            task_low_level_submission('bibupload', 'batchupload', '-c', \
                                       path_metadata_file, \
                                       '--pre-plugin=bp_pre_ingestion', \
                                       '--post-plugin=bp_post_ingestion')
@@ -162,7 +140,7 @@ def connect_to_webservice(url):
     try:
         client = Client(url)
     except:
-        raise "Imposible to connect to the webservice"
+        raise Exception("Imposible to connect to the webservice")
     return client
 
 
@@ -264,7 +242,8 @@ def get_total_nb_records(client, api_key, sr):
     return result.HitTotal
 
 
-def bst_fetch_records_from_spider(api_key, url, constant_set=100, id_max=2147483647):
+def bst_fetch_records_from_spider(api_key=CFG_SPIDER_API_KEY, url=CFG_SPIDER_WEBSERVICE_URL,\
+                                  constant_set=100, id_max=2147483647):
     """
     Bibtasklet responsible of the communication spider-repository: 
     the goal is to fetch all records crawled
@@ -277,7 +256,15 @@ def bst_fetch_records_from_spider(api_key, url, constant_set=100, id_max=2147483
     """
 
     client = connect_to_webservice(url)
-    create_error_file()
+    create_log_file()
+
+    # Let's check which is the status of the URLs that
+    # have been submitted and clean up the PROVISIONAL BLOGS
+    # collection as needed
+    task_update_progress("Start checking submitted urls status")
+    check_submitted_blog_urls_status(client)
+    task_update_progress("Finished checking submitted urls status")
+
     create_metadata_dirs()
     last_id = get_last_id()
     # Set limits to get the total of results to retrieve
@@ -285,7 +272,6 @@ def bst_fetch_records_from_spider(api_key, url, constant_set=100, id_max=2147483
     sr = create_search_request(client, page_size = 1, page_number = 0, \
                                 query = "Type:(Post OR Comment OR Blog) AND Id:["+str(id_start)\
                                 +" TO "+str(id_max)+"]")
-
     total_records = get_total_nb_records(client, api_key, sr)
 
     if total_records <= int(constant_set):
@@ -302,7 +288,7 @@ def bst_fetch_records_from_spider(api_key, url, constant_set=100, id_max=2147483
         posts = []
         comments = []
         final_matches = []
-        sr.Query = "Type:(Post OR Comment OR Blog) AND Id:["+str(id_start)+" TO "+str(id_max)+"]"
+        sr.Query = "Type:(Post OR Comment OR Blog) AND Id:["+str(id_start) +" TO "+str(id_max)+"]"
         for i in range(int(constant_set)+1):
             try:
                 result = client.service.SearchEntities(api_key, sr)
@@ -348,8 +334,10 @@ def bst_fetch_records_from_spider(api_key, url, constant_set=100, id_max=2147483
         id_start = id_max + 1
         id_max = id_start + int(constant_set)
         sr.PageNumber = 0
-        task_low_level_submission('bibindex', 'admin')
-        task_low_level_submission('webcoll', 'admin')
+
+        if final_matches:
+            task_low_level_submission('bibindex', 'admin')
+            task_low_level_submission('webcoll', 'admin', '-p1')
 
     task_update_progress("Finish fetching blog records")
     error_file = open(CFG_TMPDIR + "/error_file", "a")
