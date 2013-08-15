@@ -25,19 +25,19 @@ from invenio.config import CFG_TRANSLATE_RECORD_PREVIEW, CFG_SITE_LANG
 from invenio.translate_utils import get_translate_script
 
 
-
 def format_element(bfo):
     """
     Displays the Google translator link
     """
 
     current_language = bfo.lang
+    language_of_blog_post = bfo.field("041__a")
 
     # Insert translate script
     out = ""
     if CFG_TRANSLATE_RECORD_PREVIEW:
-        # if current_language != language_of_blog_post:
-        out += get_translate_script('to-be-translated', current_language, True)
+        if current_language != language_of_blog_post:
+            out += get_translate_script('to-be-translated', current_language, True)
 
     return out
 
