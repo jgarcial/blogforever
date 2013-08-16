@@ -27,7 +27,6 @@ __revision__ = "$Id$"
 from invenio.urlutils import create_html_link
 from invenio.messages import gettext_set_language
 from invenio.config import CFG_SITE_SECURE_URL
-from invenio.bibarchive_archiver import get_record
 
 def format_element(bfo, style):
     """
@@ -47,11 +46,7 @@ def format_element(bfo, style):
     if style != '':
         linkattrd['style'] = style
 
-    path = get_record(recid)['data']
-    
     label = _("Download BagIt")
-
-    
     
     out += create_html_link(CFG_SITE_SECURE_URL + "/record/"+str(recid)+"/bagit",
                               {},
