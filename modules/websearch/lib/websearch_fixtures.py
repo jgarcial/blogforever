@@ -1178,6 +1178,61 @@ class FormatData(DataSet):
         visibility = 1
         name = u'METS'
 
+    class Format_30:
+        code = u'xtl'
+        last_updated = None
+        description = u'XML for the timeline slider'
+        content_type = u'text/xml'
+        id = 31
+        visibility = 0
+        name = u'timeline'
+
+
+    class Format_31:
+        code = u'xcmx'
+        last_updated = None
+        description = u'CMX-XML'
+        content_type = u'text/xml'
+        id = 30
+        visibility = 0
+        name = u'CMX'
+
+    class Format_32:
+        code = u'xgexf'
+        last_updated = None
+        description = u'GEXF-XML'
+        content_type = u'text/xml'
+        id = 32
+        visibility = 0
+        name = u'GEXF'
+
+    class Format_33:
+        code = u'jpeg'
+        last_updated = None
+        description = u'Used for taking snapshot of the records'
+        content_type = u'image/jpeg'
+        id = 33
+        visibility = 1
+        name = u'JPEG'
+
+    class Format_34:
+        code = u'jpegpc'
+        last_updated = None
+        description = u'Record page for taking a snapshot of the content'
+        content_type = u'text/html'
+        id = 34
+        visibility = 1
+        name = u'JPEGPageConstructer'
+
+    class Format_35:
+        code = u'pdf'
+        last_updated = None
+        description = u'PDF of the records in latex template'
+        content_type = u'application/pdf'
+        id = 35
+        visibility = 1
+        name = u'PDF'
+
 
 class FieldTagData(DataSet):
 
