@@ -328,7 +328,7 @@ def index():
                     'invenio-software.org/repo/invenio/tree/RELEASE-NOTES'),
                   'error')
 
-    return render_template('webaccount_display.html',
+    return render_template('webaccount_index.html',
                            plugins=[plugins_left,
                                     plugins_middle,
                                     plugins_right],
