@@ -58,10 +58,10 @@ blueprint = InvenioBlueprint('webtag',
                              url_prefix='/yourtags',
                              config='invenio.webtag_config',
                              menubuilder=[('personalize.tags',
-                                          _('Your Tags'),
+                                          _('Your tags'),
                                           'webtag.display_cloud')],
                              breadcrumbs=[(_('Your Account'), 'youraccount.edit'),
-                                          (_('Your Tags'), 'webtag.display_cloud')])
+                                          (_('Your tags'), 'webtag.display_cloud')])
 
 
 @blueprint.route('/', methods=['GET', 'POST'])

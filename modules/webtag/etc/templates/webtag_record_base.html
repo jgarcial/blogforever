@@ -22,12 +22,11 @@
 {% set record = get_record(id_bibrec) %}
 
 {% block webtag_list %}
-  <i class="icon-tags"></i>
   {% if record_tags %}
     {% for tag in record_tags %}
-    <span class="label label-info">
+    <span class="label label-success">
       {# <a href="{{ url_for('search.search', p='tags:' + tag['name']) }}"> #}
-      <a href="{{ url_for('webtag.tag_details', id_tag=tag.id) }}">
+      <a style="color:white" href="{{ url_for('webtag.tag_details', id_tag=tag.id) }}">
         {{ tag['name'] }} ({{ tag.record_count }})
       </a>
     </span>
@@ -39,9 +38,9 @@
     <a href="{{ url_for('webtag.editor', id_bibrec=id_bibrec) }}" role="button"
      data-target="#tags_editor_{{ id_bibrec }}" data-toggle="modal">
       {% if record_tags|count %}
-        {{ _('Edit tags') }}
+        {{ _('Edit you own tags') }}
       {% else %}
-        {{ _('Add tags') }}
+        {{ _('Add your own tags') }}
       {% endif %}
    </a>
   {% endblock webtag_edit_button %}
