@@ -41,7 +41,7 @@ class WebSearchSettings(Settings):
         self.icon = 'search'
         self.title = _('Searches')
         self.view = '/youralerts/display'
-        self.edit = url_for('webaccount.edit', name=self.__class__.__name__.split('.')[-1])
+        self.edit = url_for('webaccount.edit', name=__name__.split('.')[-1])
 
     def widget(self):
         uid = current_user.get_id()
