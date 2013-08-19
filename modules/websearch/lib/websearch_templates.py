@@ -64,12 +64,11 @@ from invenio.config import \
      CFG_WEBSEARCH_SHOW_COMMENT_COUNT, \
      CFG_WEBSEARCH_SHOW_REVIEW_COUNT, \
      CFG_SITE_RECORD, \
-     CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT, \
-     CFG_DATABASE_NAME
+     CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT
 
 from invenio.search_engine_config import CFG_WEBSEARCH_RESULTS_OVERVIEW_MAX_COLLS_TO_PRINT
 
-from invenio.dbquery import run_sql
+from invenio.dbquery import run_sql, CFG_DATABASE_NAME
 from invenio.messages import gettext_set_language
 from invenio.urlutils import make_canonical_urlargd, drop_default_urlargd, create_html_link, create_url
 from invenio.htmlutils import nmtoken_from_string
