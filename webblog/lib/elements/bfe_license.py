@@ -65,7 +65,7 @@ def format_element(bfo):
     else:
         out += "Unknown"
 
-        return out
+    return out
 
 def escape_values(bfo):
     """
