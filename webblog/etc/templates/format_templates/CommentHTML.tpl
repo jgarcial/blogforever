@@ -42,6 +42,9 @@
 			<br />
 			{{ bfe_tags(bfo) }}
 			<br />
+			{# WebTags #}
+			{{ bfn_webtag_record_tags(record['recid'], current_user.get_id()) }}
+			<br />
 			{{ bfe_license(bfo) }}
 			<br />
 			{{ bfe_doi(bfo, prefix='<small><strong>DOI: </strong>', suffix='</small><br />') }}

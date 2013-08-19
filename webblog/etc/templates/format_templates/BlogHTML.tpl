@@ -30,6 +30,7 @@
 		<div class="bfe-blog-posts">
 			{{ bfe_blog_posts(bfo) }}
 		</div>
+
 	</div> <!-- end text span9 -->
 
 	<div class="span3">
@@ -44,6 +45,9 @@
 			{{ bfe_topic(bfo) }}
 			<br />
 			{{ bfe_tags(bfo) }}
+			<br />
+			{# WebTags #}
+			{{ bfn_webtag_record_tags(record['recid'], current_user.get_id()) }}
 			<br />
 			{{ bfe_license(bfo) }}
 			<br />

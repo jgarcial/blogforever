@@ -14,6 +14,8 @@
                         {{ bfe_discussion(bfo) }}
                         {{ bfe_reviews(bfo) }}
                         </p>
+                        {# WebTags #}
+                        {{ bfn_webtag_record_tags(record['recid'], current_user.get_id()) }}
                 </div>
         </div>
         <hr>
