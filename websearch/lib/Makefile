@@ -2,7 +2,7 @@
 
 include ../../config.mk
 
-LIBFILES = websearch_templates.py instant_browse_model.py
+LIBFILES = instant_browse_model.py
 
 all:
 	$(foreach SUBDIR, $(SUBDIRS), cd $(SUBDIR) && make all && cd .. ;)

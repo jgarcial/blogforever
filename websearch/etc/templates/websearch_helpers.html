@@ -30,22 +30,9 @@
       {%- endif -%}
     {%- endif -%}
 
-  {# Citations link #}
-  {%- if config.CFG_BIBRANK_SHOW_CITATION_LINKS -%}
-    {%- set num_citations = rinfo.get_cited_by_count() -%}
-    {%- if num_citations -%}
-     -
-    <a href="{{ url_for('.search', p="refersto:recid:%d" % recID) }}"
-       data-hotkey-action="click"
-       data-hotkey-value="g{{ i }}r">
-      {{ _("Cited by %i records") % num_citations if num_citations > 1 else _("Cited by 1 record") }}
-    </a>
-    {%- endif -%}
-  {%- endif -%}
-
-  <!--{# Comments link #}
+  {# Comments link #}
   {%- if config.CFG_WEBCOMMENT_ALLOW_COMMENTS and config.CFG_WEBSEARCH_SHOW_COMMENT_COUNT -%}
-    {%- set num_comments = rinfo.get_nb_comments() -%}
+    {%- set num_comments = record['_number_of_comments'] -%}
     {%- if num_comments -%}
      -
     <a href="{{ url_for('webcomment.comments', recid=recID) }}"
@@ -59,7 +46,7 @@
 
   {# Reviews link #}
   {%- if config.CFG_WEBCOMMENT_ALLOW_REVIEWS and config.CFG_WEBSEARCH_SHOW_REVIEW_COUNT -%}
-    {%- set num_reviews = rinfo.get_nb_reviews() -%}
+    {%- set num_reviews = record['_number_of_reviews'] -%}
     {%- if num_reviews -%}
      -
     <a href="{{ url_for('webcomment.reviews', recid=recID) }}">
@@ -67,25 +54,24 @@
       {{ _("%i reviews") % num_reviews if num_reviews > 1 else _("1 review") }}
     </a>
     {%- endif -%}
-  {%- endif -%} -->
+  {%- endif -%}
   </p>
 {% endmacro %}
-
 
 {% macro collection_tree(collections, limit=None) %}
 {%- set idxs = [0] -%}
 <ul {{ kwargs|xmlattr }}>
 {% for collection in collections recursive %}
-  <li class="span4">
+  <li>
     {# Do not show checkboxes in new UI
     {% if idxs|length == 1 %}
     <input type="checkbox" name="c" value="{{ collection.name }}" checked/>
     {% endif %}
     #}
-    <a href="{{ url_for(".collection", name=collection.name) }}">
-      <i class="icon-col-{{ collection.name }}"></i>
-      {{ collection.name_ln }}&nbsp;<small class="muted">({{ collection.nbrecs }})</small>&nbsp;
+    <a href="{{ url_for(".collection", name=collection.name, ln=g.ln, _external=True) }}">
+      {{ collection.name_ln }}
     </a>
+    <small class="muted">({{ collection.nbrecs }})</small>&nbsp;
   {% if collection.collection_children and idxs|length < limit %}
     {%- do idxs.append(loop.index) -%}
     <ul {{ kwargs|xmlattr }}>
@@ -100,24 +86,24 @@
 
 {% macro portalbox_sidebar(portalboxes, width=2) %}
   {% if portalboxes %}
-  <div class="span9 offset2" {{ kwargs|xmlattr }}>
-    <div class="row portalboxtopmargin">
+  <div {{ kwargs|xmlattr }}>
+    <ul class="thumbnails">
     {% for cp in portalboxes %}
-	    {% if cp.portalbox.body %}
-		    <div class="span4">
-		      <h5>{{ _(cp.portalbox.title) }}</h5>
-		      <p>{{ cp.portalbox.body|safe }}</p>
-		    </div>
-	    {% endif %}
-    {% endfor %}
+    <li class="span{{ width }}">
+    <div class="thumbnail">
+      <h5>{{ cp.portalbox.title }}</h5>
+      <p>{{ cp.portalbox.body|safe }}</p>
     </div>
+    </li>
+    {% endfor %}
+    </ul>
   </div>
   {% endif %}
 {% endmacro %}
 
 {% macro search_also(externalcollections) %}
   {% if externalcollections %}
-    <h4>{{ _("Search also") }}</h4>
+    <h4>{{ _("Search also:") }}</h4>
     <ul>
     {% for ex in externalcollections %}
       <li>{{ ex.name }} <a href="{{ ex.engine.base_url}}">
@@ -152,7 +138,6 @@
   {% endfor %}
 {% endmacro %}
 
-
 {% macro _search_advanced_box(collection) %}
 
   <div class="control-group">
@@ -179,6 +164,7 @@
     </div>
   </div>
 
+ 
   <div class="control-group">
     <label class="control-label">
       <strong>{{ _('how') }}?</strong>
