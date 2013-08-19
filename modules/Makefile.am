@@ -61,6 +61,7 @@ SUBDIRS = bibarchive \
           webstat \
           webstyle \
           websubmit \
+          webtag \
           docextract
 
 CLEANFILES = *~

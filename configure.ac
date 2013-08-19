@@ -960,6 +960,14 @@ AC_CONFIG_FILES([config.nice  \
      modules/bibworkflow/web/Makefile \
      modules/bibarchive/Makefile \
      modules/bibarchive/lib/Makefile
+     modules/webtag/Makefile \
+     modules/webtag/bin/Makefile \
+     modules/webtag/doc/Makefile \
+     modules/webtag/etc/Makefile \
+     modules/webtag/etc/templates/Makefile \
+     modules/webtag/lib/Makefile \
+     modules/webtag/lib/template_context_functions/Makefile \
+     modules/webtag/web/Makefile \
      ])
 
 ## Finally, write output files:
