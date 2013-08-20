@@ -1,0 +1,4 @@
+tag 980.a:
+BLOGPOST --- Post_LaTeX_brief.tpl
+COMMENT --- Comment_LaTeX_brief.tpl
+default: LaTeX.bft

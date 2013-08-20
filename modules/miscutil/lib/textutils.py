@@ -20,10 +20,12 @@
 """
 Functions useful for text wrapping (in a box) and indenting.
 """
+import string
 
 __revision__ = "$Id$"
 
 import sys
+import random
 import re
 import textwrap
 import htmlentitydefs
@@ -736,13 +738,17 @@ def transliterate_ala_lc(value):
     return text
 
 
-def get_random_string(length):
+def get_random_string(length, is_alphanumeric=False):
     """
-    Returns a random string with given length
+    Returns a random string with given length.
 
     @param length: the length of the string.
     @type length: int
 
     @rtype: str
     """
-    return b64encode(urandom(length))
+    if is_alphanumeric:
+        chars = string.ascii_letters + string.digits
+        return ''.join(random.choice(chars) for x in range(length))
+    else:
+        return b64encode(urandom(length))

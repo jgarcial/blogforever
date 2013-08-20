@@ -1,32 +1,22 @@
+<name>Actions HTML detailed</name>
+<description>Output the various actions available on a record</description>
 
-<div class="well left-menu-well">
-	<h4><i class="icon-download-alt">   </i>Export as</h4>
-	<a style="font-weight:normal" href="<BFE_SERVER_INFO var='CFG_SITE_URL'/><BFE_SERVER_INFO var='CFG_SITE_RECORD'/>/<BFE_RECORD_ID/>/export/hx?ln=<BFE_CLIENT_INFO var='ln'/>">BibTeX</a>,
-	<a style="font-weight:normal" href="<BFE_SERVER_INFO var='CFG_SITE_URL'/><BFE_SERVER_INFO var='CFG_SITE_RECORD'/>/<BFE_RECORD_ID/>/export/hm?ln=<BFE_CLIENT_INFO var='ln'/>">MARC</a>,
-	<a style="font-weight:normal" href="<BFE_SERVER_INFO var='CFG_SITE_URL'/><BFE_SERVER_INFO var='CFG_SITE_RECORD'/>/<BFE_RECORD_ID/>/export/xm?ln=<BFE_CLIENT_INFO var='ln'/>">MARCXML</a>,
-	<a style="font-weight:normal" href="<BFE_SERVER_INFO var='CFG_SITE_URL'/><BFE_SERVER_INFO var='CFG_SITE_RECORD'/>/<BFE_RECORD_ID/>/export/xmets?ln=<BFE_CLIENT_INFO var='ln'/>">METS</a>,
-	<a style="font-weight:normal" href="<BFE_SERVER_INFO var='CFG_SITE_URL'/><BFE_SERVER_INFO var='CFG_SITE_RECORD'/>/<BFE_RECORD_ID/>/export/xd?ln=<BFE_CLIENT_INFO var='ln'/>">DC</a>,
-	<a style="font-weight:normal" href="<BFE_SERVER_INFO var='CFG_SITE_URL'/><BFE_SERVER_INFO var='CFG_SITE_RECORD'/>/<BFE_RECORD_ID/>/export/pdf?ln=<BFE_CLIENT_INFO var='ln'/>">PDF</a></li>,
-	<a style="font-weight:normal" href="<BFE_SERVER_INFO var='CFG_SITE_URL'/><BFE_SERVER_INFO var='CFG_SITE_RECORD'/>/<BFE_RECORD_ID/>/export/jpeg?ln=<BFE_CLIENT_INFO var='ln'/>">JPEG</a></li>
-	<h4><i class="icon-share-alt">   </i>Share</h4>
-	<BFE_BOOKMARK prefix='<div style="padding-bottom:25px;">' suffix='</div>' />
-	<h4><i class="icon-wrench">   </i>Other options</h4>
-	<div>
-		<a href="<BFE_SERVER_INFO var='CFG_SITE_URL'/>yourbaskets/add?ln=<BFE_CLIENT_INFO var='ln'/>&amp;recid=<BFE_RECORD_ID/>">_(Add to Personal Collection)_</a>
-	</div>
-	<div>
-		<BFE_EDIT_RECORD />
-	</div>
-	<div>
-		<BFE_ASK_FOR_DELETION />
-	</div>
-	<div>
-		<BFE_ASK_FOR_MODIFICATION />
-	</div>
-	<div>
-		<BFE_EDIT_FILES />
-	</div>
-	<div>
-		<BFE_SIMILAR_RECORDS />
-	</div>
-</div>
+<ul class="detailedrecordactions">
+        <li><a href="<BFE_SERVER_INFO var='CFG_SITE_URL'/>yourbaskets/add?ln=<BFE_CLIENT_INFO var='ln'/>&amp;recid=<BFE_RECORD_ID/>">_(Add to personal basket)_</a></li>
+        <li>_(Export as)_
+            <a style="text-decoration:underline;font-weight:normal" href="<BFE_SERVER_INFO var='CFG_SITE_URL'/><BFE_SERVER_INFO var='CFG_SITE_RECORD'/>/<BFE_RECORD_ID/>/export/hx?ln=<BFE_CLIENT_INFO var='ln'/>">BibTeX</a>,
+            <a style="text-decoration:underline;font-weight:normal" href="<BFE_SERVER_INFO var='CFG_SITE_URL'/><BFE_SERVER_INFO var='CFG_SITE_RECORD'/>/<BFE_RECORD_ID/>/export/hm?ln=<BFE_CLIENT_INFO var='ln'/>">MARC</a>,
+            <a style="text-decoration:underline;font-weight:normal" href="<BFE_SERVER_INFO var='CFG_SITE_URL'/><BFE_SERVER_INFO var='CFG_SITE_RECORD'/>/<BFE_RECORD_ID/>/export/xm?ln=<BFE_CLIENT_INFO var='ln'/>">MARCXML</a>,
+            <a style="text-decoration:underline;font-weight:normal" href="<BFE_SERVER_INFO var='CFG_SITE_URL'/><BFE_SERVER_INFO var='CFG_SITE_RECORD'/>/<BFE_RECORD_ID/>/export/xmets?ln=<BFE_CLIENT_INFO var='ln'/>">METS</a>,
+            <a style="text-decoration:underline;font-weight:normal" href="<BFE_SERVER_INFO var='CFG_SITE_URL'/><BFE_SERVER_INFO var='CFG_SITE_RECORD'/>/<BFE_RECORD_ID/>/export/xd?ln=<BFE_CLIENT_INFO var='ln'/>">DC</a>,
+            <a style="text-decoration:underline;font-weight:normal" href="<BFE_SERVER_INFO var='CFG_SITE_URL'/><BFE_SERVER_INFO var='CFG_SITE_RECORD'/>/<BFE_RECORD_ID/>/export/xe?ln=<BFE_CLIENT_INFO var='ln'/>">EndNote</a>,
+<!--            <a style="text-decoration:underline;font-weight:normal" href="<BFE_SERVER_INFO var='CFG_SITE_URL'/><BFE_SERVER_INFO var='CFG_SITE_RECORD'/>/<BFE_RECORD_ID/>/export/xe8x?ln=<BFE_CLIENT_INFO var='ln'/>">EndNote (8-X)</a>,-->
+            <a style="text-decoration:underline;font-weight:normal" href="<BFE_SERVER_INFO var='CFG_SITE_URL'/><BFE_SERVER_INFO var='CFG_SITE_RECORD'/>/<BFE_RECORD_ID/>/export/xn?ln=<BFE_CLIENT_INFO var='ln'/>">NLM</a>,
+            <a style="text-decoration:underline;font-weight:normal" href="<BFE_SERVER_INFO var='CFG_SITE_URL'/><BFE_SERVER_INFO var='CFG_SITE_RECORD'/>/<BFE_RECORD_ID/>/export/xw?ln=<BFE_CLIENT_INFO var='ln'/>">RefWorks</a>,
+            <a style="text-decoration:underline;font-weight:normal" href="<BFE_SERVER_INFO var='CFG_SITE_URL'/><BFE_SERVER_INFO var='CFG_SITE_RECORD'/>/<BFE_RECORD_ID/>/export/pdf?ln=<BFE_CLIENT_INFO var='ln'/>">PDF</a>,
+            <a style="text-decoration:underline;font-weight:normal" href="<BFE_SERVER_INFO var='CFG_SITE_URL'/><BFE_SERVER_INFO var='CFG_SITE_RECORD'/>/<BFE_RECORD_ID/>/export/jpeg?ln=<BFE_CLIENT_INFO var='ln'/>">JPEG</a></li>
+        <BFE_EDIT_RECORD prefix="<li>" suffix="</li>" />
+        <BFE_EDIT_FILES prefix="<li>" suffix="</li>" />
+        <BFE_SWORD_PUSH prefix="<li>" suffix="</li>" />
+</ul>
+<BFE_BOOKMARK prefix="<div style='padding-left: 13px;'>" suffix="</div>" />

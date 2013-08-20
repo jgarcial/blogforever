@@ -1,1 +1,7 @@
+tag 980.a:
+BLOG --- BlogLaTeX.tpl
+BLOGPOST --- PostLaTeX.tpl
+COMMENT --- CommentLaTeX.tpl
+PROVBLOG --- BlogLaTeX.tpl
+REJBLOG --- BlogLaTeX.tpl
 default: LaTeX.bft

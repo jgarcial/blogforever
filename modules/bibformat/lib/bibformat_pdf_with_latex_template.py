@@ -23,18 +23,14 @@ mapped with their possible latex representations within LatexConverter class.
 If css style is provided, for each html tag, class, id or possible css
 selectors, related latex style is also applied.
 """
-
-import os.path
+from flask import g
 import re
 import copy
-import urllib2
-import Image
 from operator import itemgetter
-from shutil import copyfile
 from HTMLParser import HTMLParser
-from flask import session
 
-from invenio.config import CFG_WEBDIR
+from invenio.textutils import get_random_string
+from flask import session
 from invenio.bibformat_pdf_with_latex_template_config import \
     CFG_BIBFORMAT_LATEX_REPRESENTATION_OF_HTML_TAGS, \
     CFG_BIBFORMAT_LATEX_REPRESENTATION_OF_CSS_RULES, \
@@ -43,8 +39,6 @@ from invenio.bibformat_pdf_with_latex_template_config import \
     CFG_BIBFORMAT_LATEX_ALIGNMENTS, \
     CFG_BIBFORMAT_LATEX_COMMANDS, \
     CFG_BIBFORMAT_LATEX_DEFAULT_FONT_SIZE, \
-    CFG_BIBFORMAT_LATEX_SUPPORTED_IMG_EXTS, \
-    CFG_BIBFORMAT_LATEX_DEFAULT_IMG_FORMAT, \
     CFG_BIBFORMAT_LATEX_CSS_SELECTORS, \
     CFG_BIBFORMAT_HTML_SPECIAL_CHARS_BY_NUM, \
     CFG_BIBFORMAT_HTML_SPECIAL_CHARS_BY_NAME, \
@@ -63,8 +57,9 @@ from invenio.bibformat_pdf_with_latex_template_config import \
     CFG_BIBFORMAT_LATEX_A4_SCALE, \
     CFG_BIBFORMAT_LATEX_DEFAULT_IMG_SCALE, \
     CFG_BIBFORMAT_LATEX_LONG_WORDS, \
-    CFG_BIBFORMAT_IMG_SRC_URL, \
     CFG_BIBFORMAT_LATEX_COMMAND_CONSTRAINTS
+
+from invenio.latexutils_image import get_image_path
 
 
 class PdfWithLatexTemplateHtmlParser(HTMLParser):
@@ -93,7 +88,7 @@ class PdfWithLatexTemplateHtmlParser(HTMLParser):
     def handle_starttag(self, tag, attrs):
         # Check if the former tag is ended or not.
         if (self.__former_tag and
-                self.__former_tag in CFG_BIBFORMAT_LATEX_NON_END_TAGS):
+                    self.__former_tag in CFG_BIBFORMAT_LATEX_NON_END_TAGS):
             self.handle_endtag(self.__former_tag)
 
         # Flush content buffer before activating new html element.
@@ -103,7 +98,7 @@ class PdfWithLatexTemplateHtmlParser(HTMLParser):
         # this with formerly defined one.
         if (self.__converter.active_environment in
                 CFG_BIBFORMAT_LATEX_COMMAND_CONSTRAINTS and
-                tag in CFG_BIBFORMAT_LATEX_COMMAND_CONSTRAINTS
+                    tag in CFG_BIBFORMAT_LATEX_COMMAND_CONSTRAINTS
                 [self.__converter.active_environment]):
             tag = (CFG_BIBFORMAT_LATEX_COMMAND_CONSTRAINTS
                    [self.__converter.active_environment][tag])
@@ -166,9 +161,9 @@ class PdfWithLatexTemplateHtmlParser(HTMLParser):
     def handle_endtag(self, tag):
         # Set former latex environment for html tags having constraints.
         if (tag != self.__converter.active_environment and
-                self.__converter.active_environment in
-                CFG_BIBFORMAT_LATEX_COMMAND_CONSTRAINTS and
-                tag in CFG_BIBFORMAT_LATEX_COMMAND_CONSTRAINTS
+                    self.__converter.active_environment in
+                    CFG_BIBFORMAT_LATEX_COMMAND_CONSTRAINTS and
+                    tag in CFG_BIBFORMAT_LATEX_COMMAND_CONSTRAINTS
                 [self.__converter.active_environment]):
             tag = (CFG_BIBFORMAT_LATEX_COMMAND_CONSTRAINTS
                    [self.__converter.active_environment][tag])
@@ -350,8 +345,8 @@ class LatexConverter:
                  .remove(CFG_BIBFORMAT_MATHJAX_DELIMITERS))
             regex_str = (re
                          .escape(''
-                                 .join(CFG_BIBFORMAT_LATEX_SPECIAL_CHARS_LIST))
-                         )
+            .join(CFG_BIBFORMAT_LATEX_SPECIAL_CHARS_LIST))
+            )
             regex_str = '[' + regex_str + ']'
             global CFG_BIBFORMAT_LATEX_SPECIAL_CHARS_REGEX
             CFG_BIBFORMAT_LATEX_SPECIAL_CHARS_REGEX = re.compile(regex_str)
@@ -679,60 +674,10 @@ class LatexConverter:
 
         self.attributes['src'] = self.attributes['src'].replace("\\", "")
 
-        is_local_source = False
-        is_error_occured = False
+        path = get_image_path(self.attributes['src'])
 
-        (source, file_name) = os.path.split(self.attributes['src'])
-
-        # Check whether src is relative/absolute path or url.
-        if source:
-            url_match_obj = CFG_BIBFORMAT_IMG_SRC_URL.match(source)
-
-            if url_match_obj:
-                is_local_source = False
-            elif not url_match_obj:
-                is_local_source = True
-        else:
-            is_local_source = True
-
-        try:
-            extension = file_name.split(".")[1]
-            path_extension = '.' + extension
-        except:
-            path_extension = extension = ""
-        path = os.path.join(CFG_BIBFORMAT_LATEX_TEMP_DIR + '_' +
-                            str(self.session_id) + '_pdf',
-                            str(self.__number_of_images) + path_extension)
-
-        if not is_local_source:
-            # Download image.
-            url = self.attributes['src']
-            try:
-                response = urllib2.urlopen(url)
-                tmpf = open(path, 'wb')
-                tmpf.write(response.read())
-                tmpf.close()
-                self.attributes['src'] = path
-            except:
-                is_error_occured = True
-        elif is_local_source:
-            local_path = os.path.join(CFG_WEBDIR, self.attributes['src'])
-            if os.path.exists(local_path):
-                copyfile(local_path, path)
-            else:
-                is_error_occured = True
+        if path:
             self.attributes['src'] = path
-
-        if not is_error_occured:
-            if not extension in CFG_BIBFORMAT_LATEX_SUPPORTED_IMG_EXTS:
-                # Convert img to a supported format
-                img = Image.open(path)
-                output = os.path.join(CFG_BIBFORMAT_LATEX_TEMP_DIR,
-                                      str(self.__number_of_images) +
-                                      "." +
-                                      CFG_BIBFORMAT_LATEX_DEFAULT_IMG_FORMAT)
-                img.save(output)
-                self.attributes['src'] = output
 
             if 'height' in self.attributes:
                 height = self.attributes['height']
@@ -754,8 +699,7 @@ class LatexConverter:
                                              ', ')
             elif not width:
                 include_graphics_options += \
-                    "scale=" + (str(CFG_BIBFORMAT_LATEX_DEFAULT_IMG_SCALE) +
-                                ", ")
+                    'max height=\\textheight, max width=\\textwidth, '
 
             include_graphics_options += 'keepaspectratio=true'
             self.__number_of_images += 1
@@ -916,7 +860,7 @@ class LatexConverter:
                                          ['table_multicolumn']['start'] %
                                          self.__multicolumn_params)
             self.__handle_latex_commands(self.__latex_commands
-                                         ['table_multicolumn']['end'])
+            ['table_multicolumn']['end'])
             self.__multicolumn_params['col_num'] = 1
 
         self.__numb_of_cols = 0
@@ -1084,20 +1028,20 @@ class LatexConverter:
                 if rule == 'font-size':
                     if rule_val.endswith('%'):
                         size = (CFG_BIBFORMAT_LATEX_DEFAULT_FONT_SIZE *
-                                int(rule_val[0:-1]) / 100)
+                                int(float(rule_val[0:-1])) / 100)
                         params = (size, size * 1.2)
                     elif rule_val.endswith(('px', 'pt')):
-                        size = int(rule_val[0:-2])
+                        size = int(float(rule_val[0:-2]))
                         params = (size, size * 1.2)
                     else:
                         try:
-                            size = int(rule_val)
+                            size = int(float(rule_val))
                             params = (size, size * 1.2)
                         except:
                             size = CFG_BIBFORMAT_LATEX_DEFAULT_FONT_SIZE
                             params = (size, size * 1.2)
                     latex_commands = copy.deepcopy(self.__css_latex_mappings
-                                                   [rule]['variable'])
+                    [rule]['variable'])
                     latex_commands['start'] = (latex_commands['start'] %
                                                params)
 
@@ -1148,7 +1092,7 @@ class LatexConverter:
                             color_name = rule_val.capitalize()
 
                     latex_commands = copy.deepcopy(self.__css_latex_mappings
-                                                   [rule]['defined'])
+                    [rule]['defined'])
                     latex_commands['start'] = (latex_commands['start'] %
                                                {'val': color_name})
 
@@ -1240,8 +1184,8 @@ class LatexConverter:
                             self.active_style[rule]['value'] = rules[rule]
                             self.active_style[rule]['status'] = 1
                         elif (self.active_style[rule]['status'] != 2 and
-                              self.active_style[rule]['value'] !=
-                              rules[rule]):
+                                      self.active_style[rule]['value'] !=
+                                      rules[rule]):
                             self.active_style[rule]['value'] = rules[rule]
                             self.active_style[rule]['status'] = 1
                     break
@@ -1542,7 +1486,7 @@ class CssParser:
                     if owner in self.css_file_output:
                         css_owner = dict(self.css_file_output[owner],
                                          **self.__extract_css_declarations
-                                         (rule_block))
+                                             (rule_block))
                         self.css_file_output[owner] = css_owner
                     else:
                         css_owner = self.__extract_css_declarations(rule_block)

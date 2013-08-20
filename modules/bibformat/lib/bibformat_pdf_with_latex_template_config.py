@@ -86,6 +86,7 @@ CFG_BIBFORMAT_LATEX_PACKAGES = \
     \\usepackage{seqsplit}
     \\usepackage{fontspec}
     \\usepackage{tabulary}
+    \\usepackage[export]{adjustbox}
     \\setmainfont[Ligatures=TeX]{Linux Libertine O}
     \\usepackage{xeCJK}
     \\setCJKmainfont{WenQuanYi Micro Hei Mono}

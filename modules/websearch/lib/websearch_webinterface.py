@@ -136,7 +136,6 @@ from invenio.bibdocfile_webinterface import WebInterfaceManageDocFilesPages, Web
 from invenio.search_engine import get_record
 from invenio.shellutils import mymkdir
 from invenio.logicutils import isnumber
-from invenio.session import get_session
 
 import invenio.template
 websearch_templates = invenio.template.load('websearch')
@@ -1170,8 +1169,7 @@ class WebInterfaceSRUServicePages(WebInterfaceDirectory):
 class WebInterfaceRecordExport(WebInterfaceDirectory):
     """ Handling of a /<CFG_SITE_RECORD>/<recid>/export/<format> URL fragment """
 
-    _exports = ["recordcontent"]
-    _exports.extend(output_formats)
+    _exports = output_formats
 
     def __init__(self, recid, format=None):
         self.recid = recid
@@ -1237,38 +1235,6 @@ class WebInterfaceRecordExport(WebInterfaceDirectory):
             return str(out)
         else:
             return out
-        
-        
-    def recordcontent(self, req, form):
-        """
-        Creates record pages without any header or footer rendering record with
-        "jpegpc" output format.
-        Only called when a record is exported as jpeg. To enable the program taking
-        snapshots of the records access from outside, it should be called with
-        the session_key of the user. If the session_key is not presented, the result
-        page is created based on default mod_python request object.
-        Anyone without permission for the restricted records can not be access them.  
-        """
-        argd = wash_urlargd(form, {'session':(str, "")})
-        # If called with session_key argument, load session from database.
-        if argd['session']:
-            get_session(req, argd['session'])
-
-        argd = wash_search_urlargd(form)
-        argd['recid'] = self.recid
-        argd['of'] = 'jpegpc'
-        req.argd = argd
-        
-        # Check if the record belongs to a restricted primary
-        # collection.  If yes, redirect to the authenticated URL.
-        user_info = collect_user_info(req)
-        (auth_code, auth_msg) = check_user_can_view_record(user_info, self.recid)
-        
-        if auth_code:
-            return page_not_authorized(req, "../", text=auth_msg, navmenuid='search')
-        
-        perform_request_search(req, **argd)
-        return ""
 
     # Return the same page wether we ask for /CFG_SITE_RECORD/123/export/xm or /CFG_SITE_RECORD/123/export/xm/
     index = __call__

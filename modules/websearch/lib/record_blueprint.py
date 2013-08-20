@@ -21,6 +21,7 @@
 
 import os
 from functools import wraps
+from invenio.bibdocfile import bibdocfile_url_to_fullpath
 from invenio import webinterface_handler_config as apache
 
 from flask import g, render_template, request, flash, redirect, url_for, \
@@ -219,3 +220,9 @@ def usage(recid):
                             viewsimilarity = viewsimilarity,
                             downloadsimilarity = downloadsimilarity,
                             downloadgraph = downloadgraph)
+
+
+@blueprint.route('/<int:recid>/jpeg', methods=['GET', 'POST'])
+@request_record
+def summary(recid):
+    return render_template('record_jpeg.html')

@@ -71,6 +71,8 @@ pylib_DATA = __init__.py \
              jinja2utils.py \
              jsonutils.py \
              jsonutils_unit_tests.py \
+             latexutils.py \
+             latexutils_image.py \
              logicutils.py \
              logicutils_unit_tests.py \
              mailutils.py \
@@ -140,6 +142,7 @@ pylib_DATA = __init__.py \
 jsdir=$(localstatedir)/www/js
 
 js_DATA = jquery.mathpreview.js
+
 
 noinst_DATA = testimport.py \
               kwalitee.py \

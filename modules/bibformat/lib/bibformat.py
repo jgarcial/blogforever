@@ -35,6 +35,7 @@ record basis) should be defined, with name C{def create_*}.
 
 @see: bibformat_utils.py
 """
+from invenio.textutils import get_random_string
 
 __revision__ = "$Id$"
 
@@ -365,7 +366,7 @@ def format_records(recIDs, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
 
     return prologue + formatted_records + epilogue
 
-def create_excel(recIDs, req=None, ln=CFG_SITE_LANG, ot=None, ot_sep="; "):
+def create_excel(recIDs, req=None, ln=CFG_SITE_LANG, ot=None, ot_sep="; ", user_info=None):
     """
     Returns an Excel readable format containing the given recIDs.
     If 'req' is given, also prints the output in 'req' while individual
@@ -385,6 +386,7 @@ def create_excel(recIDs, req=None, ln=CFG_SITE_LANG, ot=None, ot_sep="; "):
     @param ln: language
     @param ot: a list of fields that should be included in the excel output as columns(see perform_request_search 'ot' param)
     @param ot_sep: a separator used to separate values for the same record, in the same columns, if any
+    @param user_info: the user_info dictionary
     @return: a string in Excel format
     """
     # Prepare the column headers to display in the Excel file
@@ -437,7 +439,8 @@ def create_excel(recIDs, req=None, ln=CFG_SITE_LANG, ot=None, ot_sep="; "):
                                              record_separator='\n',
                                              prologue = '<meta http-equiv="Content-Type" content="text/html; charset=utf-8"><table>',
                                              epilogue = footer,
-                                             req=req)
+                                             req=req,
+                                             user_info=user_info)
 
     return excel_formatted_records
 
@@ -504,18 +507,19 @@ def filter_hidden_fields(recxml, user_info=None, filter_tags=CFG_BIBFORMAT_HIDDE
 
     return out
 
-def get_output_format_content_type(of):
+def get_output_format_content_type(of, default_content_type="text/html"):
     """
     Returns the content type (for example 'text/html' or 'application/ms-excel') \
     of the given output format.
 
     @param of: the code of output format for which we want to get the content type
+    @param default_content_type: default content-type when content-type was not set up
     @return: the content-type to use for this output format
     """
     content_type = bibformat_dblayer.get_output_format_content_type(of)
 
     if content_type == '':
-        content_type = 'text/html'
+        content_type = default_content_type
 
     return content_type
 
@@ -558,6 +562,181 @@ def print_records(recIDs, of='hb', ln=CFG_SITE_LANG, verbose=0,
         **context)
 
 
+def create_pdf(recIDs):
+    """
+    Returns record's pdf created in latex template.
+
+    @param recIDs: a list of record IDs
+    @return: If the number of records to be converted to PDF is only 1 then,
+        the PDF of the record is written into "req" object. If the number is
+        more than 1, then all created PDFs are zipped and this zip file is
+        written into "req" object. In both case, "req.content_type" is set to
+        specific file type.
+
+        The PDFs are created by generating a latex template from record body.
+        Later it is converted to pdf.
+    """
+    from bibformat_pdf_with_latex_template_config import CFG_BIBFORMAT_PATH_PDF_CONVERTER, \
+        CFG_BIBFORMAT_LATEX_TEMP_DIR
+    import zipfile
+    import shutil
+
+    from flask import g
+
+    # get a unique folder
+    while True:
+        g.tex_dir = (CFG_BIBFORMAT_LATEX_TEMP_DIR +
+                     '_' +
+                     get_random_string(60, True) + '_pdf')
+        if not os.path.exists(g.tex_dir):
+            break
+
+    pdf_file_path = ""
+
+    try:
+        os.makedirs(g.tex_dir)
+    except:
+        pass
+
+    for rec in recIDs:
+        file_name = 'record' + str(rec)
+        try:
+            # create LaTeX source file
+            tex_file_path = os.path.join(g.tex_dir, file_name + '.tex')
+            pdf_file_path = os.path.join(g.tex_dir, file_name + '.pdf')
+            try:
+                tex_source = format_record(rec, 'pdf')
+            except:
+                tex_source = None
+                recIDs.remove(rec)
+
+            if isinstance(tex_source, unicode):
+                tex_source = tex_source.encode("utf-8")
+            if tex_source:
+                tex_file = file(tex_file_path, 'wb')
+                tex_file.write(tex_source)
+                tex_file.close()
+
+                tex_process = subprocess.Popen(
+                    [CFG_BIBFORMAT_PATH_PDF_CONVERTER,
+                        '-interaction=batchmode',
+                        tex_file_path,
+                    ],
+                    stdin=file(os.devnull, 'r'),
+                    stdout=file(os.devnull, 'w'),
+                    stderr=subprocess.STDOUT,
+                    close_fds=True,
+                    shell=False,
+                    cwd=g.tex_dir,
+                    env={'PATH': os.getenv('PATH')},
+                )
+                tex_process.wait()
+        finally:
+            pass
+
+    if len(recIDs) == 1:
+        pdf_file = file(pdf_file_path, 'r')
+        result = pdf_file.read()
+        pdf_file.close()
+    else:
+        zip_file_path = os.path.join(g.tex_dir, 'records.zip')
+        zip_file = zipfile.ZipFile(zip_file_path, mode='w')
+        for rec in recIDs:
+            file_name = 'record' + str(rec) + '.pdf'
+            pdf_file_path = os.path.join(g.tex_dir, file_name)
+            zip_file.write(pdf_file_path, file_name, None)
+
+        zip_file = file(zip_file_path, 'r')
+        result = zip_file.read()
+        zip_file.close()
+
+    shutil.rmtree(g.tex_dir)
+    return result
+
+
+def create_jpeg(recIDs):
+    """
+    Returns a snapshot of the record with the given recid.
+
+    @param recIDs: a list of record IDs
+    @return: If the number of records to be converted to JPEG is only 1 then,
+        the JPEG of the record is written into "req" object. If the number is
+        more than 1, then all created JPEGs are zipped and this zip file is
+        written into "req" object. In both case, "req.content_type" is set to
+        specific file type.
+
+        The JPEGs are simply snapshots of the corresponding records.
+    """
+
+    import zipfile
+    import shutil
+    from flask import g
+
+    # get a unique folder
+    while True:
+        g.jpeg_dir = (CFG_WEBDIR + "/export" + "/tmp" + '_' +
+                      get_random_string(60, True) + '_jpeg')
+        if not os.path.exists(g.jpeg_dir):
+            break
+
+    try:
+        os.makedirs(os.path.join(g.jpeg_dir))
+    except:
+        pass
+
+    image_width = "800"
+    image_height = "600"
+    script_path = "%s/js/%s" % (CFG_WEBDIR, 'jpeg_render_script.js')
+    output_path = ""
+
+    for rec in recIDs:
+        output_name = 'record' + str(rec) + '.jpeg'
+        output_path = "%s/%s" % (g.jpeg_dir, output_name)
+        record_url = "%s/record/%s/jpeg" % (CFG_SITE_URL, rec)
+        try:
+            proc = subprocess.Popen(
+                    ["phantomjs",
+                     "--ignore-ssl-errors=yes",
+                     "--local-to-remote-url-access=yes",
+                     script_path,
+                     image_width,
+                     image_height,
+                     record_url,
+                     output_path],
+                    stdin=file(os.devnull, 'r'),
+                    stdout=file(os.devnull, 'w'),
+                    stderr=subprocess.STDOUT,
+                    close_fds=True,
+                    shell=False,
+                    cwd=g.jpeg_dir,
+                    env={'PATH': os.getenv('PATH')}
+                )
+            proc.wait()
+            if proc.returncode != 0:
+                raise ValueError(1)
+        finally:
+            pass
+
+    if len(recIDs) == 1:
+        jpeg = file(output_path, 'r')
+        result = jpeg.read()
+        jpeg.close()
+    else:
+        zip_file_path = os.path.join(g.jpeg_dir, 'records.zip')
+        zip_file = zipfile.ZipFile(zip_file_path, mode='w')
+        for rec in recIDs:
+            file_name = 'record' + str(rec) + '.jpeg'
+            jpeg_file_path = os.path.join(g.jpeg_dir, file_name)
+            zip_file.write(jpeg_file_path, file_name, None)
+
+        zip_file = file(zip_file_path, 'r')
+        result = zip_file.read()
+        zip_file.close()
+
+    shutil.rmtree(g.jpeg_dir)
+    return result
+
+
 def usage(exitcode=1, msg=""):
     """
     Prints usage info.
@@ -591,171 +770,6 @@ def usage(exitcode=1, msg=""):
      -V  --version              print the script version
      """
     sys.exit(exitcode)
-
-
-def create_pdf(recIDs):
-    """
-    Returns record's pdf created in latex template.
-    
-    @param recIDs: a list of record IDs
-    @return: If the number of records to be converted to PDF is only 1 then,
-        the PDF of the record is written into "req" object. If the number is
-        more than 1, then all created PDFs are zipped and this zip file is
-        written into "req" object. In both case, "req.content_type" is set to
-        specific file type.
-        
-        The PDFs are created by generating a latex template from record body.
-        Later it is converted to pdf.
-    """
-    from bibformat_pdf_with_latex_template_config import CFG_BIBFORMAT_PATH_PDF_CONVERTER, \
-        CFG_BIBFORMAT_LATEX_TEMP_DIR
-    import zipfile
-    import shutil
-    
-    from flask import session
-    session_key = session.sid
-
-    tex_dir = CFG_BIBFORMAT_LATEX_TEMP_DIR + '_' + str(session_key) + '_pdf'
-    pdf_file_path = ""
-    
-    try:
-        os.makedirs(os.path.join(tex_dir))
-    except:
-        pass
-    
-    for rec in recIDs:
-        file_name = 'record' + str(rec)
-        try:
-            # create LaTeX source file
-            tex_file_path = os.path.join(tex_dir, file_name + '.tex')
-            pdf_file_path = os.path.join(tex_dir, file_name + '.pdf')
-            try:
-                tex_source = format_record(rec, 'pdf')
-            except:
-                tex_source = None
-                recIDs.remove(rec)
-                
-            if isinstance(tex_source, unicode):
-                tex_source = tex_source.encode("utf-8")
-            if tex_source:
-                tex_file = file(tex_file_path, 'wb')
-                tex_file.write(tex_source)
-                tex_file.close()
-                
-                tex_process = subprocess.Popen(
-                    [CFG_BIBFORMAT_PATH_PDF_CONVERTER,
-                        '-interaction=batchmode',
-                        tex_file_path,
-                    ],
-                    stdin=file(os.devnull, 'r'),
-                    stdout=file(os.devnull, 'w'),
-                    stderr=subprocess.STDOUT,
-                    close_fds=True,
-                    shell=False,
-                    cwd=tex_dir,
-                    env={'PATH': os.getenv('PATH')},
-                )
-                tex_process.wait()
-        finally:
-            pass
-    
-    if len(recIDs) == 1:
-        pdf_file = file(pdf_file_path, 'r')
-        result = pdf_file.read()
-        pdf_file.close()
-    else:
-        zip_file_path = os.path.join(tex_dir, 'records.zip')
-        zip_file = zipfile.ZipFile(zip_file_path, mode='w')
-        for rec in recIDs:
-            file_name = 'record' + str(rec) + '.pdf'
-            pdf_file_path = os.path.join(tex_dir, file_name)
-            zip_file.write(pdf_file_path, file_name, None)
-
-        zip_file = file(zip_file_path, 'r')
-        result = zip_file.read()
-        zip_file.close()
-        
-    shutil.rmtree(tex_dir)
-    return result
-
-
-def create_jpeg(recIDs):
-    """
-    Returns a snapshot of the record with the given recid.
-
-    @param recIDs: a list of record IDs
-    @return: If the number of records to be converted to JPEG is only 1 then,
-        the JPEG of the record is written into "req" object. If the number is
-        more than 1, then all created JPEGs are zipped and this zip file is
-        written into "req" object. In both case, "req.content_type" is set to
-        specific file type.
-        
-        The JPEGs are simply snapshots of the corresponding records.
-    """
-    
-    from flask import session
-    import zipfile
-    import shutil
-    
-    session_key = session.sid
-
-    export_dir = CFG_WEBDIR + "/export" + "/tmp" + '_' + str(session_key) + '_jpeg'
-    try:
-        os.makedirs(os.path.join(export_dir))
-    except:
-        pass
-    
-    image_width = "800"
-    image_height = "600"
-    script_path = "%s/js/%s" % (CFG_WEBDIR, 'jpeg_render_script.js')
-    output_path = ""
-    
-    for rec in recIDs:
-        output_name = 'record' + str(rec) + '.jpeg'
-        output_path = "%s/%s" % (export_dir, output_name)   
-        record_url = "%s/record/%s/export/recordcontent?ln=en&session=%s" % (CFG_SITE_URL, rec, session_key)
-        try:
-            proc = subprocess.Popen(
-                    ["phantomjs", 
-                     "--ignore-ssl-errors=yes",
-                     "--local-to-remote-url-access=yes",
-                     script_path,
-                     image_width,
-                     image_height,
-                     record_url, 
-                     output_path],
-                    stdin=file(os.devnull, 'r'),
-                    stdout=file(os.devnull, 'w'),
-                    stderr=subprocess.STDOUT,
-                    close_fds=True,
-                    shell=False,
-                    cwd=export_dir,
-                    env={'PATH': os.getenv('PATH')}
-                )
-            proc.wait()
-            if proc.returncode != 0:
-                raise ValueError(1)
-        finally:
-            pass
-    
-    if len(recIDs) == 1:
-        jpeg = file(output_path, 'r')
-        result = jpeg.read()
-        jpeg.close()
-    else:
-        zip_file_path = os.path.join(export_dir, 'records.zip')
-        zip_file = zipfile.ZipFile(zip_file_path, mode='w')
-        for rec in recIDs:
-            file_name = 'record' + str(rec) + '.jpeg'
-            jpeg_file_path = os.path.join(export_dir, file_name)
-            zip_file.write(jpeg_file_path, file_name, None)
-        
-        zip_file = file(zip_file_path, 'r')
-        result = zip_file.read()
-        zip_file.close()
-        
-    shutil.rmtree(export_dir)
-    return result
 
 def main():
     """
