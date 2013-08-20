@@ -103,9 +103,12 @@ class Bagit_Handler:
         '''
 
         for f in self.docfiles:
-            file_writer = open("%s/%s.metadata" % (self.bagit_folder_path, f.name), mode = 'w')
-            file_writer.write(str(f))
-            file_writer.close()
+            try:
+                file_writer = open("%s/%s.metadata" % (self.bagit_folder_path, f.name), mode = 'w')
+                file_writer.write(str(f))
+                file_writer.close()
+            except:
+                pass
 
 
     def set_up_bag(self, recid, name, docfiles):

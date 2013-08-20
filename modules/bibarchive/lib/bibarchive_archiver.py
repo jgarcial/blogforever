@@ -47,11 +47,14 @@ def get_record(recid):
     connector = Database_Connection()
     db_access = Database_Access(connector)
     res = db_access.get(recid)
-    path = os.path.join(CFG_TMPDIR, "bagit", "record_%d_v%s.zip" % (recid, res['version']))
-    f = open(path, 'wb')
-    f.write(res['data'])
-    f.close()
-    return path
+    if res:
+        path = os.path.join(CFG_TMPDIR, "bagit", "record_%d_v%s.zip" % (recid, res['version']))
+        f = open(path, 'wb')
+        f.write(res['data'])
+        f.close()
+        return path
+    else:
+        return None
 
 def delete_archive(recid):
     '''
