@@ -11,7 +11,9 @@ IMGFILES = blogforever_logo_header.png \
 		sample3.png \
 		sample4.png \
 		bf1-screenshot.jpg \
-		bf3-screenshot.jpg
+		bf3-screenshot.jpg \
+		bf5-screenshot.png \
+		bf6-screenshot.png
 
 IMGDIR = $(PREFIX)/var/www/img/
 

@@ -85,11 +85,11 @@
       </div>
   {% endif %}
 
-  {% if portalboxes.lt %}
+  {#% if portalboxes.lt %}
     {{ portalbox_sidebar(portalboxes.rt, class="span2") }}
   {% else %}
     {{ portalbox_sidebar(portalboxes.rt, class="offset2 span2") }}
-  {% endif %}
+  {% endif %#}
 
 </div> <!-- /row -->
 </div> <!-- /search-index -->
@@ -101,7 +101,7 @@
 
 <div class="search-index">
 <header class="jumbotron masthead centered">
-    <h1>Atlantis Blogs</h1>
+    <h1>{{ config.CFG_SITE_NAME }}</h1>
     <p>Preserving and disseminating blogs using <br> the BlogForever Platform</p>
 </header>
 
@@ -128,28 +128,27 @@
       <a href="http://bf1.csd.auth.gr/" class="thumbnail">
         <img src="/img/bf1-screenshot.jpg" alt="BF1 case study repository">
         <h4>Case study repository BF1</h4>
-        <p>Explore 1,342 records</p>
+        <p>Explore more than 1,000 records</p>
       </a>
     </li>
     <li class="span3">
       <a href="http://bf3.itc.auth.gr/" class="thumbnail">
-        <img src="/img/bf3-screenshot.jpg" alt="Sample archive">
-        <h4>Case study repository BF2</h4>
-        <p>Explore 9,467 records</p>
+        <img src="/img/bf3-screenshot.jpg" alt="BF3 case study repository">
+        <h4>Case study repository BF3</h4>
+        <p>Explore more than 11,000 records</p>
       </a>
     </li>
     <li class="span3">
-      <a href="#" class="thumbnail">
-        <img src="/img/bf3-screenshot.jpg" alt="Sample archive">
-        <h4> Repository Three</h4>
-        <p>Adipisicing elit, sed Thurs.</p>
+     <a href="http://bf6.itc.auth.gr/" class="thumbnail">
+        <img src="/img/bf6-screenshot.png" alt="BF6 case study repository">
+        <h4>Case study repository BF6</h4>
+        <p>Explore more than 150,000 records</p>
       </a>
     </li>
     <li class="span3">
-     <a href="#" class="thumbnail">
-        <img src="/img/bf3-screenshot.jpg" alt="Sample archive">
-        <h4> Repository Four</h4>
-        <p>Lorem ipsum dolor sit amet</p>
+      <a href="https://blogforever.cern.ch/" class="thumbnail">
+        <img src="/img/bf5-screenshot.png" alt="BF5 case study repository">
+        <h4>Repository at CERN</h4>
       </a>
     </li>
   </ul>
