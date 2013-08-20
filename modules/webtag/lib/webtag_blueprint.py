@@ -160,13 +160,13 @@ def tag_details(id_tag):
 @blueprint.invenio_wash_urlargd({'q': (unicode, '')})
 def tokenize(id_bibrec, q):
     """ Data for tokeninput """
-    user = db.session.query(User).get(current_user.get_id())
+    id_user = current_user.get_id()
 
     # Output only tags unattached to this record
-    record = db.session.query(Bibrec).get(id_bibrec)
+    record = Bibrec.query.get(id_bibrec)
 
-    tags = db.session.query(WtgTAG)\
-        .filter_by(user=user)\
+    tags = WtgTAG.query\
+        .filter_by(id_user=id_user)\
         .filter(WtgTAG.name.like('%'+ q +'%'))\
         .filter(db.not_(WtgTAG.records.contains(record)))\
         .order_by(WtgTAG.name)
@@ -187,8 +187,16 @@ def tokenize(id_bibrec, q):
 
     #If the name was not found
     if add_new_name:
-        tag_json = {'id': 0, 'name': new_name}
-        response_tags.append(tag_json)
+        # Check if a tag with this name is already attached
+        already_attached = WtgTAG.query\
+            .join(WtgTAGRecord)\
+            .filter(WtgTAG.name == new_name)\
+            .filter(WtgTAGRecord.id_bibrec == id_bibrec)\
+            .count()
+
+        if not already_attached:
+            tag_json = {'id': 0, 'name': new_name}
+            response_tags.append(tag_json)
 
     return jsonify(dict(results=response_tags, query=q))
 
