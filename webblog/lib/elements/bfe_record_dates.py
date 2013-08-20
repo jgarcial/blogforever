@@ -22,11 +22,14 @@
 BibFormat Element - displays the archived and/or the posted dates
 """
 
-from invenio.search_engine import get_creation_date
-from invenio.webblog_utils import transform_format_date
 import datetime
 
-def format_element(bfo):
+from invenio.search_engine import get_creation_date
+
+from invenio.webblog_utils import transform_format_date
+
+
+def format_element(bfo, display_posted_date=True, display_archived_date=True):
     """
     Displays the archived and/or the posted dates
     """
@@ -34,18 +37,28 @@ def format_element(bfo):
     recid = bfo.control_field('001')
     out = ""
     try:
-        posted_date = transform_format_date(bfo.fields('269__c')[0])
+        if display_posted_date:
+            posted_date = transform_format_date(bfo.fields('269__c')[0])
+        else:
+            posted_date = ""
     except:
         posted_date = ""
-    record_creation_date = get_creation_date(recid)
-    date = datetime.datetime.strptime(record_creation_date, "%Y-%m-%d")
-    record_creation_date = date.strftime("%Y/%m/%d")
+
+    if display_archived_date:
+        record_creation_date = get_creation_date(recid)
+        date = datetime.datetime.strptime(record_creation_date, "%Y-%m-%d")
+        record_creation_date = date.strftime("%Y/%m/%d")
+    else:
+        record_creation_date = ""
 
     if posted_date:
-        out = '<h4><i class="icon-calendar"></i> Posted date </h4> <span class="post-posted-date"> %s </span><br/>' % posted_date
+        out = '<h4><i class="icon-calendar"></i> Posted date </h4> <span ' \
+              'class="post-posted-date"> %s </span><br/>' % posted_date
     if record_creation_date:
-        out += '<h4><i class="icon-calendar"></i> Archived date </h4><span class="post-posted-date"> %s </span> ' % record_creation_date
+        out += '<h4><i class="icon-calendar"></i> Archived date </h4><span ' \
+               'class="post-posted-date"> %s </span> ' % record_creation_date
     return out
+
 
 def escape_values(bfo):
     """

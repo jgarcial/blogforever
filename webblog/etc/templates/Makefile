@@ -2,7 +2,7 @@
 
 include ../../../config.mk
 
-TPLFILES = *.tpl
+TPLFILES = *.tpl *.html
 TPLDIR = $(ETCLOCALDIR)/templates
 
 SUBDIRS = format_templates

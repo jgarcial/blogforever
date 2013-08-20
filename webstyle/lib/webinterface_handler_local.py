@@ -36,7 +36,10 @@ def customize_app(app):
     collections = Menu('main.collections', 'Collections', 'search.index', 3)
     app.config['menubuilder_map']['main'].children['collections'] = collections
     collections.children = {}
-    coll_list = get_nicely_ordered_collection_list()
+    try:
+        coll_list = get_nicely_ordered_collection_list()
+    except:
+        coll_list = []
     colls_nicely_ordered = [c[0] for c in reversed(coll_list)]
     for i, c in enumerate(colls_nicely_ordered):
         collections.children[c] = Menu('main.collections.'+c, c,
@@ -54,8 +57,8 @@ def customize_app(app):
 
     @app.context_processor
     def record_context():
-    	from invenio.bibedit_utils import get_bibrecord
-    	from invenio.bibrecord import record_get_field_value
+        from invenio.bibedit_utils import get_bibrecord
+        from invenio.bibrecord import record_get_field_value
         from invenio.search_engine import get_record
         from invenio.bibrecord import record_xml_output
         from invenio.blog_network_generator import get_blog_citation_network, \

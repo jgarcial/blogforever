@@ -31,7 +31,7 @@ cfg_messages = {}
 cfg_messages["in_issue"] = {"en": "Comments in this post",
                             "fr": "Commentaires sur ce post"}
 
-def format_element(bfo):
+def format_element(bfo, latest_comment_number=2, use_format='HB'):
     """
     Displays comments on a post
     """
@@ -41,21 +41,29 @@ def format_element(bfo):
     post_comments_recids = get_comments(this_recid)
     out = ""
     if post_comments_recids:
-        # let's print just the 3 latest posts
-        latest_post_comments_recids = post_comments_recids[:2]
+        # let's print just the 2 latest comments
+        if latest_comment_number:
+            latest_post_comments_recids = post_comments_recids[:latest_comment_number]
+        else:
+            latest_post_comments_recids = post_comments_recids
         try:
             out += '<div style="margin-bottom:20px;"><h4>%s</h4></div>' % cfg_messages["in_issue"][current_language]
         except:
             out += '<div style="margin-bottom:20px;"><h4>%s</h4></div>' % cfg_messages["in_issue"]["en"]
 
         for comment_recid in latest_post_comments_recids:
-            out += call_bibformat(comment_recid, format='hb')
+            out += call_bibformat(comment_recid, format=use_format)
+
+        if not latest_comment_number:
+            # All comments are already displayed
+            return out
 
         all_comments = ""
-        all_post_comments_recids = post_comments_recids[2:]
+        all_post_comments_recids = post_comments_recids[latest_comment_number:]
+
         if all_post_comments_recids:
             for comment_recid in all_post_comments_recids:
-                all_comments += call_bibformat(comment_recid, format='hb')
+                all_comments += call_bibformat(comment_recid, format=use_format)
                 all_comments += "<br />"
 
             out += """

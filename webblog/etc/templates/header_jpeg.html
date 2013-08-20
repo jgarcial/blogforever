@@ -1,0 +1,50 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2013 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+
+{#
+## This file contains header part of main page template.
+##
+## Usage:
+## {% include 'header.html' %}
+#}
+
+<div class="navbar navbar-fixed-top">
+
+    <div class="navbar-inner">
+        <div class="navbar-inner-wrap">
+            <div class="container">
+                <a class="btn btn-navbar" data-toggle="collapse"
+                   data-target=".nav-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </a>
+                <a class="brand" href="{{ url_for('search.index') }}">
+                    <img src="/img/blogforever_logo_header.png"
+                         alt="{{ config.CFG_SITE_NAME_INTL[g.ln] }}"/>
+                </a>
+
+                <div class="nav-collapse collapse">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="visible-desktop" style="clear:both; height: 80px;"></div>

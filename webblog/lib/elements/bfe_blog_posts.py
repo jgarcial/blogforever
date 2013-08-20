@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 ## This file is part of CDS Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2013 CERN.
 ##
 ## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -32,7 +32,7 @@ cfg_messages["in_issue"] = {"en": "Posts in this blog ",
                             "fr": "Posts sur ce blog"}
 
 
-def format_element(bfo):
+def format_element(bfo, latest_record_number=3, use_format='HB'):
     """
     Displays the latest posts on a blog and it also offers
     a link to see all the posts of the corresponding blog
@@ -45,20 +45,29 @@ def format_element(bfo):
     out = ""
     if blog_posts_recids:
         # let's print just the 3 latest posts
-        latest_blog_posts_recids = blog_posts_recids[:3]
+        if latest_record_number:
+            latest_blog_posts_recids = blog_posts_recids[:latest_record_number]
+        else:
+            latest_blog_posts_recids = blog_posts_recids
+
         try:
             out += "<h4>%s</h4>" % cfg_messages["in_issue"][current_language]
         except: # in english by default
             out += "<h4>%s</h4>" % cfg_messages["in_issue"]['en']
 
         for post_recid in latest_blog_posts_recids:
-            out += call_bibformat(post_recid, format='HB')
+            out += call_bibformat(post_recid, format=use_format)
+
+        if not latest_record_number:
+            # All posts are already displayed
+            return out
 
         all_posts = ""
-        all_blog_posts_recids = blog_posts_recids[3:]
+        all_blog_posts_recids = blog_posts_recids[latest_record_number:]
+
         if all_blog_posts_recids:
             for post_recid in all_blog_posts_recids:
-                all_posts += call_bibformat(post_recid, format='HB')
+                all_posts += call_bibformat(post_recid, format=use_format)
 
             out += """
                 <script type="text/javascript">

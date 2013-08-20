@@ -23,7 +23,7 @@ from invenio.bibformat_engine import BibFormatObject
 from invenio.config import CFG_SITE_URL
 
 
-def format_element(bfo):
+def format_element(bfo, only_image=False):
     """
     Displays the snapshot
     """
@@ -39,6 +39,9 @@ def format_element(bfo):
             snapshot_url = f['u']
 
     img = """<img src="%s"> """ % snapshot_url
+    if only_image:
+        return img
+
     out = """<div class="well well-small modal-margin"> 
             <a href="#SnapshotModal" data-toggle="modal"><div class="snapshot-thumb">%s</div> <small>
             <p>This is a snapshot of this blog as it appeared when it was archived. Click to enlarge</p></small></a></div> """ % (img)
