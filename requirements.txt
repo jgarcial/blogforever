@@ -23,3 +23,5 @@ git+git://github.com/romanchyla/workflow.git@e41299579501704b1486c72cc2509a9f82e
 requests==1.2.1
 fs==0.4.0
 bagit==1.2.1
+bleach==1.1.5
+suds==0.4
