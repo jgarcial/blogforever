@@ -50,4 +50,4 @@ def template_context_function(id_bibrec, id_user):
                                          id_bibrec=id_bibrec,
                                          record_tags=tags)
     else:
-        return None
+        return ""
