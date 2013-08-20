@@ -3613,6 +3613,16 @@ class Template:
         out = """\n</mets>"""
         return out
 
+    def tmpl_xml_timeline_prologue(self):
+        """Creates XML timeline prologue."""
+        out = """<data>\n"""
+        return out
+
+    def tmpl_xml_timeline_epilogue(self):
+        """Creates XML timeline epilogue."""
+        out = """\n</data>"""
+        return out
+
     def tmpl_xml_mods_prologue(self):
         """Creates XML MODS prologue."""
         out = """<modsCollection xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"\n
