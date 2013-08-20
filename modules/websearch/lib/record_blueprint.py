@@ -177,6 +177,8 @@ def bagit(recid):
     if not path:
         archive_record(recid)
         path = get_record(recid)
+        if not path:
+            return render_template('record_metadata.html')
     return send_file(path, mimetype="application/zip", as_attachment=True, attachment_filename=os.path.basename(path))
 
 from invenio.bibrank_citation_searcher import calculate_cited_by_list,\
