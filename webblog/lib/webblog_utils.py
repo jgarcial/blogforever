@@ -22,6 +22,7 @@ Various utilities for WebBlog, e.g. config parser, etc.
 """
 
 from invenio.search_engine_utils import get_fieldvalues
+from invenio.webbasket_dblayer import get_basket_recids
 from invenio.websearch_instantbrowse import instantbrowse_manager
 from invenio.pluginutils import PluginContainer
 import os
@@ -276,3 +277,59 @@ def check_submitted_blog_urls_status(client):
                         raise Exception("The submitted URL and and 'from URI' parameter do not match ")
             else: # the blog is in the PROVISIONAL BLOGS collection but it was never crawled by the spider
                  _delete_provisional_blog(recid)
+
+
+def extend_with_blog_posts(recids):
+    """
+    Extends given ids with the blogposts of given blog ids
+    @param recids:
+    @return:
+    """
+    blog_posts = []
+    for i in range(len(recids)):
+        recids[i] = int(recids[i])
+        collection = get_fieldvalues(recids[i], '980__a')
+        if collection and collection[0] == 'BLOG':
+            blog_posts.extend(get_posts(recids[i]))
+
+    recids.extend(blog_posts)
+
+    # Remove duplicated record ids.
+    recids = list(set(recids))
+
+    return recids
+
+
+def get_related_records_in_basket(recid, bsk_id):
+    """
+    Finds all records which are in same blog and same basket with given recid
+
+    @param recid:
+    @param bsk_id:
+
+    @return: list of the record ids
+    """
+    try:
+        basket_recids = get_basket_recids(bsk_id)
+        basket_recids = [i[0] for i in basket_recids]
+    except:
+        return []
+
+    collection = get_fieldvalues(recid, '980__a')
+    if collection:
+        collection = collection[0]
+
+    blog_id = 0
+
+    if collection == 'BLOG':
+        blog_id = recid
+    elif collection == 'BLOGPOST':
+        blog_id = get_parent_blog(recid)
+
+    if blog_id > 0 and blog_id in basket_recids:
+        post_ids = get_posts(blog_id)
+        post_ids.insert(0, blog_id)
+
+        return [recid for recid in post_ids if recid in basket_recids]
+
+    return []
