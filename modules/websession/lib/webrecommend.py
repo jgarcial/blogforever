@@ -65,12 +65,23 @@ def get_recommended_content(uid):
                                     key=lambda y: recommended[y],
                                     reverse=True)
 
-    return [{"id": record_id,
-             "title": get_fieldvalues(record_id, "245___")[0]
-                      .decode("utf-8", "replace")}
-            for record_id
-            in recommended_record_ids[:CFG_RECOMMENDED_CONTENT_NUMBER]
-            if recommended[record_id]]
+    res = []
+    for record_id in recommended_record_ids[:CFG_RECOMMENDED_CONTENT_NUMBER]:
+        try:
+            recommended[record_id]
+            res.append({"id": record_id,
+                        "title": get_fieldvalues(record_id, "245___")[0]
+                        .decode("utf-8", "replace")})
+        except:
+            pass
+    return res
+    
+    #    return [{"id": record_id,
+    #             "title": get_fieldvalues(record_id, "245___")[0]
+    #                      .decode("utf-8", "replace")}
+    #            for record_id
+    #            in recommended_record_ids[:CFG_RECOMMENDED_CONTENT_NUMBER]
+    #            if recommended[record_id]]
 
 
 def get_query_terms(uid):
