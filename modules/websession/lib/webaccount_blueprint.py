@@ -162,7 +162,7 @@ def register():
     form = RegisterForm(request.values, csrf_enabled=False)
     #uid = current_user.get_id()
 
-    title = _("Register")
+    title = ""
     messages = []
     state = ""
 
