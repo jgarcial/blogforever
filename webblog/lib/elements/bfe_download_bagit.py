@@ -26,7 +26,7 @@ __revision__ = "$Id$"
 
 from invenio.urlutils import create_html_link
 from invenio.messages import gettext_set_language
-from invenio.config import CFG_SITE_SECURE_URL
+from invenio.config import CFG_SITE_URL
 
 def format_element(bfo, style):
     """
@@ -48,7 +48,7 @@ def format_element(bfo, style):
 
     label = _("Download BagIt")
     
-    out += create_html_link(CFG_SITE_SECURE_URL + "/record/"+str(recid)+"/bagit",
+    out += create_html_link(CFG_SITE_URL + "/record/"+str(recid)+"/bagit",
                               {},
                               link_label = label,
                               linkattrd = linkattrd)

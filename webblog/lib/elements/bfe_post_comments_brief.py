@@ -22,7 +22,7 @@ BibFormat Element - displays the number of comments
 for the corresponding post
 """
 
-from invenio.config import CFG_SITE_SECURE_URL
+from invenio.config import CFG_SITE_URL
 from invenio.webblog_utils import get_comments
 
 def format_element(bfo):
@@ -38,7 +38,7 @@ def format_element(bfo):
     out = ""
     if post_comments_recids:
         out = """| <i class="icon-col-Comments"></i> <span><a href="%s/search?p=773__w:%s">%s</a></span>""" % \
-                (CFG_SITE_SECURE_URL, this_recid, message)
+                (CFG_SITE_URL, this_recid, message)
     # else:
         # out = """<span>No comments yet</span>"""
     return out

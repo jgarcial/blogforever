@@ -20,7 +20,7 @@
 """
 
 __revision__ = "$Id$"
-from invenio.config import CFG_SITE_SECURE_URL
+from invenio.config import CFG_SITE_URL
 from cgi import escape
 from invenio.webblog_utils import get_parent_post
 from invenio.bibformat_engine import BibFormatObject
@@ -54,7 +54,7 @@ def format_element(bfo, highlight="no", multilang='no'):
     this_recid = bfo.control_field('001')
     current_language = bfo.lang
 
-    out = """<span><a href="%s/record/%s?ln=%s">%s</a></span>""" % (CFG_SITE_SECURE_URL, this_recid, current_language, escape(title))
+    out = """<span><a href="%s/record/%s?ln=%s">%s</a></span>""" % (CFG_SITE_URL, this_recid, current_language, escape(title))
 
     return out
 

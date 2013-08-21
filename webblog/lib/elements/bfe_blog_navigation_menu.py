@@ -20,7 +20,7 @@
 BibFormat Element - creates the blog navigation menu
 """
 from invenio.bibformat_engine import BibFormatObject
-from invenio.config import CFG_SITE_SECURE_URL
+from invenio.config import CFG_SITE_URL
 from invenio.webblog_utils import get_parent_blog, get_posts, transform_format_date
 import datetime
 
@@ -77,7 +77,7 @@ def format_element(bfo):
                     title = temp_rec.fields('245__a')[0]
                 except:
                     title = 'Unknown title'
-                menu_out += '<li><a href="%s/record/%s?ln=%s">%s</a><span><small>%s</small></span></li>' % (CFG_SITE_SECURE_URL,
+                menu_out += '<li><a href="%s/record/%s?ln=%s">%s</a><span><small>%s</small></span></li>' % (CFG_SITE_URL,
                                                                                                             recid,
                                                                                                             bfo.lang,
                                                                                                             title, posted_date)
@@ -105,7 +105,7 @@ def format_element(bfo):
                         title = temp_rec.fields('245__a')[0]
                     except:
                         title = 'Unknown title'
-                    out += '<li><a href="%s/record/%s?ln=%s">%s</a><br/><span><small>%s</small></span></li>' % (CFG_SITE_SECURE_URL,
+                    out += '<li><a href="%s/record/%s?ln=%s">%s</a><br/><span><small>%s</small></span></li>' % (CFG_SITE_URL,
                                                                                                            recid,
                                                                                                            bfo.lang,
                                                                                                            title, posted_date)

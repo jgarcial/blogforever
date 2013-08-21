@@ -21,7 +21,7 @@ BibFormat Element - creates a menu containing all the links in a post
 """
 
 
-from invenio.config import CFG_SITE_SECURE_URL
+from invenio.config import CFG_SITE_URL
 from invenio.search_engine_utils import get_fieldvalues
 from invenio.search_engine import perform_request_search
 
@@ -79,7 +79,7 @@ Returns all the links used as references in a post
                     except:
                         title = "Unknown title"
                     archive_link = '<a href=%s/record/%s>%s</a>' % \
-                                (CFG_SITE_SECURE_URL, recid_in_archive[0], title)
+                                (CFG_SITE_URL, recid_in_archive[0], title)
                     menu_out += 'content: "%s" });}); </script>' % archive_link
                 menu_out += """</li>"""
         menu_out += """<li class="divider"></li></ul></div></div>"""

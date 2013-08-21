@@ -21,7 +21,6 @@
 BibFormat Element - displays license name and url if available
 """
 
-from invenio.config import CFG_SITE_SECURE_URL
 from invenio.urlutils import create_html_link
 from invenio.webblog_utils import get_parent_blog
 from invenio.bibformat_engine import BibFormatObject

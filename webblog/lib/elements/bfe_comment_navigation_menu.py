@@ -22,7 +22,7 @@ BibFormat Element - creates the comment navigation menu
 """
 
 from invenio.bibformat_engine import BibFormatObject
-from invenio.config import CFG_SITE_SECURE_URL
+from invenio.config import CFG_SITE_URL
 from invenio.webblog_utils import get_parent_post, get_comments
 from invenio.bibformat_utils import get_contextual_content
 import datetime
@@ -84,7 +84,7 @@ def format_element(bfo):
                     except:
                         this_author = ""
                     menu_out += '<li><a href="%s/record/%s?ln=%s"><span><b><i class="icon-user"></i>%s</b> %s [...]</spam></a></li>' % \
-                                    (CFG_SITE_SECURE_URL, recid, bfo.lang, author, limit_content)
+                                    (CFG_SITE_URL, recid, bfo.lang, author, limit_content)
             menu_out += """<li class="divider"></li></ul></div></div>"""
 
     return menu_out

@@ -21,7 +21,7 @@
 BibFormat Element - displays tags on brief format records
 """
 
-from invenio.config import CFG_SITE_SECURE_URL
+from invenio.config import CFG_SITE_URL
 from invenio.urlutils import create_html_link
 
 
@@ -37,7 +37,7 @@ def format_element(bfo):
     if tags:
         out = """| <i class="icon-tags"></i>  """
         for tag in tags:
-            url = create_html_link(CFG_SITE_SECURE_URL + "/search", \
+            url = create_html_link(CFG_SITE_URL + "/search", \
                                     {'p': '653__1:"%s"' % tag, \
                                      'ln': current_language}, tag, linkattrd = {'style':"color:white"})
             out += '<span class="label">%s</span>&nbsp;&nbsp;' % url

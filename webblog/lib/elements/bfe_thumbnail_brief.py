@@ -20,7 +20,7 @@
 BibFormat Element - thumbnail
 """
 from invenio.bibformat_engine import BibFormatObject
-from invenio.config import CFG_SITE_SECURE_URL
+from invenio.config import CFG_SITE_URL
 
 
 def format_element(bfo):
@@ -39,7 +39,7 @@ def format_element(bfo):
         if f['u'].find('Thumbnail') > -1:
             snapshot_url = f['u']
 
-    record_url = "%s/record/%s?ln=%s" % (CFG_SITE_SECURE_URL, this_recid, current_language)
+    record_url = "%s/record/%s?ln=%s" % (CFG_SITE_URL, this_recid, current_language)
     out = """<a href='%s'>
                 <div style="background-image:url(%s);display:inline-block;height:100px;width:100px"></div>
             </a>""" % (record_url, snapshot_url)

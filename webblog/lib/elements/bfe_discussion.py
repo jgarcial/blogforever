@@ -21,7 +21,7 @@
 BibFormat Element - displays a link to the discussion on the record
 """
 
-from invenio.config import CFG_SITE_SECURE_URL, \
+from invenio.config import CFG_SITE_URL, \
             CFG_WEBCOMMENT_ALLOW_COMMENTS, \
             CFG_WEBSEARCH_SHOW_COMMENT_COUNT
 from invenio.webcommentadminlib import get_nb_comments
@@ -38,7 +38,7 @@ def format_element(bfo):
         num_comments = get_nb_comments(this_recid)
         if num_comments > 0:
             message = """Follow discussion """
-            comments_url = create_html_link(CFG_SITE_SECURE_URL +\
+            comments_url = create_html_link(CFG_SITE_URL +\
                                            "/record/%s/comments" % this_recid, {}, message)
             out = """| <i class="icon-group"></i>  """ +  comments_url
     return out

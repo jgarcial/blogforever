@@ -21,7 +21,7 @@
 BibFormat Element - displays a link to the reviews of the record
 """
 
-from invenio.config import CFG_SITE_SECURE_URL, \
+from invenio.config import CFG_SITE_URL, \
             CFG_WEBCOMMENT_ALLOW_COMMENTS, \
             CFG_WEBSEARCH_SHOW_REVIEW_COUNT
 from invenio.webcommentadminlib import get_nb_reviews
@@ -38,7 +38,7 @@ def format_element(bfo):
         num_reviews = get_nb_reviews(this_recid)
         if num_reviews > 0:
             message = """%i Reviews""" % num_reviews
-            reviews_url = create_html_link(CFG_SITE_SECURE_URL +\
+            reviews_url = create_html_link(CFG_SITE_URL +\
                                            "/record/%s/reviews" % this_recid, {}, message)
             out = """| <i class="icon-eye-open"></i>  """ +  reviews_url
     return out

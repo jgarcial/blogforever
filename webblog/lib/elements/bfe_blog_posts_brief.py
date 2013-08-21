@@ -22,7 +22,7 @@ BibFormat Element - displays the number of posts
 for the corresponding blog
 """
 
-from invenio.config import CFG_SITE_SECURE_URL
+from invenio.config import CFG_SITE_URL
 from invenio.webblog_utils import get_posts
 from invenio.urlutils import create_html_link
 
@@ -39,7 +39,7 @@ def format_element(bfo):
     out = ""
     if blog_posts_recids:
         out = '<span>'
-        out += create_html_link(CFG_SITE_SECURE_URL + "/search", \
+        out += create_html_link(CFG_SITE_URL + "/search", \
                                 {'cc': 'Posts', 'p': '760__w:%s' % this_recid, \
                                  'ln': current_language}, \
                                 message)

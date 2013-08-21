@@ -21,7 +21,7 @@
 BibFormat Element - displays topic on brief format blog records
 """
 
-from invenio.config import CFG_SITE_SECURE_URL
+from invenio.config import CFG_SITE_URL
 from invenio.urlutils import create_html_link
 
 
@@ -37,7 +37,7 @@ def format_element(bfo):
     if topics:
         out = """| <i class="icon-picture"></i>  """
         for topic in topics:
-            url = create_html_link(CFG_SITE_SECURE_URL + "/search", \
+            url = create_html_link(CFG_SITE_URL + "/search", \
                                     {'p': '654__a:"%s"' % topic, \
                                      'ln': current_language}, topic, linkattrd = {'style':"color:white"})
             out += '<span class="label label-success">%s</span>&nbsp;&nbsp;' % url
