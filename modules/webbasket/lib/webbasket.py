@@ -69,6 +69,9 @@ from invenio.websearch_external_collections_getter import HTTPAsyncPageGetter, a
 from invenio.errorlib import register_exception
 from invenio.search_engine import search_unit
 from invenio.htmlutils import remove_html_markup, unescape
+from invenio.webblog_utils import extend_with_blog_posts
+from invenio.search_engine_utils import get_fieldvalues
+
 
 ########################################
 ### Display public baskets and notes ###
@@ -1745,6 +1748,7 @@ def perform_request_add(uid,
     _ = gettext_set_language(ln)
 
     if successful_add:
+
         body = webbasket_templates.tmpl_add(recids=recids,
                                             category=category,
                                             bskid=bskid,
@@ -1764,6 +1768,8 @@ def perform_request_add(uid,
 
     if type(recids) is not list:
         recids = [recids]
+
+    recids = extend_with_blog_posts(recids)
 
     validated_recids = []
 
@@ -2943,3 +2949,24 @@ def __create_search_box(uid,
                                                             ln=ln)
 
     return search_box
+
+
+def perform_request_confirm_delete(selected_recid, related_recids,
+                                   category="", topic="", group="",
+                                   bsk_id="", ln=CFG_SITE_LANG):
+    """
+    Displays confirmation page for deleting records from a basket if there are
+    other records being in the same blog of deleted record in the same basket.
+
+    @param selected_recid:
+    @param related_recids:
+    @param category:
+    @param topic:
+    @param group:
+    @param bsk_id:
+    @param ln:
+    @return:
+    """
+    return webbasket_templates.tmpl_delete_related_record_confirmation(
+        selected_recid, related_recids, category=category, topic=topic,
+        group=group, bsk_id=bsk_id, ln=ln)

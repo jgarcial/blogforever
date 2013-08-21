@@ -61,12 +61,13 @@ from invenio.webbasket import \
      wash_group, \
      perform_request_export_xml, \
      page_start, \
-     page_end
+     page_end, \
+     perform_request_confirm_delete
 from invenio.webbasket_config import CFG_WEBBASKET_CATEGORIES, \
                                      CFG_WEBBASKET_ACTIONS, \
                                      CFG_WEBBASKET_SHARE_LEVELS
 from invenio.webbasket_dblayer import get_basket_name, \
-     get_max_user_rights_on_basket
+     get_max_user_rights_on_basket, get_all_items_in_user_personal_baskets, get_basket_topic
 from invenio.urlutils import get_referer, redirect_to_url, make_canonical_urlargd
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.webstat import register_customevent
@@ -77,6 +78,7 @@ from invenio.access_control_engine import acc_authorize_action
 from invenio.htmlutils import is_html_text_editor_installed
 from invenio.ckeditor_invenio_connector import process_CKEditor_upload, send_response
 from invenio.bibdocfile import stream_file
+from invenio.webblog_utils import get_related_records_in_basket
 
 class WebInterfaceBasketCommentsFiles(WebInterfaceDirectory):
     """Handle upload and access to files for comments in WebBasket.
@@ -271,7 +273,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                 'unsubscribe',
                 'write_public_note',
                 'save_public_note',
-                'attachments']
+                'attachments',
+                'confirm_delete']
 
     attachments = WebInterfaceBasketCommentsFiles()
 
@@ -908,6 +911,31 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         url += '/yourbaskets/display?category=%s&topic=%s&group=%i&bskid=%i&ln=%s' % \
                (argd['category'], urllib.quote(argd['topic']), argd['group'], argd['bskid'], argd['ln'])
         if argd['action'] == CFG_WEBBASKET_ACTIONS['DELETE']:
+            related_records = get_related_records_in_basket(argd['recid'],
+                                                            argd['bskid'])
+
+            if related_records:
+                title = "Confirm Deletion"
+                body = perform_request_confirm_delete(argd['recid'],
+                                                      related_records,
+                                                      category=argd[
+                                                          'category'],
+                                                      topic=urllib.quote(
+                                                          argd['topic']),
+                                                      group=argd['group'],
+                                                      bsk_id=argd['bskid'],
+                                                      ln=argd['ln'])
+                return page(title=title,
+                            body=body,
+                            #navtrail=navtrail + navtrail_end,
+                            uid=uid,
+                            lastupdated=__lastupdated__,
+                            language=argd['ln'],
+                            req=req,
+                            #navmenuid='yourbaskets',
+                            #of=argd['of'],
+                            secure_page_p=1)
+
             delete_record(uid, argd['bskid'], argd['recid'])
             redirect_to_url(req, url)
         elif argd['action'] == CFG_WEBBASKET_ACTIONS['UP']:
@@ -1701,3 +1729,24 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     of          = argd['of'],
                     navtrail_append_title_p = 0,
                     secure_page_p=1)
+
+    def confirm_delete(self, req, form):
+        argd = wash_urlargd(form, {'recid': (list, []),
+                                   'category': (str, ""),
+                                   'topic': (str, ""),
+                                   'group': (str, ""),
+                                   'bskid': (str, ""),
+                                   'ln': (str, CFG_SITE_LANG)})
+
+        url = CFG_SITE_SECURE_URL
+        url += ('/yourbaskets/display?category=%s&topic=%s&group=%s&bskid=%s'
+                '&ln=%s' %
+               (argd['category'], argd['topic'], argd['group'],
+                argd['bskid'], argd['ln']))
+
+        uid = getUid(req)
+
+        for recid in argd['recid']:
+            delete_record(uid, argd['bskid'], recid)
+
+        redirect_to_url(req, url)

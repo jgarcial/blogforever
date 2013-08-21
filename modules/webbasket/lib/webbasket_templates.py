@@ -16,6 +16,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """ Templating for webbasket module """
+from invenio.search_engine import call_bibformat
 
 __revision__ = "$Id$"
 
@@ -4292,6 +4293,69 @@ class Template:
 </div>""" % (export_as_html,)
 
         return out
+
+    def tmpl_delete_related_record_confirmation(self,
+                                                selected_recid,
+                                                related_recids,
+                                                category="",
+                                                topic="",
+                                                group="",
+                                                bsk_id="",
+                                                ln=CFG_SITE_LANG):
+        """
+        Displays confirmation page for deleting records from a basket if there are
+        other records being in the same blog of deleted record in the same basket.
+        """
+        action_url = (CFG_SITE_SECURE_URL + "/yourbaskets/confirm_delete" +
+                      "?category=%s&topic=%s&group=%i&bskid=%i&ln=%s" % (
+                      category, topic, group, bsk_id, ln))
+
+        out = "<form method='post' action='%s'>" % action_url
+
+        out += "<input class='btn btn-primary' type='submit' value='Confirm'/>"
+        out += "<a href='#' class='btn select-toggle pull-right'>Select " \
+               "All</a>"
+
+        out += "<table class='table table-striped'>"
+
+        for recid in related_recids:
+            content = call_bibformat(recid, 'HB')
+            out += """
+<tr>
+    <td>
+       <input type="checkbox" name="recid" value="%(recid)s" %(checked)s>
+    </td>
+    <td>
+        %(content)s
+    </td>
+</tr>
+            """ % {'content': content,
+                   'recid': recid,
+                   'checked': recid == selected_recid and 'checked="checked"'
+                   or ''}
+
+        out += "</table>"
+
+        out += "<input class='btn btn-primary' type='submit' value='Confirm'/>"
+        out += "<a href='#' class='btn select-toggle pull-right'>Select " \
+               "All</a>"
+
+        out += "</form>"
+
+        script = """
+<script>
+$(document).ready(function(){
+    $('.select-toggle').toggle(function(){
+        $('input:checkbox').attr('checked','checked');
+        $(this).html('Deselect All');
+    },function(){
+        $('input:checkbox').removeAttr('checked');
+        $(this).html('Select All');
+    })
+})
+</script>"""
+
+        return out + script
 
 #############################################
 ########## SUPPLEMENTARY FUNCTIONS ##########

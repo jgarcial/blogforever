@@ -1164,6 +1164,24 @@ def get_external_colid_and_url(recid):
         else:
             return 0
 
+def get_basket_recids(bsk_id):
+    """
+    @param bsk_id: ID of the basket
+    @type bsk_id: int
+
+    @return: IDs of the records of given basket.
+    @rtype: list
+    """
+    query = """
+        SELECT  id_bibrec_or_bskEXTREC
+        FROM    bskREC
+        WHERE   id_bskBASKET=%s"""
+
+    params = (bsk_id, )
+
+    res = run_sql(query, params)
+    return res
+
 ############################ Group baskets ####################################
 
 def get_group_baskets_info_for_group(grpid):
