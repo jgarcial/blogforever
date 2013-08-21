@@ -45,15 +45,15 @@ class EasySearchForm(InvenioBaseForm):
     author = AutocompleteField(_('Author'), data_provide="typeahead-url",
         data_source=lambda: url_for('search.autocomplete', field='exactauthor'))
     title = TextField(_('Title'))
-    rn = AutocompleteField(_('Report number'), data_provide="typeahead-url",
-        data_source=lambda: url_for('search.autocomplete', field='reportnumber'))
-    aff = AutocompleteField(_('Affiliation'), data_provide="typeahead-url",
-        data_source=lambda: url_for('search.autocomplete', field='affiliation'))
-    cn = AutocompleteField(_('Collaboration'), data_provide="typeahead-url",
-        data_source=lambda: url_for('search.autocomplete', field='collaboration'))
-    k = AutocompleteField(_('Keywords'), data_provide="typeahead-url",
-        data_source=lambda: url_for('search.autocomplete', field='keyword'))
-    journal = FormField(JournalForm, widget=RowWidget())
+#    rn = AutocompleteField(_('Report number'), data_provide="typeahead-url",
+#        data_source=lambda: url_for('search.autocomplete', field='reportnumber'))
+#    aff = AutocompleteField(_('Affiliation'), data_provide="typeahead-url",
+#        data_source=lambda: url_for('search.autocomplete', field='affiliation'))
+#    cn = AutocompleteField(_('Collaboration'), data_provide="typeahead-url",
+#        data_source=lambda: url_for('search.autocomplete', field='collaboration'))
+#    k = AutocompleteField(_('Keywords'), data_provide="typeahead-url",
+#        data_source=lambda: url_for('search.autocomplete', field='keyword'))
+#    journal = FormField(JournalForm, widget=RowWidget())
 
 
 def get_collection():
